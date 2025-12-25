@@ -1,0 +1,76 @@
+/* ===== Platform-Style Theme - Layout ===== */
+.page {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    background: #f8f9fc;
+    min-height: 100vh;
+}
+
+main {
+    flex: 1;
+    background: #f8f9fc;
+}
+
+.sidebar {
+    background: linear-gradient(180deg, #4361ee 0%, #3a56d4 100%);
+}
+
+.top-row {
+    background: #4361ee;
+    border-bottom: none;
+    justify-content: flex-end;
+    height: 3.5rem;
+    display: flex;
+    align-items: center;
+}
+
+    .top-row ::deep a, .top-row .btn-link {
+        white-space: nowrap;
+        margin-left: 1.5rem;
+        color: #ffffff;
+    }
+
+    .top-row a:first-child {
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+@media (max-width: 640.98px) {
+    .top-row:not(.auth) {
+        display: none;
+    }
+
+    .top-row.auth {
+        justify-content: space-between;
+    }
+
+    .top-row a, .top-row .btn-link {
+        margin-left: 0;
+    }
+}
+
+@media (min-width: 641px) {
+    .page {
+        flex-direction: row;
+    }
+
+    .sidebar {
+        width: 220px;
+        height: 100vh;
+        position: sticky;
+        top: 0;
+    }
+
+    .top-row {
+        position: sticky;
+        top: 0;
+        z-index: 1;
+    }
+
+    .top-row, article {
+        padding-left: 2rem !important;
+        padding-right: 1.5rem !important;
+    }
+}
+

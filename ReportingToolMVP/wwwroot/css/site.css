@@ -1,0 +1,131 @@
+@import url('open-iconic/font/css/open-iconic-bootstrap.min.css');
+
+/* ===== Platform-Style Theme - Global Styles ===== */
+:root {
+    /* Sidebar Colors */
+    --sidebar-bg: #4361ee;
+    --sidebar-hover: #3a56d4;
+    --sidebar-active: #2d46b8;
+    --sidebar-text: #ffffff;
+    --sidebar-text-muted: rgba(255, 255, 255, 0.7);
+    
+    /* Content Area */
+    --bg-light: #f8f9fc;
+    --bg-white: #ffffff;
+    --text-primary: #1a1a2e;
+    --text-secondary: #6c757d;
+    --text-muted: #adb5bd;
+    
+    /* Accent Colors */
+    --accent-primary: #9b59b6;
+    --accent-secondary: #00d4aa;
+    --accent-blue: #4361ee;
+    
+    /* Borders */
+    --border-color: #e9ecef;
+    --border-light: #f1f3f5;
+    
+    /* Shadows */
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+html, body {
+    font-family: 'Segoe UI', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background-color: var(--bg-light);
+    color: var(--text-primary);
+    margin: 0;
+    padding: 0;
+}
+
+a, .btn-link {
+    color: var(--accent-blue);
+    text-decoration: none;
+}
+
+a:hover {
+    color: var(--sidebar-hover);
+}
+
+/* ===== Page Layout ===== */
+.page {
+    display: flex;
+    min-height: 100vh;
+}
+
+.sidebar {
+    width: 220px;
+    background: linear-gradient(180deg, var(--sidebar-bg) 0%, #3a56d4 100%);
+    min-height: 100vh;
+}
+
+main {
+    flex: 1;
+    background-color: var(--bg-light);
+}
+
+.content {
+    padding: 0;
+}
+
+/* ===== Buttons ===== */
+.btn-primary {
+    background-color: var(--accent-primary);
+    border-color: var(--accent-primary);
+    color: #fff;
+    font-weight: 500;
+}
+
+.btn-primary:hover {
+    background-color: #8e44ad;
+    border-color: #8e44ad;
+}
+
+.btn-secondary {
+    background-color: var(--accent-blue);
+    border-color: var(--accent-blue);
+    color: #fff;
+}
+
+.btn-outline-secondary {
+    border-color: var(--border-color);
+    color: var(--text-secondary);
+}
+
+/* ===== Forms ===== */
+.form-control {
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    padding: 0.5rem 0.75rem;
+}
+
+.form-control:focus {
+    border-color: var(--accent-blue);
+    box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.15);
+}
+
+/* ===== Alerts ===== */
+.alert-danger {
+    background-color: #fef2f2;
+    border-color: #fecaca;
+    color: #dc2626;
+}
+
+.alert-info {
+    background-color: #eff6ff;
+    border-color: #bfdbfe;
+    color: #2563eb;
+}
+
+#blazor-error-ui {
+    background: #fff;
+    border-top: 3px solid #dc2626;
+    bottom: 0;
+    display: none;
+    left: 0;
+    padding: 1rem;
+    position: fixed;
+    width: 100%;
+    z-index: 1000;
+}
+

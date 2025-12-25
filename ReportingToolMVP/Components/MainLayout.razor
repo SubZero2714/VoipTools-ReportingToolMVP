@@ -1,0 +1,46 @@
+@inherits LayoutComponentBase
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>VoIPTools Report Builder</title>
+    <base href="/" />
+    <link rel="stylesheet" href="css/bootstrap/bootstrap.min.css" />
+    <link rel="stylesheet" href="css/site.css" />
+    <link rel="stylesheet" href="_content/DevExpress.Blazor.Themes/blazing-berry.bs5.min.css" />
+    <link rel="stylesheet" href="reportbuilder.css" />
+    <HeadOutlet @rendermode="InteractiveServer" />
+</head>
+
+<body>
+    <div class="page">
+        <div class="sidebar">
+            <NavMenu />
+        </div>
+
+        <main>
+            <article class="content">
+                @Body
+            </article>
+        </main>
+    </div>
+
+    <script src="_framework/blazor.web.js"></script>
+    <script src="_content/DevExpress.Blazor/dx-blazor.js"></script>
+    <script>
+        // File download function for exports
+        window.downloadFile = (fileName, base64Content, mimeType) => {
+            const link = document.createElement('a');
+            link.href = `data:${mimeType};base64,${base64Content}`;
+            link.download = fileName;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        };
+    </script>
+</body>
+
+</html>

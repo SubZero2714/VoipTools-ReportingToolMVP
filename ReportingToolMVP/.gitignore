@@ -1,0 +1,45 @@
+# Build outputs
+bin/
+obj/
+.vs/
+.vscode/
+*.user
+*.suo
+*.sln.docstates
+
+# NuGet
+*.nupkg
+*.snupkg
+.nuget/
+
+# IDEs
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Configuration (NEVER commit real passwords)
+appsettings.json
+appsettings.Development.json
+
+# Logs
+logs/
+*.log
+
+# Build artifacts
+dist/
+build/
+
+# Dependencies
+node_modules/
+package-lock.json
+
+# Misc
+.env
+.env.local
+*.bak
+*.tmp

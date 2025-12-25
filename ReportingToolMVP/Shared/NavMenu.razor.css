@@ -1,0 +1,77 @@
+/* ===== Platform-Style Theme - Navigation ===== */
+.navbar-toggler {
+    background-color: rgba(255, 255, 255, 0.15);
+    border: none;
+}
+
+.navbar-toggler:hover {
+    background-color: rgba(255, 255, 255, 0.25);
+}
+
+.top-row {
+    height: 3.5rem;
+    background: #4361ee;
+    border-bottom: none;
+}
+
+.navbar-brand {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #ffffff !important;
+    letter-spacing: 0.3px;
+}
+
+.oi {
+    width: 1.5rem;
+    font-size: 1rem;
+    vertical-align: text-top;
+    top: -2px;
+    color: inherit;
+}
+
+.nav-item {
+    font-size: 0.875rem;
+    padding-bottom: 0.25rem;
+}
+
+    .nav-item:first-of-type {
+        padding-top: 1rem;
+    }
+
+    .nav-item:last-of-type {
+        padding-bottom: 1rem;
+    }
+
+    .nav-item ::deep a {
+        color: rgba(255, 255, 255, 0.85);
+        border-radius: 6px;
+        height: 2.75rem;
+        display: flex;
+        align-items: center;
+        line-height: 2.75rem;
+        margin: 0 0.75rem;
+        padding-left: 0.75rem;
+        transition: all 0.15s ease;
+    }
+
+.nav-item ::deep a.active {
+    background: rgba(255, 255, 255, 0.2);
+    color: #ffffff;
+    font-weight: 600;
+}
+
+.nav-item ::deep a:hover {
+    background: rgba(255, 255, 255, 0.15);
+    color: #ffffff;
+}
+
+@media (min-width: 641px) {
+    .navbar-toggler {
+        display: none;
+    }
+
+    .collapse {
+        display: block;
+    }
+}
+
