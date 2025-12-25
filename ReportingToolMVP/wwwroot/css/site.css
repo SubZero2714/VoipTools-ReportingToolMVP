@@ -54,14 +54,15 @@ a:hover {
 }
 
 .sidebar {
-    width: 220px;
     background: linear-gradient(180deg, var(--sidebar-bg) 0%, #3a56d4 100%);
     min-height: 100vh;
+    flex-shrink: 0;
 }
 
 main {
     flex: 1;
     background-color: var(--bg-light);
+    min-width: 0; /* Prevents flex child from overflowing */
 }
 
 .content {

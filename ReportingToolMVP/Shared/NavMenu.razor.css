@@ -1,77 +1,128 @@
-/* ===== Platform-Style Theme - Navigation ===== */
-.navbar-toggler {
-    background-color: rgba(255, 255, 255, 0.15);
-    border: none;
+/* ===== Collapsible Sidebar ===== */
+.sidebar-container {
+    display: flex;
+    flex-direction: column;
+    width: 220px;
+    height: 100vh;
+    transition: width 0.3s ease;
 }
 
-.navbar-toggler:hover {
-    background-color: rgba(255, 255, 255, 0.25);
+.sidebar-container.collapsed {
+    width: 60px;
 }
 
+/* Top Row with Brand and Collapse Button */
 .top-row {
-    height: 3.5rem;
-    background: #4361ee;
-    border-bottom: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 56px;
+    padding: 0 12px;
+    background: rgba(0, 0, 0, 0.15);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.navbar-brand {
-    font-size: 1rem;
+.brand-section {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    overflow: hidden;
+}
+
+.brand-icon {
+    font-size: 1.4rem;
+}
+
+.brand-icon-only {
+    font-size: 1.6rem;
+}
+
+.brand-text {
+    font-size: 0.95rem;
     font-weight: 600;
-    color: #ffffff !important;
-    letter-spacing: 0.3px;
-}
-
-.oi {
-    width: 1.5rem;
-    font-size: 1rem;
-    vertical-align: text-top;
-    top: -2px;
-    color: inherit;
-}
-
-.nav-item {
-    font-size: 0.875rem;
-    padding-bottom: 0.25rem;
-}
-
-    .nav-item:first-of-type {
-        padding-top: 1rem;
-    }
-
-    .nav-item:last-of-type {
-        padding-bottom: 1rem;
-    }
-
-    .nav-item ::deep a {
-        color: rgba(255, 255, 255, 0.85);
-        border-radius: 6px;
-        height: 2.75rem;
-        display: flex;
-        align-items: center;
-        line-height: 2.75rem;
-        margin: 0 0.75rem;
-        padding-left: 0.75rem;
-        transition: all 0.15s ease;
-    }
-
-.nav-item ::deep a.active {
-    background: rgba(255, 255, 255, 0.2);
     color: #ffffff;
-    font-weight: 600;
+    white-space: nowrap;
 }
 
-.nav-item ::deep a:hover {
+.collapse-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    background: rgba(255, 255, 255, 0.15);
+    border: none;
+    border-radius: 6px;
+    color: #ffffff;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+}
+
+.collapse-btn:hover {
+    background: rgba(255, 255, 255, 0.25);
+}
+
+.collapse-btn .oi {
+    font-size: 0.75rem;
+}
+
+/* Navigation Menu */
+.nav-menu {
+    display: flex;
+    flex-direction: column;
+    padding: 16px 8px;
+    gap: 4px;
+}
+
+.nav-link-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    color: rgba(255, 255, 255, 0.85);
+    text-decoration: none;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.nav-link-item:hover {
     background: rgba(255, 255, 255, 0.15);
     color: #ffffff;
 }
 
-@media (min-width: 641px) {
-    .navbar-toggler {
-        display: none;
-    }
+.nav-link-item.active {
+    background: rgba(255, 255, 255, 0.2);
+    color: #ffffff;
+    font-weight: 600;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
 
-    .collapse {
-        display: block;
-    }
+.nav-icon {
+    font-size: 1.1rem;
+    width: 20px;
+    text-align: center;
+    flex-shrink: 0;
+}
+
+.nav-text {
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+/* Collapsed State */
+.sidebar-container.collapsed .nav-link-item {
+    justify-content: center;
+    padding: 12px;
+}
+
+.sidebar-container.collapsed .nav-icon {
+    font-size: 1.2rem;
+}
+
+.sidebar-container.collapsed .collapse-btn {
+    margin: 0 auto;
 }
 

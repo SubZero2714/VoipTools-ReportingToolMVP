@@ -1,26 +1,53 @@
-﻿<div class="top-row ps-3 navbar navbar-dark">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="">
-            <span class="brand-icon">📊</span> VoIPTools Reporting
-        </a>
+﻿<div class="sidebar-container @(IsCollapsed ? "collapsed" : "")">
+    <div class="top-row">
+        <div class="brand-section">
+            @if (!IsCollapsed)
+            {
+                <span class="brand-icon">📊</span>
+                <span class="brand-text">VoIPTools Reporting</span>
+            }
+            else
+            {
+                <span class="brand-icon-only">📊</span>
+            }
+        </div>
+        <button class="collapse-btn" @onclick="ToggleSidebar" title="@(IsCollapsed ? "Expand" : "Collapse")">
+            <span class="oi @(IsCollapsed ? "oi-chevron-right" : "oi-chevron-left")"></span>
+        </button>
     </div>
-</div>
 
-<div class="nav-scrollable">
-    <nav class="flex-column">
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="oi oi-home" aria-hidden="true"></span> Home
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="reportbuilder">
-                <span class="oi oi-spreadsheet" aria-hidden="true"></span> Report Builder
-            </NavLink>
-        </div>
+    <nav class="nav-menu">
+        <NavLink class="nav-link-item" href="" Match="NavLinkMatch.All">
+            <span class="nav-icon oi oi-home"></span>
+            @if (!IsCollapsed)
+            {
+                <span class="nav-text">Home</span>
+            }
+        </NavLink>
+        
+        <NavLink class="nav-link-item" href="reportbuilder">
+            <span class="nav-icon oi oi-spreadsheet"></span>
+            @if (!IsCollapsed)
+            {
+                <span class="nav-text">Report Builder</span>
+            }
+        </NavLink>
+
+        <NavLink class="nav-link-item" href="test">
+            <span class="nav-icon oi oi-check"></span>
+            @if (!IsCollapsed)
+            {
+                <span class="nav-text">Test Suite</span>
+            }
+        </NavLink>
     </nav>
 </div>
 
 @code {
-    // Sidebar is always visible on desktop - no collapse needed
+    private bool IsCollapsed = false;
+
+    private void ToggleSidebar()
+    {
+        IsCollapsed = !IsCollapsed;
+    }
 }
