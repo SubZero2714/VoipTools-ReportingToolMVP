@@ -1,0 +1,31 @@
+# .NET
+bin/
+obj/
+*.user
+*.suo
+*.cache
+*.log
+
+# IDE
+.vs/
+.vscode/
+*.swp
+
+# Build outputs
+publish/
+out/
+
+# User-specific files
+appsettings.Development.json
+appsettings.json
+
+# NuGet
+packages/
+*.nupkg
+
+# Test results
+TestResults/
+
+# OS files
+.DS_Store
+Thumbs.db
