@@ -5,6 +5,10 @@ This document tracks all DevExpress Blazor components used in the project.
 ## Package Reference
 ```xml
 <PackageReference Include="DevExpress.Blazor" Version="25.1.6" />
+<PackageReference Include="DevExpress.Blazor.Reporting" Version="25.1.6" />
+<PackageReference Include="DevExpress.Blazor.Reporting.Viewer" Version="25.1.6" />
+<PackageReference Include="DevExpress.Blazor.Reporting.JSBasedControls" Version="25.1.6" />
+<PackageReference Include="DevExpress.AspNetCore.Reporting" Version="25.1.6" />
 ```
 
 ## Theme
@@ -211,3 +215,122 @@ Located in: `wwwroot/reportbuilder.css`
 | Date | Version | Changes |
 |------|---------|---------|
 | 2025-12-25 | 1.0 | Initial DevExpress integration with DxDateEdit, DxListBox, DxComboBox, DxButton, DxGrid, DxChart, DxPieChart |
+| 2025-12-30 | 1.1 | Added DevExpress Reporting - DxReportDesigner and DxReportViewer |
+
+---
+
+## DevExpress Reporting Components
+
+### 8. DxReportDesigner
+**File:** `Components/Pages/ReportDesigner.razor`
+**Purpose:** Visual WYSIWYG report template designer with drag-and-drop functionality
+**NuGet Packages Required:**
+- `DevExpress.Blazor.Reporting` v25.1.6
+- `DevExpress.Blazor.Reporting.Viewer` v25.1.6
+- `DevExpress.Blazor.Reporting.JSBasedControls` v25.1.6
+- `DevExpress.AspNetCore.Reporting` v25.1.6
+
+**Properties Used:**
+- `ReportName` - URL/name of the report to load or create
+- `AllowMDI` - Enable multiple document interface for multiple reports
+- `Height` / `Width` - Component dimensions
+
+**Features:**
+- Drag-and-drop report element placement
+- Data binding to SQL data sources
+- Band-based report structure (Header, Detail, Footer)
+- Property grid for element customization
+- Built-in preview and export
+
+```razor
+<DxReportDesigner ReportName="@CurrentReportName"
+                  AllowMDI="true"
+                  Height="100%"
+                  Width="100%" />
+```
+
+**Required Program.cs Configuration:**
+```csharp
+builder.Services.AddDevExpressBlazorReporting();
+builder.Services.AddDevExpressServerSideBlazorReportViewer();
+builder.Services.AddScoped<ReportStorageWebExtension, FileReportStorageService>();
+app.UseDevExpressBlazorReporting();
+```
+
+---
+
+### 9. DxReportViewer
+**File:** `Components/Pages/ReportViewer.razor`
+**Purpose:** View, print, and export designed reports
+**Properties Used:**
+- `ReportName` - URL/name of the report to display
+- `Height` / `Width` - Component dimensions
+
+**Features:**
+- Report preview with pagination
+- Print functionality
+- Export to PDF, Excel, Word, HTML, etc.
+- Search within report
+- Zoom controls
+
+```razor
+<DxReportViewer ReportName="@CurrentReportName"
+                Height="100%"
+                Width="100%" />
+```
+
+---
+
+### 10. FileReportStorageService
+**File:** `Services/FileReportStorageService.cs`
+**Purpose:** Backend service for storing and retrieving .repx report files
+**Implements:** `ReportStorageWebExtension`
+
+**Key Methods:**
+- `GetData(url)` - Load report definition from file
+- `SetData(report, url)` - Save report to file
+- `SetNewData(report, url)` - Create new report file
+- `GetUrls()` - List all available reports
+- `IsValidUrl(url)` - Validate report URL
+
+**Storage Location:** `Reports/` folder in application root
+
+```csharp
+public class FileReportStorageService : ReportStorageWebExtension
+{
+    private readonly string _reportDirectory;
+    
+    public override byte[] GetData(string url)
+    {
+        if (string.IsNullOrEmpty(url))
+            return CreateBlankReport();
+            
+        var filePath = Path.Combine(_reportDirectory, $"{url}.repx");
+        return File.ReadAllBytes(filePath);
+    }
+}
+```
+
+---
+
+### 11. BlankReport
+**File:** `Reports/BlankReport.cs`
+**Purpose:** Blank starter template for new reports
+**Inherits:** `DevExpress.XtraReports.UI.XtraReport`
+
+**Default Bands:**
+- `DetailBand` - Main content area
+- `PageHeaderBand` - Page header
+- `PageFooterBand` - Page footer with page numbers
+
+```csharp
+public class BlankReport : XtraReport
+{
+    public BlankReport()
+    {
+        Bands.Add(new DetailBand { HeightF = 100 });
+        Bands.Add(new PageHeaderBand { HeightF = 50 });
+        Bands.Add(new PageFooterBand { HeightF = 50 });
+    }
+}
+```

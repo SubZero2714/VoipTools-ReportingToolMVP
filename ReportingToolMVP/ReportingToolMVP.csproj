@@ -8,7 +8,11 @@
 
   <ItemGroup>
     <PackageReference Include="Dapper" Version="2.1.66" />
+    <PackageReference Include="DevExpress.AspNetCore.Reporting" Version="25.1.6" />
     <PackageReference Include="DevExpress.Blazor" Version="25.1.6" />
+    <PackageReference Include="DevExpress.Blazor.Reporting" Version="25.1.6" />
+    <PackageReference Include="DevExpress.Blazor.Reporting.JSBasedControls" Version="25.1.6" />
+    <PackageReference Include="DevExpress.Blazor.Reporting.Viewer" Version="25.1.6" />
     <PackageReference Include="EPPlus" Version="7.0.0" />
     <PackageReference Include="Microsoft.Data.SqlClient" Version="6.1.2" />
     <PackageReference Include="QuestPDF" Version="2025.12.0" />

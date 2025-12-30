@@ -1,0 +1,87 @@
+@page "/reportdesigner"
+@page "/reportdesigner/{ReportUrl}"
+@using DevExpress.Blazor.Reporting
+@rendermode InteractiveServer
+
+<PageTitle>Report Designer - VoIPTools</PageTitle>
+
+<div class="report-designer-container">
+    <div class="designer-header">
+        <h3><span class="oi oi-brush"></span> Report Designer</h3>
+        <p class="text-muted">Design and customize report templates visually</p>
+    </div>
+    
+    <div class="designer-wrapper">
+        @if (!string.IsNullOrEmpty(ErrorMessage))
+        {
+            <div class="alert alert-danger">
+                <span class="oi oi-warning"></span> @ErrorMessage
+            </div>
+        }
+        else
+        {
+            <DxReportDesigner @ref="DesignerComponent"
+                              ReportName="@CurrentReportName"
+                              AllowMDI="true"
+                              Height="calc(100vh - 180px)"
+                              Width="100%" />
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public string? ReportUrl { get; set; }
+
+    private DxReportDesigner? DesignerComponent;
+    private string CurrentReportName = string.Empty;
+    private string ErrorMessage = string.Empty;
+
+    protected override void OnInitialized()
+    {
+        try
+        {
+            // Set report name - empty string creates a new blank report
+            CurrentReportName = ReportUrl ?? string.Empty;
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = $"Error initializing report designer: {ex.Message}";
+        }
+    }
+}
+
+<style>
+    .report-designer-container {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        padding: 16px;
+        background: #f8f9fc;
+    }
+
+    .designer-header {
+        margin-bottom: 16px;
+    }
+
+    .designer-header h3 {
+        color: #4361ee;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .designer-header p {
+        margin: 4px 0 0 0;
+        font-size: 0.9rem;
+    }
+
+    .designer-wrapper {
+        flex: 1;
+        background: #ffffff;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+    }
+</style>

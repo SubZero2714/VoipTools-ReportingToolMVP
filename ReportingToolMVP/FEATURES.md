@@ -149,6 +149,12 @@ Before marking MVP "complete", verify:
 | PDF Export | Dec 25, 2025 | ✅ COMPLETED |
 | Info Buttons | Dec 25, 2025 | ✅ COMPLETED |
 | **MVP Phase 0** | **Dec 25, 2025** | ✅ **COMPLETED** |
+| Date Validation | Dec 26, 2025 | ✅ COMPLETED |
+| Queue Search | Dec 26, 2025 | ✅ COMPLETED |
+| Smart Refresh | Dec 26, 2025 | ✅ COMPLETED |
+| Collapsible Sidebar | Dec 26, 2025 | ✅ COMPLETED |
+| Report Designer Integration | Dec 30, 2025 | ✅ COMPLETED |
+| Report Viewer Integration | Dec 30, 2025 | ✅ COMPLETED |
 
 ---
 
@@ -163,6 +169,8 @@ Before marking MVP "complete", verify:
 | **DxButton** | Actions (Refresh, Clear, Export, Select All) |
 | **DxChart** | Bar and Line charts |
 | **DxPieChart** | Pie chart visualization |
+| **DxReportDesigner** | Visual WYSIWYG report template designer |
+| **DxReportViewer** | Report viewing, printing, and export |
 
 ---
 
@@ -173,6 +181,10 @@ Before marking MVP "complete", verify:
 | **Date Range Validation** | HIGH | ✅ | Ensure From ≤ To, max 365 day range, inline error messages |
 | **Queue Search** | MEDIUM | ✅ | Filter queue list with search box as you type |
 | **Smart Refresh Button** | MEDIUM | ✅ | Disable button with hints when validation fails |
+| **Collapsible Sidebar** | MEDIUM | ✅ | Toggle sidebar between expanded and icon-only modes |
+| **DevExpress Report Designer** | HIGH | ✅ | Visual WYSIWYG report template designer with drag-drop |
+| **DevExpress Report Viewer** | HIGH | ✅ | View, print, and export designed reports |
+| **File-based Report Storage** | MEDIUM | ✅ | Store report definitions as .repx files |
 | **Report Templates** | HIGH | ⏳ | Save/load report configurations |
 | **Report Naming** | MEDIUM | ⏳ | Custom names for saved reports |
 | **Column Reordering** | MEDIUM | ⏳ | Drag-drop to reorder columns |

@@ -1,53 +1,102 @@
-﻿<div class="sidebar-container @(IsCollapsed ? "collapsed" : "")">
-    <div class="top-row">
-        <div class="brand-section">
+﻿<div class="sidebar @(IsCollapsed ? "sidebar-collapsed" : "sidebar-expanded")">
+    <!-- Header with brand and collapse button -->
+    <div class="sidebar-header">
+        <div class="brand">
+            <div class="brand-logo">
+                <span class="oi oi-bar-chart"></span>
+            </div>
             @if (!IsCollapsed)
             {
-                <span class="brand-icon">📊</span>
                 <span class="brand-text">VoIPTools Reporting</span>
             }
-            else
-            {
-                <span class="brand-icon-only">📊</span>
-            }
         </div>
-        <button class="collapse-btn" @onclick="ToggleSidebar" title="@(IsCollapsed ? "Expand" : "Collapse")">
-            <span class="oi @(IsCollapsed ? "oi-chevron-right" : "oi-chevron-left")"></span>
-        </button>
+        @if (!IsCollapsed)
+        {
+            <button type="button" class="toggle-btn" @onclick="ToggleSidebar" @onclick:preventDefault @onclick:stopPropagation title="Collapse">
+                <span class="oi oi-chevron-left"></span>
+            </button>
+        }
     </div>
+    @if (IsCollapsed)
+    {
+        <button type="button" class="toggle-btn-collapsed" @onclick="ToggleSidebar" @onclick:preventDefault @onclick:stopPropagation title="Expand">
+            <span class="oi oi-chevron-right"></span>
+        </button>
+    }
 
-    <nav class="nav-menu">
-        <NavLink class="nav-link-item" href="" Match="NavLinkMatch.All">
+    <!-- Navigation Links -->
+    <nav class="sidebar-nav">
+        <a href="" class="nav-item @(IsActive("") ? "active" : "")">
             <span class="nav-icon oi oi-home"></span>
             @if (!IsCollapsed)
             {
-                <span class="nav-text">Home</span>
+                <span class="nav-label">Home</span>
             }
-        </NavLink>
+        </a>
         
-        <NavLink class="nav-link-item" href="reportbuilder">
+        <a href="reportbuilder" class="nav-item @(IsActive("reportbuilder") ? "active" : "")">
             <span class="nav-icon oi oi-spreadsheet"></span>
             @if (!IsCollapsed)
             {
-                <span class="nav-text">Report Builder</span>
+                <span class="nav-label">Report Builder</span>
             }
-        </NavLink>
+        </a>
 
-        <NavLink class="nav-link-item" href="test">
+        <a href="reportdesigner" class="nav-item @(IsActive("reportdesigner") ? "active" : "")">
+            <span class="nav-icon oi oi-brush"></span>
+            @if (!IsCollapsed)
+            {
+                <span class="nav-label">Report Designer</span>
+            }
+        </a>
+
+        <a href="reportviewer" class="nav-item @(IsActive("reportviewer") ? "active" : "")">
+            <span class="nav-icon oi oi-document"></span>
+            @if (!IsCollapsed)
+            {
+                <span class="nav-label">Report Viewer</span>
+            }
+        </a>
+
+        <a href="test" class="nav-item @(IsActive("test") ? "active" : "")">
             <span class="nav-icon oi oi-check"></span>
             @if (!IsCollapsed)
             {
-                <span class="nav-text">Test Suite</span>
+                <span class="nav-label">Test Suite</span>
             }
-        </NavLink>
+        </a>
     </nav>
+
+    <!-- Footer section (optional - for settings/help) -->
+    <div class="sidebar-footer">
+        <a href="#" class="nav-item">
+            <span class="nav-icon oi oi-cog"></span>
+            @if (!IsCollapsed)
+            {
+                <span class="nav-label">Settings</span>
+            }
+        </a>
+    </div>
 </div>
 
 @code {
+    [Inject]
+    private NavigationManager? NavigationManager { get; set; }
+
     private bool IsCollapsed = false;
 
     private void ToggleSidebar()
     {
         IsCollapsed = !IsCollapsed;
+    }
+
+    private bool IsActive(string href)
+    {
+        var relativePath = NavigationManager?.ToBaseRelativePath(NavigationManager.Uri) ?? "";
+        if (string.IsNullOrEmpty(href))
+        {
+            return string.IsNullOrEmpty(relativePath);
+        }
+        return relativePath.StartsWith(href, StringComparison.OrdinalIgnoreCase);
     }
 }

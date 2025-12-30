@@ -1,0 +1,184 @@
+@page "/reportviewer"
+@page "/reportviewer/{ReportUrl}"
+@using DevExpress.Blazor.Reporting
+@using DevExpress.XtraReports.Web.Extensions
+@rendermode InteractiveServer
+
+@inject ReportStorageWebExtension ReportStorage
+
+<PageTitle>Report Viewer - VoIPTools</PageTitle>
+
+<div class="report-viewer-container">
+    <div class="viewer-header">
+        <div class="header-left">
+            <h3><span class="oi oi-document"></span> Report Viewer</h3>
+            <p class="text-muted">View, print, and export designed reports</p>
+        </div>
+        <div class="header-right">
+            @if (AvailableReports.Any())
+            {
+                <div class="report-selector">
+                    <label>Select Report:</label>
+                    <select class="form-select" @onchange="OnReportSelected">
+                        <option value="">-- Choose a report --</option>
+                        @foreach (var report in AvailableReports)
+                        {
+                            <option value="@report.Key" selected="@(report.Key == CurrentReportName)">@report.Value</option>
+                        }
+                    </select>
+                </div>
+            }
+        </div>
+    </div>
+    
+    <div class="viewer-wrapper">
+        @if (!string.IsNullOrEmpty(ErrorMessage))
+        {
+            <div class="alert alert-danger m-3">
+                <span class="oi oi-warning"></span> @ErrorMessage
+            </div>
+        }
+        else if (string.IsNullOrEmpty(CurrentReportName))
+        {
+            <div class="empty-state">
+                <div class="empty-icon">📄</div>
+                <h4>No Report Selected</h4>
+                @if (AvailableReports.Any())
+                {
+                    <p>Select a report from the dropdown above to view it.</p>
+                }
+                else
+                {
+                    <p>No reports available yet. Use the <a href="/reportdesigner">Report Designer</a> to create one.</p>
+                }
+            </div>
+        }
+        else
+        {
+            <DxReportViewer @ref="ViewerComponent"
+                            ReportName="@CurrentReportName"
+                            Height="calc(100vh - 180px)"
+                            Width="100%" />
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public string? ReportUrl { get; set; }
+
+    private DxReportViewer? ViewerComponent;
+    private string CurrentReportName = string.Empty;
+    private Dictionary<string, string> AvailableReports = new();
+    private string ErrorMessage = string.Empty;
+
+    protected override void OnInitialized()
+    {
+        try
+        {
+            // Get available reports from storage
+            AvailableReports = ReportStorage.GetUrls();
+            
+            // If a report URL is specified in route, use it
+            if (!string.IsNullOrEmpty(ReportUrl))
+            {
+                CurrentReportName = ReportUrl;
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = $"Error initializing report viewer: {ex.Message}";
+        }
+    }
+
+    private void OnReportSelected(Microsoft.AspNetCore.Components.ChangeEventArgs e)
+    {
+        var reportName = e.Value?.ToString();
+        CurrentReportName = reportName ?? string.Empty;
+        StateHasChanged();
+    }
+}
+
+<style>
+    .report-viewer-container {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        padding: 16px;
+        background: #f8f9fc;
+    }
+
+    .viewer-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 16px;
+        flex-wrap: wrap;
+        gap: 16px;
+    }
+
+    .header-left h3 {
+        color: #4361ee;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .header-left p {
+        margin: 4px 0 0 0;
+        font-size: 0.9rem;
+    }
+
+    .report-selector {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .report-selector label {
+        font-weight: 500;
+        white-space: nowrap;
+    }
+
+    .report-selector .form-select {
+        min-width: 250px;
+    }
+
+    .viewer-wrapper {
+        flex: 1;
+        background: #ffffff;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+    }
+
+    .empty-state {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        min-height: 400px;
+        color: #6b7280;
+    }
+
+    .empty-state .empty-icon {
+        font-size: 4rem;
+        margin-bottom: 16px;
+        opacity: 0.6;
+    }
+
+    .empty-state h4 {
+        color: #4b5563;
+        margin: 0 0 8px 0;
+    }
+
+    .empty-state p {
+        margin: 0;
+    }
+
+    .empty-state a {
+        color: #4361ee;
+    }
+</style>

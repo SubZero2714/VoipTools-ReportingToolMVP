@@ -1,8 +1,8 @@
 # ReportingToolMVP - Configurable Reporting Tool
 
-**Phase 0 MVP - DevExpress Evaluation & Prototype**
+**Phase 1 - DevExpress Reporting Integration Complete**
 
-A standalone .NET 9 Blazor Server application for creating custom reports from the 3CX Exporter database. This is a dedicated reporting tool built to evaluate DevExpress Blazor components and test real-time dashboard capabilities.
+A standalone .NET 8 Blazor Server application for creating custom reports from the 3CX Exporter database. This is a dedicated reporting tool built to evaluate DevExpress Blazor components and includes a visual WYSIWYG Report Designer.
 
 ## Project Goals
 
@@ -21,7 +21,7 @@ A standalone .NET 9 Blazor Server application for creating custom reports from t
 ## Quick Start
 
 ### Prerequisites
-- .NET 9 SDK
+- .NET 8 SDK
 - SQL Server (local or remote)
 - 3CX Exporter database with call queue data
 
@@ -63,35 +63,51 @@ ReportingToolMVP/
 │   ├── ReportConfig.cs       # User selections/configuration
 │   ├── ReportDataRow.cs      # Flexible row wrapper
 │   └── QueueBasicInfo.cs     # Queue dropdown data
-├── Services/                  # Service interfaces (implementations TBD)
-│   ├── ICustomReportService.cs
-│   └── IReportExportService.cs
+├── Services/                  # Business logic services
+│   ├── CustomReportService.cs     # Report data queries
+│   ├── ReportExportService.cs     # PDF/Excel/CSV exports
+│   └── FileReportStorageService.cs # .repx file storage
+├── Reports/                   # Report templates
+│   └── BlankReport.cs        # Blank starter template
 ├── Components/Pages/          # Razor pages
 │   ├── Index.razor           # Landing page
-│   └── Test.razor            # Feature tracking checklist
+│   ├── ReportBuilder.razor   # Query-based report builder
+│   ├── ReportDesigner.razor  # Visual WYSIWYG designer
+│   ├── ReportViewer.razor    # Report viewer/preview
+│   └── TestSuite.razor       # Feature tracking checklist
+├── SQL/                       # SQL query documentation
 ├── wwwroot/css/              # Stylesheets
 ├── Program.cs                # DI & Startup config
 ├── appsettings.json          # (gitignored - use .sample)
 ├── FEATURES.md               # Feature tracking & testing
+├── DEVEXPRESS_COMPONENTS.md  # DevExpress usage guide
+├── daily_report.md           # Development journal
 └── README.md                 # This file
 ```
 
 ## Available Pages
 
-- `/` - Home/Index page
-- `/test` - Feature checklist & progress tracking
-- `/reportbuilder` - Main report builder (TBD)
+| Route | Page | Description |
+|-------|------|-------------|
+| `/` | Home | Landing page with navigation |
+| `/reportbuilder` | Report Builder | Query-based report with DxGrid and charts |
+| `/reportdesigner` | Report Designer | Visual WYSIWYG report template designer |
+| `/reportviewer` | Report Viewer | View, print, and export designed reports |
+| `/test` | Test Suite | Feature checklist & progress tracking |
 
 ## Technology Stack
 
 | Technology | Version | Purpose |
 |-----------|---------|---------|
-| .NET | 9.0 | Framework |
-| Blazor Server | 9.0 | UI framework |
-| DevExpress | 25.1.6 | UI components |
+| .NET | 8.0 | Framework |
+| Blazor Server | 8.0 | UI framework with InteractiveServer render mode |
+| DevExpress.Blazor | 25.1.6 | UI components (Grid, Charts, DateEdit, etc.) |
+| DevExpress.Blazor.Reporting | 25.1.6 | Report Designer & Viewer |
+| DevExpress.AspNetCore.Reporting | 25.1.6 | Backend reporting services |
 | Dapper | 2.1.66 | Data access (lightweight ORM) |
 | Microsoft.Data.SqlClient | 6.1.2 | SQL Server driver |
 | EPPlus | 7.0.0 | Excel export |
+| QuestPDF | 2025.12.0 | PDF generation |
 
 ## Development Workflow
 
@@ -135,7 +151,7 @@ The application connects to the 3CX Exporter database using the connection strin
 
 ### Build Errors
 - Run `dotnet clean && dotnet restore`
-- Check .NET 9 SDK is installed: `dotnet --version`
+- Check .NET 8 SDK is installed: `dotnet --version`
 
 ### Port Already in Use
 - Change port in `Properties/launchSettings.json`
@@ -147,6 +163,7 @@ The application connects to the 3CX Exporter database using the connection strin
 - [Dapper GitHub](https://github.com/DapperLib/Dapper)
 - [EPPlus Documentation](https://epplussoftware.com/)
 - [FEATURES.md](FEATURES.md) - Feature tracking & test criteria
+- [DEVEXPRESS_COMPONENTS.md](DEVEXPRESS_COMPONENTS.md) - DevExpress components usage guide
 
 ## License
 
@@ -159,4 +176,4 @@ VoIPTools - Internal Use Only
 
 ---
 
-*Last Updated: December 23, 2025*
+*Last Updated: December 30, 2025*

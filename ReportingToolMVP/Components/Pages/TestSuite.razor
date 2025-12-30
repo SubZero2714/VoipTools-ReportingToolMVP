@@ -186,6 +186,38 @@
                     </div>
                 }
             </div>
+
+            <!-- Report Designer -->
+            <div class="test-group">
+                <h3><span class="oi oi-brush"></span> Report Designer</h3>
+                @foreach (var test in GetTestsByCategory("ReportDesigner"))
+                {
+                    <div class="test-item @(test.Passed ? "passed" : "")">
+                        <label>
+                            <input type="checkbox" checked="@test.Passed" @onchange="() => ToggleTest(test.Id)" />
+                            <span class="checkbox-custom"></span>
+                            <span class="test-label">@test.Name</span>
+                        </label>
+                        <span class="test-steps">@test.Steps</span>
+                    </div>
+                }
+            </div>
+
+            <!-- Report Viewer -->
+            <div class="test-group">
+                <h3><span class="oi oi-document"></span> Report Viewer</h3>
+                @foreach (var test in GetTestsByCategory("ReportViewer"))
+                {
+                    <div class="test-item @(test.Passed ? "passed" : "")">
+                        <label>
+                            <input type="checkbox" checked="@test.Passed" @onchange="() => ToggleTest(test.Id)" />
+                            <span class="checkbox-custom"></span>
+                            <span class="test-label">@test.Name</span>
+                        </label>
+                        <span class="test-steps">@test.Steps</span>
+                    </div>
+                }
+            </div>
         </div>
     </div>
 
@@ -304,6 +336,23 @@
             new TestCase { Id = 82, Category = "Sidebar", Phase = Phase1, Name = "Sidebar expands on second click", Steps = "Click expand - Full sidebar with text returns" },
             new TestCase { Id = 83, Category = "Sidebar", Phase = Phase1, Name = "Nav links work in collapsed mode", Steps = "With sidebar collapsed - Click icons - Pages navigate" },
             new TestCase { Id = 84, Category = "Sidebar", Phase = Phase1, Name = "Active page highlighted", Steps = "On Report Builder - That nav item is highlighted" },
+
+            // Phase 1: Report Designer
+            new TestCase { Id = 100, Category = "ReportDesigner", Phase = Phase1, Name = "Report Designer page loads at /reportdesigner", Steps = "Navigate to /reportdesigner - Page loads with designer UI" },
+            new TestCase { Id = 101, Category = "ReportDesigner", Phase = Phase1, Name = "Designer toolbar displays correctly", Steps = "Verify toolbar with New, Open, Save, Preview buttons" },
+            new TestCase { Id = 102, Category = "ReportDesigner", Phase = Phase1, Name = "Toolbox panel shows report elements", Steps = "Left panel shows Labels, Tables, Images, etc." },
+            new TestCase { Id = 103, Category = "ReportDesigner", Phase = Phase1, Name = "Property grid shows on element select", Steps = "Click element in designer - Properties panel updates" },
+            new TestCase { Id = 104, Category = "ReportDesigner", Phase = Phase1, Name = "Can drag elements to design surface", Steps = "Drag Label from toolbox to report - Element placed" },
+            new TestCase { Id = 105, Category = "ReportDesigner", Phase = Phase1, Name = "Can save report to file", Steps = "Create report - Click Save - Enter name - Report saved" },
+            new TestCase { Id = 106, Category = "ReportDesigner", Phase = Phase1, Name = "Can open existing report", Steps = "Click Open - Select report - Report loads in designer" },
+
+            // Phase 1: Report Viewer
+            new TestCase { Id = 110, Category = "ReportViewer", Phase = Phase1, Name = "Report Viewer page loads at /reportviewer", Steps = "Navigate to /reportviewer - Page loads with viewer UI" },
+            new TestCase { Id = 111, Category = "ReportViewer", Phase = Phase1, Name = "Report dropdown lists available reports", Steps = "Click dropdown - Shows list of saved reports" },
+            new TestCase { Id = 112, Category = "ReportViewer", Phase = Phase1, Name = "Selected report renders in viewer", Steps = "Select report from list - Report displays in viewer" },
+            new TestCase { Id = 113, Category = "ReportViewer", Phase = Phase1, Name = "Viewer toolbar has export options", Steps = "Verify toolbar with PDF, Excel, Print buttons" },
+            new TestCase { Id = 114, Category = "ReportViewer", Phase = Phase1, Name = "Can print report from viewer", Steps = "Click Print - Print dialog opens" },
+            new TestCase { Id = 115, Category = "ReportViewer", Phase = Phase1, Name = "Can export report to PDF", Steps = "Click PDF export - File downloads as PDF" },
 
             // Performance
             new TestCase { Id = 90, Category = "Performance", Phase = PerfSection, Name = "Query completes in < 5 seconds", Steps = "Load 1000+ rows - Check query time in console/logs" },
