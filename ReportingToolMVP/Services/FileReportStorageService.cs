@@ -50,6 +50,7 @@ namespace ReportingToolMVP.Services
         /// <summary>
         /// Loads report data from the file system
         /// Returns a blank report if URL is empty (for new report creation)
+        /// Supports code-based reports (QueueDashboardReport) and .repx files
         /// </summary>
         public override byte[] GetData(string url)
         {
@@ -63,6 +64,18 @@ namespace ReportingToolMVP.Services
                     using (var stream = new MemoryStream())
                     {
                         blankReport.SaveLayoutToXml(stream);
+                        return stream.ToArray();
+                    }
+                }
+
+                // Handle code-based reports
+                if (url == "QueueDashboardReport" || url == "Queue Dashboard Report")
+                {
+                    _logger.LogInformation("Loading code-based QueueDashboardReport");
+                    var report = new ReportingToolMVP.Reports.QueueDashboardReport();
+                    using (var stream = new MemoryStream())
+                    {
+                        report.SaveLayoutToXml(stream);
                         return stream.ToArray();
                     }
                 }
@@ -93,6 +106,7 @@ namespace ReportingToolMVP.Services
 
         /// <summary>
         /// Returns a dictionary of available report URLs and display names
+        /// Includes both .repx files and code-based reports
         /// </summary>
         public override Dictionary<string, string> GetUrls()
         {
@@ -100,6 +114,9 @@ namespace ReportingToolMVP.Services
 
             try
             {
+                // Add code-based reports first
+                reports["QueueDashboardReport"] = "Queue Dashboard (Code-Based)";
+
                 if (Directory.Exists(_reportsDirectory))
                 {
                     var reportFiles = Directory.GetFiles(_reportsDirectory, "*.repx");

@@ -2,7 +2,7 @@
 
 **Phase 1 - DevExpress Reporting Integration Complete**
 
-A standalone .NET 8 Blazor Server application for creating custom reports from the 3CX Exporter database. This is a dedicated reporting tool built to evaluate DevExpress Blazor components and includes a visual WYSIWYG Report Designer.
+A standalone .NET 8 Blazor Server application for creating custom reports from the 3CX Exporter database. This is a dedicated reporting tool built to evaluate DevExpress Blazor components and includes a visual WYSIWYG Report Designer with code-based report templates.
 
 ## Project Goals
 
@@ -11,12 +11,14 @@ A standalone .NET 8 Blazor Server application for creating custom reports from t
 - Validate DxChart for real-time data visualization  
 - Assess PDF/Excel export functionality
 - Measure performance with 10K+ rows
+- **NEW:** Evaluate DxReportDesigner for code-based reports
 
 ✅ **Build MVP Prototype**
 - Users configure reports via UI (column selection, filtering)
 - Real-time preview in interactive grid + chart
 - Export to PDF/Excel/CSV
-- No database storage yet (Phase 1 feature)
+- **NEW:** Queue Dashboard with KPI cards, agent tables, trend charts
+- **NEW:** Code-based report templates with SqlDataSource
 
 ## Quick Start
 
@@ -24,6 +26,7 @@ A standalone .NET 8 Blazor Server application for creating custom reports from t
 - .NET 8 SDK
 - SQL Server (local or remote)
 - 3CX Exporter database with call queue data
+- DevExpress license (evaluation or purchased)
 
 ### Setup Instructions
 
@@ -37,15 +40,18 @@ cp appsettings.json.sample appsettings.json
 # 3. Update connection string in appsettings.json
 #    Replace YOUR_SERVER and YOUR_PASSWORD with actual values
 
-# 4. Restore dependencies
+# 4. Create dashboard views in SQL Server (run once)
+#    Execute: SQL/QueueDashboard_CreateAll.sql
+
+# 5. Restore dependencies
 dotnet restore
 
-# 5. Run the project
+# 6. Run the project
 dotnet run
 
-# 6. Open browser
-# https://localhost:7XXX
-# Navigate to /test for feature checklist
+# 7. Open browser
+# https://localhost:7209
+# Navigate to /reportdesigner for Queue Dashboard
 ```
 
 ### Environment Variables (Development)
@@ -64,23 +70,31 @@ ReportingToolMVP/
 │   ├── ReportDataRow.cs      # Flexible row wrapper
 │   └── QueueBasicInfo.cs     # Queue dropdown data
 ├── Services/                  # Business logic services
-│   ├── CustomReportService.cs     # Report data queries
+│   ├── CustomReportService.cs     # Report data queries (Dapper)
 │   ├── ReportExportService.cs     # PDF/Excel/CSV exports
-│   └── FileReportStorageService.cs # .repx file storage
+│   ├── FileReportStorageService.cs # .repx file storage + code-based reports
+│   └── ReportDataSourceProviders.cs # SQL connection + query validator
 ├── Reports/                   # Report templates
-│   └── BlankReport.cs        # Blank starter template
+│   ├── BlankReport.cs        # Blank starter template
+│   └── QueueDashboardReport.cs # Code-based Queue Dashboard with KPIs/charts
 ├── Components/Pages/          # Razor pages
 │   ├── Index.razor           # Landing page
 │   ├── ReportBuilder.razor   # Query-based report builder
 │   ├── ReportDesigner.razor  # Visual WYSIWYG designer
 │   ├── ReportViewer.razor    # Report viewer/preview
 │   └── TestSuite.razor       # Feature tracking checklist
-├── SQL/                       # SQL query documentation
+├── SQL/                       # SQL scripts and views
+│   ├── QueueDashboard_CreateAll.sql # Dashboard view creation script
+│   ├── QueueDashboard_KPIs.sql      # KPI aggregation query
+│   ├── QueueDashboard_AgentPerformance.sql # Agent metrics query
+│   ├── QueueDashboard_CallTrends.sql # Daily trend data query
+│   └── README.md             # SQL documentation
 ├── wwwroot/css/              # Stylesheets
 ├── Program.cs                # DI & Startup config
 ├── appsettings.json          # (gitignored - use .sample)
 ├── FEATURES.md               # Feature tracking & testing
 ├── DEVEXPRESS_COMPONENTS.md  # DevExpress usage guide
+├── REPORT_DESIGNER_GUIDE.md  # Report Designer knowledge base
 ├── daily_report.md           # Development journal
 └── README.md                 # This file
 ```
@@ -101,9 +115,10 @@ ReportingToolMVP/
 |-----------|---------|---------|
 | .NET | 8.0 | Framework |
 | Blazor Server | 8.0 | UI framework with InteractiveServer render mode |
-| DevExpress.Blazor | 25.1.6 | UI components (Grid, Charts, DateEdit, etc.) |
-| DevExpress.Blazor.Reporting | 25.1.6 | Report Designer & Viewer |
-| DevExpress.AspNetCore.Reporting | 25.1.6 | Backend reporting services |
+| DevExpress.Blazor | 25.2.3 | UI components (Grid, Charts, DateEdit, etc.) |
+| DevExpress.Blazor.Reporting | 25.2.3 | Report Designer & Viewer |
+| DevExpress.AspNetCore.Reporting | 25.2.3 | Backend reporting services |
+| DevExpress.XtraCharts | 25.2.3 | Chart components for reports |
 | Dapper | 2.1.66 | Data access (lightweight ORM) |
 | Microsoft.Data.SqlClient | 6.1.2 | SQL Server driver |
 | EPPlus | 7.0.0 | Excel export |
@@ -132,6 +147,18 @@ The application connects to the 3CX Exporter database using the connection strin
 - `callcent_queuecalls` - Individual call records
 - `queue` - Queue definitions
 - `dn` - Phone numbers/extensions
+- `users` - Agent/user information
+
+**Dashboard Views (SQL/QueueDashboard_CreateAll.sql):**
+- `vw_QueueDashboard_KPIs` - Aggregated KPI metrics per queue per day
+- `vw_QueueDashboard_AgentPerformance` - Agent-level call statistics
+- `vw_QueueDashboard_CallTrends` - Daily call trends by queue
+- `vw_QueueList` - Queue list for dropdown parameters
+
+**Call Status Logic:**
+- Answered: `reason_noanswercode = 0` AND `ts_servicing > 0`
+- Abandoned: `reason_noanswercode = 3` (MaxWaitTime) or `4` (UserRequested)
+- Missed: `reason_noanswercode = 2` (NoAgents)
 
 ## Notes for Next Phases
 
@@ -164,6 +191,7 @@ The application connects to the 3CX Exporter database using the connection strin
 - [EPPlus Documentation](https://epplussoftware.com/)
 - [FEATURES.md](FEATURES.md) - Feature tracking & test criteria
 - [DEVEXPRESS_COMPONENTS.md](DEVEXPRESS_COMPONENTS.md) - DevExpress components usage guide
+- [REPORT_DESIGNER_GUIDE.md](REPORT_DESIGNER_GUIDE.md) - Report Designer knowledge base
 
 ## License
 
@@ -176,4 +204,4 @@ VoIPTools - Internal Use Only
 
 ---
 
-*Last Updated: December 30, 2025*
+*Last Updated: January 20, 2026*

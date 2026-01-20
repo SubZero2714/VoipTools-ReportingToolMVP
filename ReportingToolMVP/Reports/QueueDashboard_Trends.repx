@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<XtraReportsLayoutSerializer SerializerVersion="25.2.3.0" Ref="1" ControlType="DevExpress.XtraReports.UI.XtraReport, DevExpress.XtraReports.v25.2, Version=25.2.3.0, Culture=neutral" Name="QueueDashboard_Trends" DisplayName="Call Trends Chart" PageWidth="500" PageHeight="300" Version="25.2" Margins="10,10,10,10" PaperKind="Custom" DataMember="vw_QueueDashboard_CallTrends" DataSource="#Ref-0" Font="Arial, 9pt">
+  <Parameters>
+    <Item1 Ref="3" Name="paramQueueNumber" />
+    <Item2 Ref="4" Name="paramStartDate" Type="#Ref-2" />
+    <Item3 Ref="5" Name="paramEndDate" Type="#Ref-2" />
+  </Parameters>
+  <Bands>
+    <Item1 Ref="6" ControlType="ReportHeaderBand" Name="ReportHeader" HeightF="260">
+      <Controls>
+        <Item1 Ref="7" ControlType="XRChart" Name="chartTrends" SizeF="480,250" LocationFloat="0,0">
+          <DataSource Ref="0" />
+          <DataMember>vw_QueueDashboard_CallTrends</DataMember>
+          <SeriesSerializable>
+            <Item1 Ref="8" Name="Answered" ValueDataMembers="AnsweredCalls" ArgumentDataMember="CallDate" SeriesViewType="Area" Color="46,204,113">
+              <Label Ref="9" />
+              <View Ref="10" TypeName="AreaSeriesView" Transparency="100" />
+            </Item1>
+            <Item2 Ref="11" Name="Missed" ValueDataMembers="MissedCalls" ArgumentDataMember="CallDate" SeriesViewType="Area" Color="243,156,18">
+              <Label Ref="12" />
+              <View Ref="13" TypeName="AreaSeriesView" Transparency="100" />
+            </Item2>
+            <Item3 Ref="14" Name="Abandoned" ValueDataMembers="AbandonedCalls" ArgumentDataMember="CallDate" SeriesViewType="Area" Color="231,76,60">
+              <Label Ref="15" />
+              <View Ref="16" TypeName="AreaSeriesView" Transparency="100" />
+            </Item3>
+          </SeriesSerializable>
+          <Legend Ref="17" AlignmentHorizontal="RightOutside" AlignmentVertical="Top" />
+          <Titles>
+            <Item1 Ref="18" Text="Call Volume by Date" Font="Arial, 10pt, style=Bold" />
+          </Titles>
+        </Item1>
+      </Controls>
+    </Item1>
+    <Item2 Ref="19" ControlType="DetailBand" Name="Detail" HeightF="0" Visible="false" />
+  </Bands>
+  <ComponentStorage>
+    <Item1 Ref="0" ObjectType="DevExpress.DataAccess.Sql.SqlDataSource,DevExpress.DataAccess.v25.2" Name="sqlDataSource1">
+      <Connection Name="3CX_Exporter" />
+      <Query Type="SelectQuery" Name="vw_QueueDashboard_CallTrends">
+        <Tables>
+          <Item1 Name="vw_QueueDashboard_CallTrends" />
+        </Tables>
+        <Columns>
+          <Item1 Table="vw_QueueDashboard_CallTrends" Name="CallDate" />
+          <Item2 Table="vw_QueueDashboard_CallTrends" Name="AnsweredCalls" />
+          <Item3 Table="vw_QueueDashboard_CallTrends" Name="MissedCalls" />
+          <Item4 Table="vw_QueueDashboard_CallTrends" Name="AbandonedCalls" />
+        </Columns>
+        <Filter>[vw_QueueDashboard_CallTrends.QueueNumber] = ?paramQueueNumber And [vw_QueueDashboard_CallTrends.CallDate] Between(?paramStartDate, ?paramEndDate)</Filter>
+      </Query>
+    </Item1>
+    <Item2 Ref="2" ObjectType="System.DateTime" />
+  </ComponentStorage>
+</XtraReportsLayoutSerializer>
