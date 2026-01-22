@@ -58,6 +58,39 @@
                     <span class="oi oi-warning"></span> @DateValidationError
                 </div>
             }
+            
+            <!-- Quick Date Filters -->
+            <div class="quick-date-filters">
+                <label>Quick Select:</label>
+                <div class="button-row">
+                    <DxButton Text="Today" 
+                              Click="@(() => SetQuickDateRange(QuickDateRange.Today))" 
+                              RenderStyle="ButtonRenderStyle.Secondary"
+                              SizeMode="SizeMode.Small" />
+                    <DxButton Text="Week" 
+                              Click="@(() => SetQuickDateRange(QuickDateRange.Week))" 
+                              RenderStyle="ButtonRenderStyle.Secondary"
+                              SizeMode="SizeMode.Small" />
+                    <DxButton Text="Month" 
+                              Click="@(() => SetQuickDateRange(QuickDateRange.Month))" 
+                              RenderStyle="ButtonRenderStyle.Secondary"
+                              SizeMode="SizeMode.Small" />
+                </div>
+                <div class="button-row mt-1">
+                    <DxButton Text="Quarter" 
+                              Click="@(() => SetQuickDateRange(QuickDateRange.Quarter))" 
+                              RenderStyle="ButtonRenderStyle.Secondary"
+                              SizeMode="SizeMode.Small" />
+                    <DxButton Text="Year" 
+                              Click="@(() => SetQuickDateRange(QuickDateRange.Year))" 
+                              RenderStyle="ButtonRenderStyle.Secondary"
+                              SizeMode="SizeMode.Small" />
+                    <DxButton Text="All" 
+                              Click="@(() => SetQuickDateRange(QuickDateRange.All))" 
+                              RenderStyle="ButtonRenderStyle.Secondary"
+                              SizeMode="SizeMode.Small" />
+                </div>
+            </div>
         </div>
 
         <!-- Queues Card -->
@@ -415,6 +448,9 @@
     // Info button functionality
     private enum InfoType { None, DateRange, Queues, Columns, Chart, Results, Export }
     private InfoType ActiveInfo = InfoType.None;
+    
+    // Quick date range options
+    private enum QuickDateRange { Today, Week, Month, Quarter, Year, All }
 
     private void ShowInfo(InfoType infoType)
     {
@@ -501,6 +537,43 @@
     private void ClearQueues()
     {
         SelectedQueues = Enumerable.Empty<string>();
+    }
+
+    private void SetQuickDateRange(QuickDateRange range)
+    {
+        var today = DateTime.Today;
+        
+        switch (range)
+        {
+            case QuickDateRange.Today:
+                Config.StartDate = today;
+                Config.EndDate = today;
+                break;
+            case QuickDateRange.Week:
+                Config.StartDate = today.AddDays(-7);
+                Config.EndDate = today;
+                break;
+            case QuickDateRange.Month:
+                Config.StartDate = today.AddMonths(-1);
+                Config.EndDate = today;
+                break;
+            case QuickDateRange.Quarter:
+                Config.StartDate = today.AddMonths(-3);
+                Config.EndDate = today;
+                break;
+            case QuickDateRange.Year:
+                Config.StartDate = today.AddYears(-1);
+                Config.EndDate = today;
+                break;
+            case QuickDateRange.All:
+                // Use the full data range available
+                Config.StartDate = new DateTime(2023, 12, 1);
+                Config.EndDate = new DateTime(2025, 10, 29);
+                break;
+        }
+        
+        ValidateDateRange();
+        StateHasChanged();
     }
 
     private void SelectAllColumns()

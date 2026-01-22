@@ -1,6 +1,6 @@
 using DevExpress.XtraReports.UI;
 
-namespace ReportingToolMVP.Reports
+namespace ReportingToolMVP.Reports.CodeBased
 {
     /// <summary>
     /// A blank starter report that serves as a template for new reports

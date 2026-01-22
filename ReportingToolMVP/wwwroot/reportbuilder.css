@@ -932,6 +932,40 @@ select.form-control {
     gap: 0.5rem;
 }
 
+/* Quick Date Filters */
+.quick-date-filters {
+    margin-top: 0.75rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--border-color);
+}
+
+.quick-date-filters > label {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.quick-date-filters .button-row {
+    display: flex;
+    gap: 0.375rem;
+    flex-wrap: wrap;
+}
+
+.quick-date-filters .dxbl-btn {
+    flex: 1;
+    min-width: 60px;
+    padding: 0.25rem 0.5rem !important;
+    font-size: 0.75rem !important;
+}
+
+.quick-date-filters .mt-1 {
+    margin-top: 0.375rem;
+}
+
 /* DxGrid Styling */
 .report-grid {
     border-radius: var(--radius-lg) !important;

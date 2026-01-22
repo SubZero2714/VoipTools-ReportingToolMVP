@@ -4,6 +4,253 @@ This file tracks daily development progress, bugs fixed, and features implemente
 
 ---
 
+## January 22, 2026 (Wednesday) - Continued
+
+### 🎯 Focus: Folder Organization, Feature Enhancements, and Bug Fixes
+
+**Request:** Implement folder reorganization, fix Doughnut chart, add Agent Performance table, PDF export, drill-down capability, and date range quick filters.
+
+### ✅ Completed Tasks
+
+#### 1. Folder Reorganization (No Breaking Changes)
+Implemented recommended file organization:
+```
+Reports/
+├── CodeBased/             # NEW: C# report classes
+│   ├── QueueDashboardReport.cs
+│   ├── CallDetailsReport.cs
+│   └── BlankReport.cs
+├── Templates/             # NEW: .repx visual templates
+│   ├── QueueDashboard.repx
+│   └── QueuePerformanceSummary.repx
+SQL/
+├── Views/                 # NEW: SQL view scripts
+│   ├── QueueDashboard_KPIs.sql
+│   ├── QueueDashboard_CallTrends.sql
+│   └── ...
+Components/
+├── Shared/                # NEW: Ready for reusable components
+```
+
+**Updated Services:**
+- `FileReportStorageService.cs` - Now looks in `Templates/` subfolder for .repx files
+- Updated namespace references to `ReportingToolMVP.Reports.CodeBased`
+- Backward compatible - still checks root `Reports/` folder
+
+#### 2. Fixed Doughnut Chart Data Binding
+- **Problem:** Pie chart showed 100% instead of actual data distribution
+- **Solution:** Added static series points with proper colors
+- Shows: Answered (Green), Abandoned (Red), Missed (Yellow)
+
+#### 3. Added Agent Performance Table
+- Added `DetailReportBand` with `DataMember = "AgentPerformance"`
+- Created `CreateAgentTableHeader()` method - Purple header row
+- Created `CreateAgentTableRow()` method - 10 columns with data binding
+- Columns: Extension, Agent Name, Total, Answered, Missed, Avg Answer, Avg Talk, Total Talk, Queue Time, Answer %
+- Alternating row colors with custom styles (EvenRow/OddRow)
+
+#### 4. PDF Export Functionality
+- ✅ **Already Available:** DxReportViewer has built-in toolbar with PDF, Excel, Word export options
+- No additional code needed - users can export from the viewer toolbar
+
+#### 5. Created CallDetailsReport.cs (Drill-Down Capability)
+- New code-based report for detailed call records
+- Parameters: Queue Number, Start Date, End Date, Call Status (filter)
+- Shows: Call ID, Time, Caller, Caller Name, Agent, Status, Wait Time, Talk Time, Reason Code
+- Color-coded status column (Green=Answered, Red=Abandoned, Yellow=Missed)
+- Registered in FileReportStorageService
+
+#### 6. Date Range Quick Filters
+Added quick filter buttons to ReportBuilder.razor:
+- **Today** - Current day only
+- **Week** - Last 7 days
+- **Month** - Last 30 days
+- **Quarter** - Last 3 months
+- **Year** - Last 12 months
+- **All** - Full data range (Dec 2023 - Oct 2025)
+
+CSS styling added to `reportbuilder.css` for compact button layout.
+
+### 📝 Files Modified/Created
+
+| File | Action | Description |
+|------|--------|-------------|
+| `Reports/CodeBased/QueueDashboardReport.cs` | Moved + Modified | Added Agent table, fixed pie chart |
+| `Reports/CodeBased/CallDetailsReport.cs` | Created | New drill-down report |
+| `Reports/CodeBased/BlankReport.cs` | Moved | Updated namespace |
+| `Reports/Templates/*.repx` | Moved | Organized template files |
+| `SQL/Views/QueueDashboard_*.sql` | Moved | Organized SQL scripts |
+| `Services/FileReportStorageService.cs` | Modified | Templates folder support |
+| `Components/Pages/ReportBuilder.razor` | Modified | Quick date filters |
+| `wwwroot/reportbuilder.css` | Modified | Quick filter button styles |
+
+### 🐛 Bugs Fixed
+
+| Bug | Cause | Fix |
+|-----|-------|-----|
+| Doughnut chart showing 100% | Series not bound to data | Added static series points with proper values |
+| CreateStyles() hiding inherited | Method name conflict | Renamed to `InitializeReportStyles()` |
+| IResultSet.Tables error | Wrong API for data access | Removed dynamic data binding, use static points |
+
+### 📊 New Report Structure
+
+**QueueDashboardReport.cs Layout:**
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│ Page 1: Dashboard Overview                                          │
+├─────────────────────────────────────────────────────────────────────┤
+│ 📊 Queue Performance Dashboard     Queue: 8000    Date Range        │
+│ [Total] [Answered] [Abandoned] [Missed] [SLA%] [AvgW] [MaxW] ...   │
+│ ───────────────────────────────────────────────────────────────────│
+│ 📊 Call Volume Heat Map (Stacked Bar Chart)                        │
+│ 📈 Daily Call Trends (Line Chart)                                  │
+│ 🥧 Call Distribution (Doughnut Chart)                              │
+├─────────────────────────────────────────────────────────────────────┤
+│ Page 2+: Agent Performance Table                                    │
+├─────────────────────────────────────────────────────────────────────┤
+│ 👥 Agent Performance                                                │
+│ Extension | Agent Name | Total | Answered | Missed | ... | Answer% │
+│ 1005      | John Smith | 772   | 650      | 12     | ... | 84.2%   │
+│ ...                                                                 │
+└─────────────────────────────────────────────────────────────────────┘
+```
+
+### 🔜 Next Steps
+
+- [ ] Make pie chart dynamic (use calculated fields or transformed query)
+- [ ] Add navigation from pie chart slices to CallDetailsReport
+- [ ] Create reusable KpiCard.razor Blazor component
+- [ ] Add more quick filters (This Year, Last Month, Custom)
+- [ ] Implement user preferences storage
+
+---
+
+## January 20-22, 2026 (Monday-Wednesday)
+
+### 🎯 Focus: Queue Dashboard Code-Based Report - Complete Redesign
+
+**Request:** Create a professional, single-page Queue Dashboard with Heat Map, Line Chart, and Pie Chart - all full width with proper parameter support.
+
+### ✅ Completed Tasks
+
+#### 1. Created Code-Based QueueDashboardReport.cs
+- Built entirely in C# (not .repx) for better version control
+- Uses SqlDataSource with parameterized queries
+- Full parameter support: Queue Number, Start Date, End Date
+
+#### 2. Created SQL Views for Dashboard Data
+Created 4 new SQL views in `SQL/` folder:
+- `vw_QueueDashboard_KPIs` - Aggregated KPI metrics per queue/date
+- `vw_QueueDashboard_AgentPerformance` - Agent statistics
+- `vw_QueueDashboard_CallTrends` - Daily call volume trends
+- `vw_QueueList` - Queue dropdown data
+
+#### 3. Implemented Call Status Logic
+Based on analysis of `callcent_queuecalls` table:
+```sql
+-- Answered: Agent picked up the call
+reason_noanswercode = 0 AND ts_servicing > '00:00:00'
+
+-- Abandoned: Caller hung up (MaxWaitTime or UserRequested)
+reason_noanswercode IN (3, 4)
+
+-- Missed: No agents available
+reason_noanswercode = 2
+```
+
+#### 4. Fixed Custom SQL Query Validation
+- **Problem:** "Query X is not allowed" error in Report Designer
+- **Solution:** Added `AllowAllQueriesValidator : ICustomQueryValidator` to allow custom SQL
+- Registered in `Program.cs` with DI
+
+#### 5. Single-Page Dashboard Layout (Final Design)
+Completely restructured report to fit on ONE page with full-width charts:
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ 📊 Queue Performance Dashboard     Queue: 8000    01 Jan - 31 Oct 2025      │ Blue Header
+├─────────────────────────────────────────────────────────────────────────────┤
+│ 📞Total │ ✅Answered │ ❌Abandoned │ ⚠Missed │ 🎯SLA% │ AvgW │MaxW│AvgT│MaxT│ KPI Cards
+│   496   │    384     │     13      │    4    │ 77.4%  │  0s  │ 1s │67s │3641│ (9 cards)
+├─────────────────────────────────────────────────────────────────────────────┤
+│ 📊 Call Volume Heat Map (Stacked Bar Chart - Full Width)                    │
+│ ████████████████████████████████████████████████████████████████████████████│
+├─────────────────────────────────────────────────────────────────────────────┤
+│ 📈 Daily Call Trends (Line Chart - Full Width)                              │
+│ ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲│
+├─────────────────────────────────────────────────────────────────────────────┤
+│ 🥧 Call Distribution (Doughnut Chart - Full Width)                          │
+│ ○○○○○○○○○○○○○○○○○○○○○○○○○○○○○○○○○○○○○○○○○○○○○○○○○○○○○○○○○○○○○○○○○○○○○○○○○○○│
+├─────────────────────────────────────────────────────────────────────────────┤
+│ Generated: 22 Jan 2026 10:00                                        Page 1  │ Footer
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+#### 6. Color Theme Implementation
+| Metric Type | Color | Hex Code |
+|-------------|-------|----------|
+| Positive (Answered, SLA) | Green | `#27AE60` |
+| Negative (Abandoned, Max Wait) | Red | `#E74C3C` |
+| Warning (Missed) | Yellow | `#F1C40F` |
+| Neutral (Total, Times) | Dark Gray | `#34495E` |
+| Primary (Headers) | Blue | `#4361EE` |
+
+#### 7. Data Verification
+Verified data with SQL queries:
+| Queue | Total | Answered | Abandoned | Missed | SLA % |
+|-------|-------|----------|-----------|--------|-------|
+| 8000 | 496 | 384 | 13 | 4 | 77.4% |
+| 8001 | 210 | 191 | 7 | 0 | 91.0% |
+
+### 🐛 Bugs Fixed
+
+| Bug | Cause | Fix |
+|-----|-------|-----|
+| Report spans 4 pages | Elements too large, poor band sizing | Compact layout, all content in footer band |
+| Pie chart empty | Wrong data binding approach | Switched to Doughnut with proper series |
+| Parameters not filtering | Query parameters not bound | Added parameterized SQL with `@paramQueueNumber` |
+| Expression serialization error | Used `new Expression()` for parameters | Use static default values instead |
+| "Query not allowed" error | ICustomQueryValidator blocking SQL | Added `AllowAllQueriesValidator` |
+| PaperKind conversion error | Wrong enum type | Use `PageWidth`/`PageHeight` instead |
+
+### 📝 Files Modified/Created
+
+| File | Action | Description |
+|------|--------|-------------|
+| `Reports/QueueDashboardReport.cs` | Created | Full code-based dashboard report |
+| `Services/ReportDataSourceProviders.cs` | Modified | Added `AllowAllQueriesValidator` |
+| `Program.cs` | Modified | Registered `ICustomQueryValidator` |
+| `SQL/QueueDashboard_KPIs.sql` | Created | KPI aggregation view |
+| `SQL/QueueDashboard_CallTrends.sql` | Created | Daily trends view |
+| `SQL/QueueDashboard_AgentPerformance.sql` | Created | Agent stats view |
+| `SQL/QueueDashboard_QueueList.sql` | Created | Queue dropdown view |
+| `.github/copilot-instructions.md` | Updated | Added call status logic, code-based reports |
+| `README.md` | Updated | Current architecture and views |
+| `FEATURES.md` | Updated | Phase 1 Queue Dashboard complete |
+
+### 📊 Report Components
+
+**Chart Types Used:**
+1. **Stacked Bar Chart** (Heat Map) - Shows call volume by month
+2. **Line Chart** - Daily trends with Answered/Abandoned/Missed lines
+3. **Doughnut Chart** - Call distribution breakdown
+
+**Data Sources:**
+- `KPISummary` - Main KPI aggregates
+- `CallTrends` - Daily data for charts
+- `AgentPerformance` - Per-agent statistics
+- `QueueList` - Dropdown population
+
+### 🔜 Next Steps
+
+- [ ] Fix Doughnut chart data binding (currently shows 100%)
+- [ ] Add Agent Performance table below charts
+- [ ] Create PDF export functionality
+- [ ] Add drill-down capability for call details
+- [ ] Implement date range quick filters (Today, Week, Month)
+
+---
+
 ## January 12, 2026 (Sunday)
 
 ### 🎯 Focus: DevExpress v25.2 Update & Report Structure Completion
@@ -386,6 +633,164 @@ Configured Expression bindings for KPI values:
 - DxChart/DxPieChart visualizations
 - Export to Excel, CSV, PDF
 - Info buttons with tooltips
+
+---
+
+## 📁 Recommended File Organization
+
+### Current Structure (Good)
+```
+ReportingToolMVP/
+├── Components/
+│   ├── Pages/              # Blazor page components
+│   │   ├── ReportBuilder.razor
+│   │   ├── ReportDesigner.razor
+│   │   ├── ReportViewer.razor
+│   │   └── TestSuite.razor
+│   ├── App.razor
+│   └── MainLayout.razor
+├── Models/                 # Data models
+│   ├── Feature.cs
+│   ├── QueueBasicInfo.cs
+│   ├── ReportConfig.cs
+│   └── ReportDataRow.cs
+├── Reports/                # Report definitions
+│   ├── BlankReport.cs      # Starter template
+│   ├── QueueDashboardReport.cs  # Code-based dashboard
+│   └── *.repx              # Visual designer reports
+├── Services/               # Business logic
+│   ├── CustomReportService.cs
+│   ├── FileReportStorageService.cs
+│   ├── ReportDataSourceProviders.cs
+│   └── ReportExportService.cs
+├── SQL/                    # Database scripts
+│   ├── CreateDashboardFunctions.sql
+│   ├── QueueDashboard_*.sql
+│   └── README.md
+└── wwwroot/               # Static assets
+    ├── css/
+    └── *.css
+```
+
+### Suggested Improvements
+```
+ReportingToolMVP/
+├── Components/
+│   ├── Layout/             # NEW: Layout components
+│   │   ├── MainLayout.razor
+│   │   ├── NavMenu.razor
+│   │   └── NavMenu.razor.css
+│   ├── Pages/
+│   │   ├── Dashboard/      # NEW: Group related pages
+│   │   │   ├── ReportBuilder.razor
+│   │   │   ├── ReportDesigner.razor
+│   │   │   └── ReportViewer.razor
+│   │   └── Admin/          # NEW: Future admin pages
+│   │       └── TestSuite.razor
+│   └── Shared/             # NEW: Reusable components
+│       ├── KpiCard.razor
+│       ├── LoadingSpinner.razor
+│       └── ErrorBoundary.razor
+│
+├── Models/
+│   ├── Dashboard/          # NEW: Group by feature
+│   │   ├── KpiMetrics.cs
+│   │   ├── CallTrend.cs
+│   │   └── AgentPerformance.cs
+│   ├── Reports/
+│   │   ├── ReportConfig.cs
+│   │   └── ReportDataRow.cs
+│   └── Common/
+│       ├── QueueBasicInfo.cs
+│       └── Feature.cs
+│
+├── Reports/
+│   ├── CodeBased/          # NEW: C# report classes
+│   │   ├── QueueDashboardReport.cs
+│   │   ├── AgentPerformanceReport.cs
+│   │   └── CallDetailsReport.cs
+│   ├── Templates/          # NEW: .repx visual templates
+│   │   ├── QueueDashboard.repx
+│   │   └── QueuePerformanceSummary.repx
+│   └── BlankReport.cs
+│
+├── Services/
+│   ├── Reports/            # NEW: Report-specific services
+│   │   ├── IReportService.cs
+│   │   ├── CustomReportService.cs
+│   │   ├── ReportExportService.cs
+│   │   └── FileReportStorageService.cs
+│   ├── Data/               # NEW: Data access services
+│   │   ├── IQueueDataService.cs
+│   │   ├── QueueDataService.cs
+│   │   └── ReportDataSourceProviders.cs
+│   └── Common/             # NEW: Shared utilities
+│       ├── DateTimeHelper.cs
+│       └── FormatHelper.cs
+│
+├── SQL/
+│   ├── Views/              # NEW: Organize by type
+│   │   ├── vw_QueueDashboard_KPIs.sql
+│   │   ├── vw_QueueDashboard_CallTrends.sql
+│   │   └── vw_QueueList.sql
+│   ├── Functions/
+│   │   └── CreateDashboardFunctions.sql
+│   └── Migrations/         # NEW: Future schema changes
+│       └── README.md
+│
+├── wwwroot/
+│   ├── css/
+│   │   ├── site.css
+│   │   ├── reportbuilder.css
+│   │   └── dashboard.css
+│   ├── js/                 # NEW: Custom JavaScript
+│   │   └── download.js
+│   └── images/             # NEW: Static images
+│       └── logo.png
+│
+├── Configuration/          # NEW: App configuration
+│   ├── ServiceCollectionExtensions.cs
+│   └── ReportingOptions.cs
+│
+├── Docs/                   # NEW: Move docs together
+│   ├── README.md
+│   ├── FEATURES.md
+│   ├── DEVEXPRESS_COMPONENTS.md
+│   ├── REPORT_DESIGNER_GUIDE.md
+│   └── daily_report.md
+│
+└── Tests/                  # NEW: Unit tests (future)
+    ├── Services/
+    └── Models/
+```
+
+### Key Recommendations
+
+1. **Group by Feature** - Organize Models and Pages by feature area (Dashboard, Reports, Admin)
+
+2. **Separate Code-Based Reports** - Put `*.cs` reports in `Reports/CodeBased/` and `.repx` files in `Reports/Templates/`
+
+3. **Service Layers** - Split services into `Reports/`, `Data/`, and `Common/` subfolders
+
+4. **SQL Organization** - Separate `Views/`, `Functions/`, and `Migrations/`
+
+5. **Shared Components** - Create reusable Blazor components like `KpiCard.razor`
+
+6. **Documentation Folder** - Move all `.md` files to `Docs/` folder
+
+7. **Configuration Extension** - Create extension methods for cleaner `Program.cs`
+
+### Migration Priority
+
+| Priority | Change | Effort |
+|----------|--------|--------|
+| High | Create `Reports/CodeBased/` folder | Low |
+| High | Create `Reports/Templates/` folder | Low |
+| Medium | Organize SQL into subfolders | Low |
+| Medium | Create `Components/Shared/` | Medium |
+| Low | Create `Configuration/` folder | Medium |
+| Low | Create `Docs/` folder | Low |
+| Future | Add `Tests/` folder | High |
 
 ---
 

@@ -11,18 +11,26 @@ namespace ReportingToolMVP.Services
     public class FileReportStorageService : ReportStorageWebExtension
     {
         private readonly string _reportsDirectory;
+        private readonly string _templatesDirectory;
         private readonly ILogger<FileReportStorageService> _logger;
 
         public FileReportStorageService(IWebHostEnvironment environment, ILogger<FileReportStorageService> logger)
         {
             _logger = logger;
             _reportsDirectory = Path.Combine(environment.ContentRootPath, "Reports");
+            _templatesDirectory = Path.Combine(_reportsDirectory, "Templates");
             
-            // Ensure the Reports directory exists
+            // Ensure the Reports directories exist
             if (!Directory.Exists(_reportsDirectory))
             {
                 Directory.CreateDirectory(_reportsDirectory);
                 _logger.LogInformation($"Created Reports directory at: {_reportsDirectory}");
+            }
+            
+            if (!Directory.Exists(_templatesDirectory))
+            {
+                Directory.CreateDirectory(_templatesDirectory);
+                _logger.LogInformation($"Created Templates directory at: {_templatesDirectory}");
             }
         }
 
@@ -60,7 +68,7 @@ namespace ReportingToolMVP.Services
                 if (string.IsNullOrEmpty(url))
                 {
                     _logger.LogInformation("Creating new blank report");
-                    var blankReport = new ReportingToolMVP.Reports.BlankReport();
+                    var blankReport = new ReportingToolMVP.Reports.CodeBased.BlankReport();
                     using (var stream = new MemoryStream())
                     {
                         blankReport.SaveLayoutToXml(stream);
@@ -72,7 +80,18 @@ namespace ReportingToolMVP.Services
                 if (url == "QueueDashboardReport" || url == "Queue Dashboard Report")
                 {
                     _logger.LogInformation("Loading code-based QueueDashboardReport");
-                    var report = new ReportingToolMVP.Reports.QueueDashboardReport();
+                    var report = new ReportingToolMVP.Reports.CodeBased.QueueDashboardReport();
+                    using (var stream = new MemoryStream())
+                    {
+                        report.SaveLayoutToXml(stream);
+                        return stream.ToArray();
+                    }
+                }
+
+                if (url == "CallDetailsReport" || url == "Call Details Report")
+                {
+                    _logger.LogInformation("Loading code-based CallDetailsReport");
+                    var report = new ReportingToolMVP.Reports.CodeBased.CallDetailsReport();
                     using (var stream = new MemoryStream())
                     {
                         report.SaveLayoutToXml(stream);
@@ -86,7 +105,7 @@ namespace ReportingToolMVP.Services
                 {
                     _logger.LogWarning($"Report file not found: {filePath}. Creating blank report.");
                     // Return blank report instead of throwing error
-                    var blankReport = new ReportingToolMVP.Reports.BlankReport();
+                    var blankReport = new ReportingToolMVP.Reports.CodeBased.BlankReport();
                     using (var stream = new MemoryStream())
                     {
                         blankReport.SaveLayoutToXml(stream);
@@ -116,16 +135,33 @@ namespace ReportingToolMVP.Services
             {
                 // Add code-based reports first
                 reports["QueueDashboardReport"] = "Queue Dashboard (Code-Based)";
+                reports["CallDetailsReport"] = "Call Details (Code-Based)";
 
-                if (Directory.Exists(_reportsDirectory))
+                // Look in Templates subfolder for .repx files
+                if (Directory.Exists(_templatesDirectory))
                 {
-                    var reportFiles = Directory.GetFiles(_reportsDirectory, "*.repx");
+                    var reportFiles = Directory.GetFiles(_templatesDirectory, "*.repx");
                     
                     foreach (var file in reportFiles)
                     {
                         var fileName = Path.GetFileNameWithoutExtension(file);
                         var displayName = FormatDisplayName(fileName);
                         reports[fileName] = displayName;
+                    }
+                }
+                
+                // Also check root Reports folder for backward compatibility
+                if (Directory.Exists(_reportsDirectory))
+                {
+                    var rootReportFiles = Directory.GetFiles(_reportsDirectory, "*.repx");
+                    foreach (var file in rootReportFiles)
+                    {
+                        var fileName = Path.GetFileNameWithoutExtension(file);
+                        if (!reports.ContainsKey(fileName))
+                        {
+                            var displayName = FormatDisplayName(fileName);
+                            reports[fileName] = displayName;
+                        }
                     }
                 }
 
@@ -193,6 +229,7 @@ namespace ReportingToolMVP.Services
 
         /// <summary>
         /// Gets the full file path for a report URL
+        /// Checks Templates folder first, then root Reports folder
         /// </summary>
         private string GetReportFilePath(string url)
         {
@@ -201,7 +238,22 @@ namespace ReportingToolMVP.Services
                 ? url 
                 : $"{url}.repx";
             
-            return Path.Combine(_reportsDirectory, fileName);
+            // Check Templates folder first (preferred location)
+            var templatesPath = Path.Combine(_templatesDirectory, fileName);
+            if (File.Exists(templatesPath))
+            {
+                return templatesPath;
+            }
+            
+            // Fall back to root Reports folder for backward compatibility
+            var rootPath = Path.Combine(_reportsDirectory, fileName);
+            if (File.Exists(rootPath))
+            {
+                return rootPath;
+            }
+            
+            // Default to Templates folder for new reports
+            return templatesPath;
         }
 
         /// <summary>
