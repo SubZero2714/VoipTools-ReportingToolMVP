@@ -2,26 +2,9 @@ using DevExpress.DataAccess.ConnectionParameters;
 using DevExpress.DataAccess.Sql;
 using DevExpress.DataAccess.Web;
 using DevExpress.DataAccess.Wizard.Services;
-using DevExpress.Xpo.DB;
 
 namespace ReportingToolMVP.Services
 {
-    /// <summary>
-    /// Validator that allows custom SQL queries to execute.
-    /// DevExpress blocks custom SQL queries by default for security.
-    /// This validator permits all queries - in production, add proper validation.
-    /// </summary>
-    public class AllowAllQueriesValidator : ICustomQueryValidator
-    {
-        public bool Validate(DataConnectionParametersBase connectionParameters, string sql, ref string message)
-        {
-            // Allow all queries (for development)
-            // In production, validate query content for security
-            message = string.Empty;
-            return true;
-        }
-    }
-
     /// <summary>
     /// Provides available data connections for the Report Designer wizard.
     /// This service supplies connection strings to display in the Data Source Wizard.
@@ -64,7 +47,6 @@ namespace ReportingToolMVP.Services
             
             if (name == "3CX_Exporter" || name == "DefaultConnection")
             {
-                // Use CustomStringConnectionParameters with TrustServerCertificate for SSL compatibility
                 var connectionString = @"XpoProvider=MSSqlServer;Server=LAPTOP-A5UI98NJ\SQLEXPRESS;Database=Test_3CX_Exporter;User Id=sa;Password=V01PT0y5;TrustServerCertificate=True;Encrypt=False;";
                 
                 _logger.LogInformation($"Returning CustomStringConnectionParameters for {name}");
@@ -77,21 +59,38 @@ namespace ReportingToolMVP.Services
     }
 
     /// <summary>
-    /// Factory for creating DB Schema Providers used by the Query Builder.
-    /// This is REQUIRED for the Query Builder pencil icon to work!
+    /// Validates custom SQL queries in the Report Designer's Query Builder.
+    /// This implementation allows all queries - customize for production security.
     /// </summary>
-    public class CustomDBSchemaProviderExFactory : IDBSchemaProviderExFactory
+    public class AllowAllQueriesValidator : ICustomQueryValidator
     {
-        public IDBSchemaProviderEx Create()
+        public bool Validate(DataConnectionParametersBase connectionParameters, string sql, ref string message)
         {
-            // Returns the default DB schema provider which handles Query Builder operations
-            return new DBSchemaProviderEx();
+            // Allow all queries (for development)
+            message = string.Empty;
+            return true;
         }
     }
 
     /// <summary>
-    /// Provides connection options for data connections in the designer.
-    /// Required for editing queries in existing data sources.
+    /// Service that provides database connections for report execution.
+    /// Called when previewing or running reports.
+    /// </summary>
+    public class CustomConnectionProviderService : IConnectionProviderService
+    {
+        public SqlDataConnection? LoadConnection(string connectionName)
+        {
+            if (connectionName == "3CX_Exporter" || connectionName == "DefaultConnection")
+            {
+                var connectionString = @"XpoProvider=MSSqlServer;Server=LAPTOP-A5UI98NJ\SQLEXPRESS;Database=Test_3CX_Exporter;User Id=sa;Password=V01PT0y5;TrustServerCertificate=True;Encrypt=False;";
+                return new SqlDataConnection(connectionName, new CustomStringConnectionParameters(connectionString));
+            }
+            return null;
+        }
+    }
+
+    /// <summary>
+    /// Factory for creating connection provider instances.
     /// </summary>
     public class CustomConnectionProviderFactory : IConnectionProviderFactory
     {
@@ -102,20 +101,14 @@ namespace ReportingToolMVP.Services
     }
 
     /// <summary>
-    /// Service that provides database connections to the Query Builder.
+    /// Factory for creating DB Schema Provider instances.
+    /// Required for the Query Builder in Report Designer to work.
     /// </summary>
-    public class CustomConnectionProviderService : IConnectionProviderService
+    public class CustomDBSchemaProviderExFactory : DevExpress.DataAccess.Web.IDBSchemaProviderExFactory
     {
-        public SqlDataConnection? LoadConnection(string connectionName)
+        public DevExpress.DataAccess.Sql.IDBSchemaProviderEx Create()
         {
-            // Return a connection based on the name
-            if (connectionName == "3CX_Exporter" || connectionName == "DefaultConnection")
-            {
-                var connectionString = @"XpoProvider=MSSqlServer;Server=LAPTOP-A5UI98NJ\SQLEXPRESS;Database=Test_3CX_Exporter;User Id=sa;Password=V01PT0y5;TrustServerCertificate=True;Encrypt=False;";
-                var connection = new SqlDataConnection(connectionName, new CustomStringConnectionParameters(connectionString));
-                return connection;
-            }
-            return null;
+            return new DevExpress.DataAccess.Sql.DBSchemaProviderEx();
         }
     }
 }

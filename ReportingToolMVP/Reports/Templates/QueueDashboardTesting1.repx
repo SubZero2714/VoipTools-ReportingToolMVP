@@ -1,0 +1,277 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<XtraReportsLayoutSerializer SerializerVersion="25.2.3.0" Ref="1" ControlType="DevExpress.XtraReports.UI.XtraReport, DevExpress.XtraReports.v25.2, Version=25.2.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a" Name="QueueDashboardTesting1" DisplayName="Queue Dashboard Testing 1" Landscape="true" Margins="30, 30, 30, 30" PageWidthF="1100" PageHeightF="850" Version="25.2" DataSource="#Ref-0" Font="Segoe UI, 9pt">
+  <Parameters>
+    <Item1 Ref="3" Description="Queue Number:" ValueInfo="8000" Name="paramQueueNumber" />
+    <Item2 Ref="4" Description="Start Date:" ValueInfo="2024-01-01" Name="paramStartDate" />
+    <Item3 Ref="5" Description="End Date:" ValueInfo="2025-12-31" Name="paramEndDate" />
+  </Parameters>
+  <Bands>
+    <Item1 Ref="6" ControlType="TopMarginBand" Name="TopMargin1" HeightF="30" />
+    <Item2 Ref="7" ControlType="ReportHeaderBand" Name="ReportHeader" HeightF="145" BackColor="255,248,249,250">
+      <Controls>
+        <Item1 Ref="8" ControlType="XRPanel" Name="CardTotal" SizeF="190,55" LocationFloat="10,8" BackColor="White" BorderColor="255,200,200,200" Borders="All" BorderWidth="1">
+          <Controls>
+            <Item1 Ref="9" ControlType="XRPanel" Name="AccentTotal" SizeF="5,55" LocationFloat="0,0" BackColor="255,52,73,94" Borders="None" />
+            <Item2 Ref="10" ControlType="XRLabel" Name="IconTotal" Text="Total Calls" SizeF="120,18" LocationFloat="12,5" Font="Segoe UI, 9pt" ForeColor="255,100,100,100" />
+            <Item3 Ref="11" ControlType="XRLabel" Name="ValueTotal" SizeF="170,28" LocationFloat="12,24" Font="Segoe UI, 16pt, style=Bold" ForeColor="255,52,73,94">
+              <ExpressionBindings>
+                <Item1 Ref="12" EventName="BeforePrint" PropertyName="Text" Expression="[TotalCalls]" />
+              </ExpressionBindings>
+            </Item3>
+          </Controls>
+        </Item1>
+        <Item2 Ref="13" ControlType="XRPanel" Name="CardAnswered" SizeF="190,55" LocationFloat="210,8" BackColor="White" BorderColor="255,200,200,200" Borders="All" BorderWidth="1">
+          <Controls>
+            <Item1 Ref="14" ControlType="XRPanel" Name="AccentAnswered" SizeF="5,55" LocationFloat="0,0" BackColor="255,39,174,96" Borders="None" />
+            <Item2 Ref="15" ControlType="XRLabel" Name="IconAnswered" Text="Answered" SizeF="120,18" LocationFloat="12,5" Font="Segoe UI, 9pt" ForeColor="255,100,100,100" />
+            <Item3 Ref="16" ControlType="XRLabel" Name="ValueAnswered" SizeF="170,28" LocationFloat="12,24" Font="Segoe UI, 16pt, style=Bold" ForeColor="255,39,174,96">
+              <ExpressionBindings>
+                <Item1 Ref="17" EventName="BeforePrint" PropertyName="Text" Expression="[AnsweredCalls]" />
+              </ExpressionBindings>
+            </Item3>
+          </Controls>
+        </Item2>
+        <Item3 Ref="18" ControlType="XRPanel" Name="CardAbandoned" SizeF="190,55" LocationFloat="410,8" BackColor="White" BorderColor="255,200,200,200" Borders="All" BorderWidth="1">
+          <Controls>
+            <Item1 Ref="19" ControlType="XRPanel" Name="AccentAbandoned" SizeF="5,55" LocationFloat="0,0" BackColor="255,231,76,60" Borders="None" />
+            <Item2 Ref="20" ControlType="XRLabel" Name="IconAbandoned" Text="Abandoned" SizeF="120,18" LocationFloat="12,5" Font="Segoe UI, 9pt" ForeColor="255,100,100,100" />
+            <Item3 Ref="21" ControlType="XRLabel" Name="ValueAbandoned" SizeF="170,28" LocationFloat="12,24" Font="Segoe UI, 16pt, style=Bold" ForeColor="255,231,76,60">
+              <ExpressionBindings>
+                <Item1 Ref="22" EventName="BeforePrint" PropertyName="Text" Expression="[AbandonedCalls]" />
+              </ExpressionBindings>
+            </Item3>
+          </Controls>
+        </Item3>
+        <Item4 Ref="23" ControlType="XRPanel" Name="CardMissed" SizeF="190,55" LocationFloat="610,8" BackColor="White" BorderColor="255,200,200,200" Borders="All" BorderWidth="1">
+          <Controls>
+            <Item1 Ref="24" ControlType="XRPanel" Name="AccentMissed" SizeF="5,55" LocationFloat="0,0" BackColor="255,241,196,15" Borders="None" />
+            <Item2 Ref="25" ControlType="XRLabel" Name="IconMissed" Text="Missed" SizeF="120,18" LocationFloat="12,5" Font="Segoe UI, 9pt" ForeColor="255,100,100,100" />
+            <Item3 Ref="26" ControlType="XRLabel" Name="ValueMissed" SizeF="170,28" LocationFloat="12,24" Font="Segoe UI, 16pt, style=Bold" ForeColor="255,241,196,15">
+              <ExpressionBindings>
+                <Item1 Ref="27" EventName="BeforePrint" PropertyName="Text" Expression="[MissedCalls]" />
+              </ExpressionBindings>
+            </Item3>
+          </Controls>
+        </Item4>
+        <Item5 Ref="28" ControlType="XRPanel" Name="CardAnswerRate" SizeF="190,55" LocationFloat="810,8" BackColor="White" BorderColor="255,200,200,200" Borders="All" BorderWidth="1">
+          <Controls>
+            <Item1 Ref="29" ControlType="XRPanel" Name="AccentAnswerRate" SizeF="5,55" LocationFloat="0,0" BackColor="255,39,174,96" Borders="None" />
+            <Item2 Ref="30" ControlType="XRLabel" Name="IconAnswerRate" Text="Answer Rate" SizeF="120,18" LocationFloat="12,5" Font="Segoe UI, 9pt" ForeColor="255,100,100,100" />
+            <Item3 Ref="31" ControlType="XRLabel" Name="ValueAnswerRate" SizeF="170,28" LocationFloat="12,24" Font="Segoe UI, 16pt, style=Bold" ForeColor="255,39,174,96">
+              <ExpressionBindings>
+                <Item1 Ref="32" EventName="BeforePrint" PropertyName="Text" Expression="Iif([TotalCalls] &gt; 0, FormatString('{0:0.0}%', [AnsweredCalls] * 100.0 / [TotalCalls]), 'N/A')" />
+              </ExpressionBindings>
+            </Item3>
+          </Controls>
+        </Item5>
+        <Item6 Ref="33" ControlType="XRPanel" Name="CardAvgWait" SizeF="240,55" LocationFloat="10,75" BackColor="White" BorderColor="255,200,200,200" Borders="All" BorderWidth="1">
+          <Controls>
+            <Item1 Ref="34" ControlType="XRPanel" Name="AccentAvgWait" SizeF="5,55" LocationFloat="0,0" BackColor="255,241,196,15" Borders="None" />
+            <Item2 Ref="35" ControlType="XRLabel" Name="LabelAvgWait" Text="Avg Wait Time" SizeF="150,18" LocationFloat="12,5" Font="Segoe UI, 9pt" ForeColor="255,100,100,100" />
+            <Item3 Ref="36" ControlType="XRLabel" Name="ValueAvgWait" SizeF="220,28" LocationFloat="12,24" Font="Segoe UI, 14pt, style=Bold" ForeColor="255,241,196,15">
+              <ExpressionBindings>
+                <Item1 Ref="37" EventName="BeforePrint" PropertyName="Text" Expression="FormatString('{0:0} sec', [AvgWaitTimeSec])" />
+              </ExpressionBindings>
+            </Item3>
+          </Controls>
+        </Item6>
+        <Item7 Ref="38" ControlType="XRPanel" Name="CardMaxWait" SizeF="240,55" LocationFloat="260,75" BackColor="White" BorderColor="255,200,200,200" Borders="All" BorderWidth="1">
+          <Controls>
+            <Item1 Ref="39" ControlType="XRPanel" Name="AccentMaxWait" SizeF="5,55" LocationFloat="0,0" BackColor="255,231,76,60" Borders="None" />
+            <Item2 Ref="40" ControlType="XRLabel" Name="LabelMaxWait" Text="Max Wait Time" SizeF="150,18" LocationFloat="12,5" Font="Segoe UI, 9pt" ForeColor="255,100,100,100" />
+            <Item3 Ref="41" ControlType="XRLabel" Name="ValueMaxWait" SizeF="220,28" LocationFloat="12,24" Font="Segoe UI, 14pt, style=Bold" ForeColor="255,231,76,60">
+              <ExpressionBindings>
+                <Item1 Ref="42" EventName="BeforePrint" PropertyName="Text" Expression="FormatString('{0:0} sec', [MaxWaitTimeSec])" />
+              </ExpressionBindings>
+            </Item3>
+          </Controls>
+        </Item7>
+        <Item8 Ref="43" ControlType="XRPanel" Name="CardAvgTalk" SizeF="240,55" LocationFloat="510,75" BackColor="White" BorderColor="255,200,200,200" Borders="All" BorderWidth="1">
+          <Controls>
+            <Item1 Ref="44" ControlType="XRPanel" Name="AccentAvgTalk" SizeF="5,55" LocationFloat="0,0" BackColor="255,39,174,96" Borders="None" />
+            <Item2 Ref="45" ControlType="XRLabel" Name="LabelAvgTalk" Text="Avg Talk Time" SizeF="150,18" LocationFloat="12,5" Font="Segoe UI, 9pt" ForeColor="255,100,100,100" />
+            <Item3 Ref="46" ControlType="XRLabel" Name="ValueAvgTalk" SizeF="220,28" LocationFloat="12,24" Font="Segoe UI, 14pt, style=Bold" ForeColor="255,39,174,96">
+              <ExpressionBindings>
+                <Item1 Ref="47" EventName="BeforePrint" PropertyName="Text" Expression="FormatString('{0:0} sec', [AvgTalkTimeSec])" />
+              </ExpressionBindings>
+            </Item3>
+          </Controls>
+        </Item8>
+        <Item9 Ref="48" ControlType="XRPanel" Name="CardMaxTalk" SizeF="240,55" LocationFloat="760,75" BackColor="White" BorderColor="255,200,200,200" Borders="All" BorderWidth="1">
+          <Controls>
+            <Item1 Ref="49" ControlType="XRPanel" Name="AccentMaxTalk" SizeF="5,55" LocationFloat="0,0" BackColor="255,52,73,94" Borders="None" />
+            <Item2 Ref="50" ControlType="XRLabel" Name="LabelMaxTalk" Text="Max Talk Time" SizeF="150,18" LocationFloat="12,5" Font="Segoe UI, 9pt" ForeColor="255,100,100,100" />
+            <Item3 Ref="51" ControlType="XRLabel" Name="ValueMaxTalk" SizeF="220,28" LocationFloat="12,24" Font="Segoe UI, 14pt, style=Bold" ForeColor="255,52,73,94">
+              <ExpressionBindings>
+                <Item1 Ref="52" EventName="BeforePrint" PropertyName="Text" Expression="FormatString('{0:0} sec', [MaxTalkTimeSec])" />
+              </ExpressionBindings>
+            </Item3>
+          </Controls>
+        </Item9>
+      </Controls>
+    </Item2>
+    <Item3 Ref="53" ControlType="PageHeaderBand" Name="PageHeader" HeightF="45" BackColor="255,67,97,238">
+      <Controls>
+        <Item1 Ref="54" ControlType="XRLabel" Name="TitleLabel" Text="Queue Performance Dashboard" SizeF="320,26" LocationFloat="10,10" Font="Segoe UI, 14pt, style=Bold" ForeColor="White" />
+        <Item2 Ref="55" ControlType="XRLabel" Name="QueueInfoLabel" SizeF="100,22" LocationFloat="350,12" Font="Segoe UI, 10pt, style=Bold" ForeColor="White">
+          <ExpressionBindings>
+            <Item1 Ref="56" EventName="BeforePrint" PropertyName="Text" Expression="'Queue: ' + [Parameters.paramQueueNumber]" />
+          </ExpressionBindings>
+        </Item2>
+        <Item3 Ref="57" ControlType="XRLabel" Name="PeriodLabel" SizeF="220,22" LocationFloat="470,12" Font="Segoe UI, 9pt" ForeColor="255,200,220,255">
+          <ExpressionBindings>
+            <Item1 Ref="58" EventName="BeforePrint" PropertyName="Text" Expression="FormatString('{0:dd-MM-yyyy}', [Parameters.paramStartDate]) + ' to ' + FormatString('{0:dd-MM-yyyy}', [Parameters.paramEndDate])" />
+          </ExpressionBindings>
+        </Item3>
+        <Item4 Ref="59" ControlType="XRLabel" Name="GeneratedLabel" TextAlignment="TopRight" SizeF="180,22" LocationFloat="850,12" Font="Segoe UI, 8pt" ForeColor="255,200,220,255">
+          <ExpressionBindings>
+            <Item1 Ref="60" EventName="BeforePrint" PropertyName="Text" Expression="FormatString('Generated: {0:dd-MM-yyyy HH:mm}', Now())" />
+          </ExpressionBindings>
+        </Item4>
+      </Controls>
+    </Item3>
+    <Item4 Ref="61" ControlType="DetailBand" Name="Detail" HeightF="0" Visible="false" />
+    <Item5 Ref="62" ControlType="ReportFooterBand" Name="ReportFooter" HeightF="500" BackColor="White">
+      <Controls>
+        <Item1 Ref="63" ControlType="XRLabel" Name="SummaryTitle" Text="Performance Summary" SizeF="280,24" LocationFloat="10,10" Font="Segoe UI, 11pt, style=Bold" ForeColor="255,52,73,94" />
+        <Item2 Ref="64" ControlType="XRPanel" Name="SummaryHeader" SizeF="1000,28" LocationFloat="10,38" BackColor="255,67,97,238">
+          <Controls>
+            <Item1 Ref="65" ControlType="XRLabel" Name="HdrQueue" Text="Queue" SizeF="80,24" LocationFloat="5,2" Font="Segoe UI, 9pt, style=Bold" ForeColor="White" />
+            <Item2 Ref="66" ControlType="XRLabel" Name="HdrTotal" Text="Total" TextAlignment="TopCenter" SizeF="80,24" LocationFloat="90,2" Font="Segoe UI, 9pt, style=Bold" ForeColor="White" />
+            <Item3 Ref="67" ControlType="XRLabel" Name="HdrAnswered" Text="Answered" TextAlignment="TopCenter" SizeF="90,24" LocationFloat="175,2" Font="Segoe UI, 9pt, style=Bold" ForeColor="White" />
+            <Item4 Ref="68" ControlType="XRLabel" Name="HdrAbandoned" Text="Abandoned" TextAlignment="TopCenter" SizeF="90,24" LocationFloat="270,2" Font="Segoe UI, 9pt, style=Bold" ForeColor="White" />
+            <Item5 Ref="69" ControlType="XRLabel" Name="HdrMissed" Text="Missed" TextAlignment="TopCenter" SizeF="80,24" LocationFloat="365,2" Font="Segoe UI, 9pt, style=Bold" ForeColor="White" />
+            <Item6 Ref="70" ControlType="XRLabel" Name="HdrAvgWait" Text="Avg Wait" TextAlignment="TopCenter" SizeF="90,24" LocationFloat="450,2" Font="Segoe UI, 9pt, style=Bold" ForeColor="White" />
+            <Item7 Ref="71" ControlType="XRLabel" Name="HdrMaxWait" Text="Max Wait" TextAlignment="TopCenter" SizeF="90,24" LocationFloat="545,2" Font="Segoe UI, 9pt, style=Bold" ForeColor="White" />
+            <Item8 Ref="72" ControlType="XRLabel" Name="HdrAvgTalk" Text="Avg Talk" TextAlignment="TopCenter" SizeF="90,24" LocationFloat="640,2" Font="Segoe UI, 9pt, style=Bold" ForeColor="White" />
+            <Item9 Ref="73" ControlType="XRLabel" Name="HdrMaxTalk" Text="Max Talk" TextAlignment="TopCenter" SizeF="90,24" LocationFloat="735,2" Font="Segoe UI, 9pt, style=Bold" ForeColor="White" />
+            <Item10 Ref="74" ControlType="XRLabel" Name="HdrRate" Text="Answer %" TextAlignment="TopCenter" SizeF="90,24" LocationFloat="830,2" Font="Segoe UI, 9pt, style=Bold" ForeColor="White" />
+          </Controls>
+        </Item2>
+        <Item3 Ref="75" ControlType="XRPanel" Name="SummaryRow" SizeF="1000,28" LocationFloat="10,66" BackColor="255,248,249,250" BorderColor="255,200,200,200" Borders="All" BorderWidth="1">
+          <Controls>
+            <Item1 Ref="76" ControlType="XRLabel" Name="DataQueue" SizeF="80,24" LocationFloat="5,2" Font="Segoe UI, 9pt, style=Bold" ForeColor="255,52,73,94">
+              <ExpressionBindings>
+                <Item1 Ref="77" EventName="BeforePrint" PropertyName="Text" Expression="[Parameters.paramQueueNumber]" />
+              </ExpressionBindings>
+            </Item1>
+            <Item2 Ref="78" ControlType="XRLabel" Name="DataTotal" TextAlignment="TopCenter" SizeF="80,24" LocationFloat="90,2" Font="Segoe UI, 9pt" ForeColor="255,52,73,94">
+              <ExpressionBindings>
+                <Item1 Ref="79" EventName="BeforePrint" PropertyName="Text" Expression="[TotalCalls]" />
+              </ExpressionBindings>
+            </Item2>
+            <Item3 Ref="80" ControlType="XRLabel" Name="DataAnswered" TextAlignment="TopCenter" SizeF="90,24" LocationFloat="175,2" Font="Segoe UI, 9pt" ForeColor="255,39,174,96">
+              <ExpressionBindings>
+                <Item1 Ref="81" EventName="BeforePrint" PropertyName="Text" Expression="[AnsweredCalls]" />
+              </ExpressionBindings>
+            </Item3>
+            <Item4 Ref="82" ControlType="XRLabel" Name="DataAbandoned" TextAlignment="TopCenter" SizeF="90,24" LocationFloat="270,2" Font="Segoe UI, 9pt" ForeColor="255,231,76,60">
+              <ExpressionBindings>
+                <Item1 Ref="83" EventName="BeforePrint" PropertyName="Text" Expression="[AbandonedCalls]" />
+              </ExpressionBindings>
+            </Item4>
+            <Item5 Ref="84" ControlType="XRLabel" Name="DataMissed" TextAlignment="TopCenter" SizeF="80,24" LocationFloat="365,2" Font="Segoe UI, 9pt" ForeColor="255,241,196,15">
+              <ExpressionBindings>
+                <Item1 Ref="85" EventName="BeforePrint" PropertyName="Text" Expression="[MissedCalls]" />
+              </ExpressionBindings>
+            </Item5>
+            <Item6 Ref="86" ControlType="XRLabel" Name="DataAvgWait" TextAlignment="TopCenter" SizeF="90,24" LocationFloat="450,2" Font="Segoe UI, 9pt" ForeColor="255,241,196,15">
+              <ExpressionBindings>
+                <Item1 Ref="87" EventName="BeforePrint" PropertyName="Text" Expression="FormatString('{0:0}s', [AvgWaitTimeSec])" />
+              </ExpressionBindings>
+            </Item6>
+            <Item7 Ref="88" ControlType="XRLabel" Name="DataMaxWait" TextAlignment="TopCenter" SizeF="90,24" LocationFloat="545,2" Font="Segoe UI, 9pt" ForeColor="255,231,76,60">
+              <ExpressionBindings>
+                <Item1 Ref="89" EventName="BeforePrint" PropertyName="Text" Expression="FormatString('{0:0}s', [MaxWaitTimeSec])" />
+              </ExpressionBindings>
+            </Item7>
+            <Item8 Ref="90" ControlType="XRLabel" Name="DataAvgTalk" TextAlignment="TopCenter" SizeF="90,24" LocationFloat="640,2" Font="Segoe UI, 9pt" ForeColor="255,39,174,96">
+              <ExpressionBindings>
+                <Item1 Ref="91" EventName="BeforePrint" PropertyName="Text" Expression="FormatString('{0:0}s', [AvgTalkTimeSec])" />
+              </ExpressionBindings>
+            </Item8>
+            <Item9 Ref="92" ControlType="XRLabel" Name="DataMaxTalk" TextAlignment="TopCenter" SizeF="90,24" LocationFloat="735,2" Font="Segoe UI, 9pt" ForeColor="255,52,73,94">
+              <ExpressionBindings>
+                <Item1 Ref="93" EventName="BeforePrint" PropertyName="Text" Expression="FormatString('{0:0}s', [MaxTalkTimeSec])" />
+              </ExpressionBindings>
+            </Item9>
+            <Item10 Ref="94" ControlType="XRLabel" Name="DataRate" TextAlignment="TopCenter" SizeF="90,24" LocationFloat="830,2" Font="Segoe UI, 9pt, style=Bold" ForeColor="255,39,174,96">
+              <ExpressionBindings>
+                <Item1 Ref="95" EventName="BeforePrint" PropertyName="Text" Expression="Iif([TotalCalls] &gt; 0, FormatString('{0:0.0}%', [AnsweredCalls] * 100.0 / [TotalCalls]), 'N/A')" />
+              </ExpressionBindings>
+            </Item10>
+          </Controls>
+        </Item3>
+        <Item4 Ref="96" ControlType="XRLabel" Name="StatsTitle" Text="Quick Statistics" SizeF="280,24" LocationFloat="10,120" Font="Segoe UI, 11pt, style=Bold" ForeColor="255,52,73,94" />
+        <Item5 Ref="97" ControlType="XRPanel" Name="StatsPanel" SizeF="480,140" LocationFloat="10,148" BackColor="255,248,249,250" BorderColor="255,200,200,200" Borders="All" BorderWidth="1">
+          <Controls>
+            <Item1 Ref="98" ControlType="XRLabel" Name="LblAnswerRate" Text="Answer Rate:" SizeF="150,22" LocationFloat="15,15" Font="Segoe UI, 10pt" ForeColor="255,80,80,80" />
+            <Item2 Ref="99" ControlType="XRLabel" Name="ValAnswerRate" SizeF="200,22" LocationFloat="170,15" Font="Segoe UI, 10pt, style=Bold" ForeColor="255,39,174,96">
+              <ExpressionBindings>
+                <Item1 Ref="100" EventName="BeforePrint" PropertyName="Text" Expression="Iif([TotalCalls] &gt; 0, FormatString('{0:0.00}%', [AnsweredCalls] * 100.0 / [TotalCalls]), 'N/A')" />
+              </ExpressionBindings>
+            </Item2>
+            <Item3 Ref="101" ControlType="XRLabel" Name="LblAbandonRate" Text="Abandon Rate:" SizeF="150,22" LocationFloat="15,42" Font="Segoe UI, 10pt" ForeColor="255,80,80,80" />
+            <Item4 Ref="102" ControlType="XRLabel" Name="ValAbandonRate" SizeF="200,22" LocationFloat="170,42" Font="Segoe UI, 10pt, style=Bold" ForeColor="255,231,76,60">
+              <ExpressionBindings>
+                <Item1 Ref="103" EventName="BeforePrint" PropertyName="Text" Expression="Iif([TotalCalls] &gt; 0, FormatString('{0:0.00}%', [AbandonedCalls] * 100.0 / [TotalCalls]), 'N/A')" />
+              </ExpressionBindings>
+            </Item4>
+            <Item5 Ref="104" ControlType="XRLabel" Name="LblMissedRate" Text="Missed Rate:" SizeF="150,22" LocationFloat="15,69" Font="Segoe UI, 10pt" ForeColor="255,80,80,80" />
+            <Item6 Ref="105" ControlType="XRLabel" Name="ValMissedRate" SizeF="200,22" LocationFloat="170,69" Font="Segoe UI, 10pt, style=Bold" ForeColor="255,241,196,15">
+              <ExpressionBindings>
+                <Item1 Ref="106" EventName="BeforePrint" PropertyName="Text" Expression="Iif([TotalCalls] &gt; 0, FormatString('{0:0.00}%', [MissedCalls] * 100.0 / [TotalCalls]), 'N/A')" />
+              </ExpressionBindings>
+            </Item6>
+            <Item7 Ref="107" ControlType="XRLabel" Name="LblTotalTime" Text="Total Calls in Period:" SizeF="150,22" LocationFloat="15,96" Font="Segoe UI, 10pt" ForeColor="255,80,80,80" />
+            <Item8 Ref="108" ControlType="XRLabel" Name="ValTotalTime" SizeF="200,22" LocationFloat="170,96" Font="Segoe UI, 10pt, style=Bold" ForeColor="255,52,73,94">
+              <ExpressionBindings>
+                <Item1 Ref="109" EventName="BeforePrint" PropertyName="Text" Expression="[TotalCalls]" />
+              </ExpressionBindings>
+            </Item8>
+          </Controls>
+        </Item5>
+        <Item6 Ref="110" ControlType="XRPanel" Name="BreakdownPanel" SizeF="480,140" LocationFloat="510,148" BackColor="255,248,249,250" BorderColor="255,200,200,200" Borders="All" BorderWidth="1">
+          <Controls>
+            <Item1 Ref="111" ControlType="XRLabel" Name="BreakdownTitle" Text="Call Breakdown" SizeF="200,22" LocationFloat="15,10" Font="Segoe UI, 10pt, style=Bold" ForeColor="255,52,73,94" />
+            <Item2 Ref="112" ControlType="XRLabel" Name="LblBreakAnswered" Text="Answered Calls:" SizeF="160,22" LocationFloat="15,40" Font="Segoe UI, 10pt" ForeColor="255,39,174,96" />
+            <Item3 Ref="113" ControlType="XRLabel" Name="ValBreakAnswered" SizeF="200,22" LocationFloat="180,40" Font="Segoe UI, 10pt, style=Bold" ForeColor="255,39,174,96">
+              <ExpressionBindings>
+                <Item1 Ref="114" EventName="BeforePrint" PropertyName="Text" Expression="[AnsweredCalls]" />
+              </ExpressionBindings>
+            </Item3>
+            <Item4 Ref="115" ControlType="XRLabel" Name="LblBreakAbandoned" Text="Abandoned Calls:" SizeF="160,22" LocationFloat="15,67" Font="Segoe UI, 10pt" ForeColor="255,231,76,60" />
+            <Item5 Ref="116" ControlType="XRLabel" Name="ValBreakAbandoned" SizeF="200,22" LocationFloat="180,67" Font="Segoe UI, 10pt, style=Bold" ForeColor="255,231,76,60">
+              <ExpressionBindings>
+                <Item1 Ref="117" EventName="BeforePrint" PropertyName="Text" Expression="[AbandonedCalls]" />
+              </ExpressionBindings>
+            </Item5>
+            <Item6 Ref="118" ControlType="XRLabel" Name="LblBreakMissed" Text="Missed Calls:" SizeF="160,22" LocationFloat="15,94" Font="Segoe UI, 10pt" ForeColor="255,241,196,15" />
+            <Item7 Ref="119" ControlType="XRLabel" Name="ValBreakMissed" SizeF="200,22" LocationFloat="180,94" Font="Segoe UI, 10pt, style=Bold" ForeColor="255,241,196,15">
+              <ExpressionBindings>
+                <Item1 Ref="120" EventName="BeforePrint" PropertyName="Text" Expression="[MissedCalls]" />
+              </ExpressionBindings>
+            </Item7>
+          </Controls>
+        </Item6>
+        <Item7 Ref="121" ControlType="XRLabel" Name="NotesLabel" Text="Notes: This dashboard shows call metrics for the selected queue and date range. Answered calls are successful connections. Abandoned calls are when callers hung up waiting. Missed calls are when agents did not answer in time." SizeF="980,40" LocationFloat="10,310" Font="Segoe UI, 9pt, style=Italic" ForeColor="255,120,120,120" />
+      </Controls>
+    </Item5>
+    <Item6 Ref="122" ControlType="PageFooterBand" Name="PageFooter" HeightF="25" BackColor="WhiteSmoke">
+      <Controls>
+        <Item1 Ref="123" ControlType="XRPageInfo" Name="DateTimeInfo" PageInfo="DateTime" TextFormatString="Generated: {0:dd-MM-yyyy HH:mm}" SizeF="200,18" LocationFloat="10,4" Font="Segoe UI, 8pt" ForeColor="Gray" />
+        <Item2 Ref="124" ControlType="XRLabel" Name="ReportName" Text="Queue Dashboard Testing 1" TextAlignment="TopCenter" SizeF="300,18" LocationFloat="400,4" Font="Segoe UI, 8pt" ForeColor="Gray" />
+        <Item3 Ref="125" ControlType="XRPageInfo" Name="PageNumberInfo" TextFormatString="Page {0} of {1}" TextAlignment="TopRight" SizeF="100,18" LocationFloat="910,4" Font="Segoe UI, 8pt" ForeColor="Gray" />
+      </Controls>
+    </Item6>
+    <Item7 Ref="126" ControlType="BottomMarginBand" Name="BottomMargin1" HeightF="30" />
+  </Bands>
+  <ParameterPanelLayoutItems>
+    <Item1 Ref="127" LayoutItemType="Parameter" Parameter="#Ref-3" />
+    <Item2 Ref="128" LayoutItemType="Parameter" Parameter="#Ref-4" />
+    <Item3 Ref="129" LayoutItemType="Parameter" Parameter="#Ref-5" />
+  </ParameterPanelLayoutItems>
+  <ComponentStorage>
+    <Item1 Ref="0" ObjectType="DevExpress.DataAccess.Sql.SqlDataSource,DevExpress.DataAccess.v25.2" Name="SqlDataSource" Base64="PFNxbERhdGFTb3VyY2UgTmFtZT0iU3FsRGF0YVNvdXJjZSI+PENvbm5lY3Rpb24gTmFtZT0iM0NYX0V4cG9ydGVyIiBDb25uZWN0aW9uU3RyaW5nPSJYcG9Qcm92aWRlcj1NU1NxbFNlcnZlcjtTZXJ2ZXI9TEFQVE9QLUExVUk5OE5KXFNRTEVYUFJFU1M7RGF0YWJhc2U9VGVzdF8zQ1hfRXhwb3J0ZXI7VXNlciBJZD1zYTtQYXNzd29yZD1WMDFQVDB5NTtUcnVzdFNlcnZlckNlcnRpZmljYXRlPVRydWU7RW5jcnlwdD1GYWxzZTsiIC8+PENvbm5lY3Rpb25PcHRpb25zIENsb3NlQ29ubmVjdGlvbj0idHJ1ZSIgLz48L1NxbERhdGFTb3VyY2U+" />
+  </ComponentStorage>
+</XtraReportsLayoutSerializer>

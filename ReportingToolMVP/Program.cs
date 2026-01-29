@@ -1,9 +1,7 @@
-﻿using DevExpress.Blazor;
+﻿using DevExpress.AspNetCore.Reporting;
+using DevExpress.Blazor;
 using DevExpress.Blazor.Reporting;
 using DevExpress.XtraReports.Web.Extensions;
-using DevExpress.DataAccess.Web;
-using DevExpress.DataAccess.Wizard.Services;
-using DevExpress.DataAccess.Sql;
 using ReportingToolMVP.Components;
 using ReportingToolMVP.Services;
 
@@ -23,20 +21,29 @@ builder.Services.AddDevExpressBlazor();
 builder.Services.AddDevExpressBlazorReporting();
 builder.Services.AddDevExpressServerSideBlazorReportViewer();
 
+// Configure Reporting Services - CRITICAL: Enable Custom SQL for Report Designer
+builder.Services.ConfigureReportingServices(configurator => {
+    configurator.ConfigureReportDesigner(designerConfigurator => {
+        // Enable custom SQL queries in the Report Designer - THIS FIXES "Query X is not allowed"
+        designerConfigurator.EnableCustomSql();
+    });
+    
+    configurator.ConfigureWebDocumentViewer(viewerConfigurator => {
+        viewerConfigurator.UseCachedReportSourceBuilder();
+    });
+});
+
 // Register report storage service (file-based)
 builder.Services.AddScoped<ReportStorageWebExtension, FileReportStorageService>();
 
 // Register SQL Data Source provider for Report Designer wizard
-builder.Services.AddScoped<IDataSourceWizardConnectionStringsProvider, CustomDataSourceWizardConnectionStringsProvider>();
-
-// Register DB Schema Provider Factory for Query Builder (REQUIRED for pencil icon to work!)
-builder.Services.AddScoped<IDBSchemaProviderExFactory, CustomDBSchemaProviderExFactory>();
+builder.Services.AddScoped<DevExpress.DataAccess.Web.IDataSourceWizardConnectionStringsProvider, CustomDataSourceWizardConnectionStringsProvider>();
 
 // Register Connection Provider Factory for editing existing data source queries
-builder.Services.AddScoped<IConnectionProviderFactory, CustomConnectionProviderFactory>();
+builder.Services.AddScoped<DevExpress.DataAccess.Web.IConnectionProviderFactory, CustomConnectionProviderFactory>();
 
-// Register custom SQL query validator to allow our dashboard queries
-builder.Services.AddScoped<ICustomQueryValidator, AllowAllQueriesValidator>();
+// Register DB Schema Provider Factory - Required for Query Builder in Report Designer
+builder.Services.AddScoped<DevExpress.DataAccess.Web.IDBSchemaProviderExFactory, CustomDBSchemaProviderExFactory>();
 
 // Register custom services
 builder.Services.AddScoped<ICustomReportService, CustomReportService>();

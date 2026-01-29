@@ -1,40 +1,20 @@
 # VoIPTools Reporting Tool - AI Agent Instructions
 
 ## Project Overview
-.NET 8 Blazor Server reporting application for 3CX call queue analytics. Two reporting modes: query-based builder (DxGrid/DxChart) and WYSIWYG designer (DevExpress `.repx` templates + code-based reports).
+.NET 8 Blazor Server reporting application for 3CX call queue analytics. Two reporting modes: query-based builder (DxGrid/DxChart) and WYSIWYG designer (DevExpress `.repx` templates).
 
 ## Architecture
 
 ```
 ReportBuilder.razor → CustomReportService.cs → Dapper → SQL Server → DxGrid/DxChart
-ReportDesigner.razor → DxReportDesigner → FileReportStorageService → Reports/*.repx OR code-based reports
+ReportDesigner.razor → DxReportDesigner → FileReportStorageService → Reports/*.repx
 ReportViewer.razor → DxReportViewer → ReportStorageWebExtension
-QueueDashboardReport.cs → SqlDataSource → vw_QueueDashboard_* views → KPI Cards + Charts
 ```
 
 ### Key Tables
 - `callcent_queuecalls` – call records with queue metrics
 - `queue` – queue definitions (names)
 - `dn` – phone extensions (links queues to calls)
-- `users` – agent information
-
-### Dashboard SQL Views
-- `vw_QueueDashboard_KPIs` – aggregated KPI metrics (Total/Answered/Abandoned/Missed/SLA)
-- `vw_QueueDashboard_AgentPerformance` – per-agent call statistics
-- `vw_QueueDashboard_CallTrends` – daily call volume trends
-- `vw_QueueList` – queue dropdown data
-
-### Call Status Logic
-```sql
--- Answered: Agent picked up the call
-reason_noanswercode = 0 AND ts_servicing > '00:00:00'
-
--- Abandoned: Caller hung up (MaxWaitTime or UserRequested)
-reason_noanswercode IN (3, 4)
-
--- Missed: No agents available
-reason_noanswercode = 2
-```
 
 ## Critical Patterns
 
@@ -102,31 +82,10 @@ builder.Services.AddDevExpressBlazorReporting();           // 2. Reporting servi
 builder.Services.AddScoped<ReportStorageWebExtension, FileReportStorageService>();
 builder.Services.AddScoped<IDataSourceWizardConnectionStringsProvider, ...>();
 builder.Services.AddScoped<IDBSchemaProviderExFactory, ...>();  // Required for Query Builder
-builder.Services.AddScoped<ICustomQueryValidator, AllowAllQueriesValidator>();  // Allow custom SQL
 // ...
 app.UseDevExpressBlazorReporting();  // BEFORE MapRazorComponents
 app.MapRazorComponents<App>().AddInteractiveServerRenderMode();
 ```
-
-## Code-Based Reports
-Reports can be created programmatically in C# (see `Reports/QueueDashboardReport.cs`):
-```csharp
-public class QueueDashboardReport : XtraReport
-{
-    private void CreateDataSource()
-    {
-        var sqlDataSource = new SqlDataSource("QueueDashboardDataSource");
-        sqlDataSource.ConnectionParameters = new CustomStringConnectionParameters(connectionString);
-        
-        var kpiQuery = new CustomSqlQuery("KPISummary", "SELECT ... FROM vw_QueueDashboard_KPIs ...");
-        kpiQuery.Parameters.Add(new QueryParameter("paramQueueNumber", typeof(string), "8000"));
-        
-        sqlDataSource.Queries.AddRange(new[] { kpiQuery, agentQuery, trendsQuery });
-        this.DataSource = sqlDataSource;
-    }
-}
-```
-**Note:** Expression-based parameter bindings (`new Expression("?paramName")`) cannot be serialized. Use static default values.
 
 ## Developer Workflow
 
