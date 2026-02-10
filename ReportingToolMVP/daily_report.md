@@ -4,6 +4,194 @@ This file tracks daily development progress, bugs fixed, and features implemente
 
 ---
 
+## January 29, 2026 (Wednesday)
+
+### 🎯 Focus: Custom SQL Guide Documentation & Report Designer Troubleshooting
+
+**Session Theme:** Deep dive into DevExpress Report Designer - understanding data binding, SQL parameters, and creating end-user documentation.
+
+### 📚 Learning Topics Covered
+
+| Topic | Key Takeaways |
+|-------|---------------|
+| **Data Federation** | Combining multiple data sources (SQL, JSON, Excel) into one unified data source. Useful for joining data from different systems. |
+| **Yellow X Icon in Report Designer** | Indicates invalid data binding - the field/query referenced doesn't exist in the data source or schema mismatch |
+| **SQL Parameter Binding** | SQL parameters (like `@StartDate`) MUST be linked to Report Parameters using Type="Expression" and Value=`[Parameters.paramName]` |
+| **.repx File Format** | DevExpress v25.2 requires Base64-encoded ComponentStorage format for data sources, not inline XML |
+| **Expression Bindings** | Use `[FieldName]` syntax for data fields, `[Parameters.paramName]` for report parameters |
+
+### ✅ Completed Tasks
+
+#### 1. Created Comprehensive Custom SQL Guide
+- Created `CUSTOM_SQL_GUIDE.md` - step-by-step guide for end users
+- Covers: Adding SQL Data Source, Custom SQL queries, Parameter configuration
+- Includes troubleshooting section for common errors
+- Documents key database tables and columns
+
+#### 2. Fixed Query Builder Schema Error
+- **Problem:** "An error occurred while rebuilding a data source schema"
+- **Root Cause:** Missing `IDBSchemaProviderExFactory` service
+- **Solution:** Added `CustomDBSchemaProviderExFactory` class and registered in DI
+
+#### 3. Diagnosed Blank Report Preview Issue
+- **Problem:** Reports showing blank data in Preview
+- **Root Cause:** SQL parameters not linked to Report Parameters
+- **Error:** "Must declare the scalar variable @paramQueueNumber"
+- **Solution Documented:** Set parameter Type to "Expression" and Value to `[Parameters.xxx]`
+
+#### 4. Cleaned Up Broken Report Files
+- Deleted `SimpleKPITest.repx` - had incorrect XML format (inline instead of Base64)
+- Verified remaining reports in `Reports/Templates/` folder
+
+#### 5. Git Commit & Push
+- Committed all changes with descriptive message
+- Pushed to GitHub: `c2da118`
+
+### 📝 Documentation Created
+
+| File | Purpose |
+|------|---------|
+| `CUSTOM_SQL_GUIDE.md` | End-user guide for custom SQL in Report Designer |
+
+**Key Documentation Links Researched:**
+- Report Parameters: https://devexpress.github.io/dotnet-eud/reporting-for-web/articles/report-designer/use-report-parameters.html
+- Reference Parameters: https://docs.devexpress.com/XtraReports/402962/detailed-guide-to-devexpress-reporting/use-report-parameters/reference-report-parameters
+- Data Binding Modes: https://docs.devexpress.com/XtraReports/119236/detailed-guide-to-devexpress-reporting/use-expressions/data-binding-modes
+
+### 🐛 Issues Investigated
+
+| Issue | Root Cause | Status |
+|-------|------------|--------|
+| Schema rebuild error | Missing IDBSchemaProviderExFactory | ✅ Fixed |
+| Blank report preview | SQL params not linked to Report params | 📝 Documented |
+| "Invalid data member 'KPIData'" | .repx file used wrong XML format | ✅ Deleted broken file |
+| Yellow X next to Data Member | Data source schema mismatch | 📝 Documented in guide |
+
+### 💡 Key Insight: SQL Parameter Binding
+
+The **critical step** that was causing blank reports:
+
+```
+❌ WRONG: SQL Parameter Type = "Value", Value = "8000"
+   → Error: "Must declare scalar variable @paramQueueNumber"
+
+✅ CORRECT: SQL Parameter Type = "Expression", Value = "[Parameters.paramQueueNumber]"
+   → Data flows correctly from Report Parameter to SQL Query
+```
+
+### 🔜 Next Steps
+
+- [ ] Test the documented workflow in Report Designer
+- [ ] Create a working sample report using the guide
+- [ ] Add more SQL query examples to the guide
+- [ ] Consider creating video walkthrough
+
+---
+
+## January 28, 2026 (Tuesday)
+
+### 🎯 Focus: Report Designer Data Source Investigation
+
+**Session Theme:** Troubleshooting why custom SQL queries in Report Designer show no data in Preview.
+
+### 📚 Learning Topics Covered
+
+| Topic | Key Takeaways |
+|-------|---------------|
+| **Report Parameters vs SQL Parameters** | Report Parameters are user-facing (shown in Parameters Panel). SQL Parameters are query-level and must be linked to Report Parameters. |
+| **EnableCustomSql()** | Must call `options.EnableCustomSql()` in Program.cs to allow end users to write custom SQL queries |
+| **ICustomQueryValidator** | Validates custom SQL queries - `AllowAllQueriesValidator` allows all queries |
+| **IDBSchemaProviderExFactory** | Required for Query Builder to fetch database schema (tables, columns) |
+
+### ✅ Completed Tasks
+
+#### 1. Added IDBSchemaProviderExFactory Service
+- Created `CustomDBSchemaProviderExFactory` in `ReportDataSourceProviders.cs`
+- Registered in `Program.cs` DI container
+- Fixed Query Builder schema fetching
+
+#### 2. Investigated "Must declare scalar variable" Error
+- Found in terminal logs when running report Preview
+- Identified that SQL parameters weren't properly bound to Report Parameters
+- Researched DevExpress documentation on parameter binding
+
+### 🐛 Bugs Identified
+
+| Bug | Cause | Status |
+|-----|-------|--------|
+| Query Builder not fetching schema | Missing IDBSchemaProviderExFactory | ✅ Fixed |
+| SQL parameters not resolved | Parameters need Expression binding | 📝 Documented |
+
+---
+
+## January 27, 2026 (Monday)
+
+### 🎯 Focus: Understanding Report Designer Architecture
+
+**Session Theme:** Learning how DevExpress Report Designer works in a Blazor Server application.
+
+### 📚 Learning Topics Covered
+
+| Topic | Key Takeaways |
+|-------|---------------|
+| **ReportStorageWebExtension** | Service that handles report file storage (load/save .repx files) |
+| **FileReportStorageService** | Custom implementation storing reports in `Reports/Templates/` folder |
+| **DxReportDesigner vs DxReportViewer** | Designer = create/edit reports, Viewer = view/export reports |
+| **Data Source Wizard** | Built-in wizard for connecting to databases, selecting tables/queries |
+
+### ✅ Completed Tasks
+
+#### 1. Reviewed Report Designer Service Architecture
+- Understood `FileReportStorageService` for .repx storage
+- Reviewed `ReportDataSourceProviders.cs` for data connections
+- Examined `Program.cs` service registration order
+
+#### 2. Tested Report Designer UI
+- Navigated to `/reportdesigner`
+- Explored Data Source wizard
+- Tested custom SQL query input
+
+---
+
+## January 24-26, 2026 (Friday-Sunday)
+
+### 🎯 Focus: Application Testing & Bug Fixes
+
+**Session Theme:** Testing the Report Builder and Report Designer components, fixing various issues.
+
+### ✅ Completed Tasks
+
+1. Tested ReportBuilder with DxGrid and DxChart
+2. Verified date range filtering works
+3. Tested queue selection dropdown
+4. Fixed various CSS styling issues
+
+---
+
+## January 23, 2026 (Thursday)
+
+### 🎯 Focus: Hot Reload & Development Workflow
+
+**Session Theme:** Learning efficient development workflow with .NET hot reload.
+
+### 📚 Learning Topics Covered
+
+| Topic | Key Takeaways |
+|-------|---------------|
+| **Hot Reload** | `dotnet watch run` enables live code changes without restart |
+| **appsettings.json** | Configuration file for connection strings, not committed to git |
+| **launchSettings.json** | Defines development URLs and environment |
+
+### ✅ Commands Learned
+
+| Command | Purpose |
+|---------|---------|
+| `dotnet run` | Build and run the application |
+| `dotnet build` | Compile without running |
+| `dotnet watch run` | Run with hot reload enabled |
+
+---
+
 ## January 22, 2026 (Wednesday) - Continued
 
 ### 🎯 Focus: Folder Organization, Feature Enhancements, and Bug Fixes

@@ -1,0 +1,309 @@
+<?xml version="1.0" encoding="utf-8"?>
+<XtraReportsLayoutSerializer SerializerVersion="25.2.3.0" Ref="1" ControlType="DevExpress.XtraReports.UI.XtraReport, DevExpress.XtraReports.v25.2" Name="QueueSummaryReport" DisplayName="Queue Summary Report" PageWidth="850" PageHeight="1100" Version="25.2" DataSource="#Ref-0" DataMember="QueueKPIs" Font="Segoe UI, 9pt">
+  <Parameters>
+    <Item1 Ref="2" Name="QueueNumber" Description="Select Queue" Type="#Ref-3" ValueSourceSettings="#Ref-4" />
+  </Parameters>
+  <Bands>
+    <Item1 Ref="5" ControlType="TopMarginBand" Name="TopMargin" HeightF="40" />
+    <Item2 Ref="6" ControlType="ReportHeaderBand" Name="ReportHeader" HeightF="210">
+      <Controls>
+        <!-- Report Title -->
+        <Item1 Ref="7" ControlType="XRLabel" Name="lblTitle" Text="Queue Performance Report" SizeF="400,35" LocationFloat="15,10" Font="Segoe UI, 22pt, style=Bold" ForeColor="#9b59b6" Padding="2,2,0,0,100" />
+        <Item2 Ref="8" ControlType="XRLabel" Name="lblSubtitle" Text="Individual Queue Performance Analysis" SizeF="350,20" LocationFloat="15,45" Font="Segoe UI, 9pt" ForeColor="#718096" Padding="2,2,0,0,100" />
+        
+        <!-- Queue Info -->
+        <Item3 Ref="9" ControlType="XRLabel" Name="lblQueueName" SizeF="300,30" LocationFloat="15,75" Font="Segoe UI, 16pt, style=Bold" ForeColor="#2d3748" Padding="2,2,0,0,100">
+          <ExpressionBindings>
+            <Item1 Ref="10" EventName="BeforePrint" PropertyName="Text" Expression="[QueueName]" />
+          </ExpressionBindings>
+        </Item3>
+        <Item4 Ref="11" ControlType="XRLabel" Name="lblQueueRank" SizeF="200,20" LocationFloat="15,105" Font="Segoe UI, 9pt" ForeColor="#718096" Padding="2,2,0,0,100">
+          <ExpressionBindings>
+            <Item1 Ref="12" EventName="BeforePrint" PropertyName="Text" Expression="'Rank #' + [QueueRank] + ' by call volume | ' + [UniqueAgents] + ' agents'" />
+          </ExpressionBindings>
+        </Item4>
+        
+        <!-- Date Range Info -->
+        <Item5 Ref="13" ControlType="XRLabel" Name="lblDateRange" SizeF="250,15" LocationFloat="600,15" Font="Segoe UI, 7pt" ForeColor="#a0aec0" TextAlignment="TopRight" Padding="2,2,0,0,100">
+          <ExpressionBindings>
+            <Item1 Ref="14" EventName="BeforePrint" PropertyName="Text" Expression="'Data: ' + FormatString('{0:MMM d, yyyy}', [FirstCallDate]) + ' - ' + FormatString('{0:MMM d, yyyy}', [LastCallDate])" />
+          </ExpressionBindings>
+        </Item5>
+        <Item6 Ref="15" ControlType="XRLabel" Name="lblGenerated" SizeF="250,15" LocationFloat="600,30" Font="Segoe UI, 7pt" ForeColor="#a0aec0" TextAlignment="TopRight" Padding="2,2,0,0,100">
+          <ExpressionBindings>
+            <Item1 Ref="16" EventName="BeforePrint" PropertyName="Text" Expression="'Generated: ' + FormatString('{0:MM-dd-yyyy hh:mm tt}', Now())" />
+          </ExpressionBindings>
+        </Item6>
+        
+        <!-- KPI Cards Row 1 -->
+        <!-- Card 1: Total Calls -->
+        <Item7 Ref="17" ControlType="XRPanel" Name="panelTotalCalls" SizeF="100,55" LocationFloat="15,135" BorderColor="#e2e8f0" Borders="All" BorderWidth="1">
+          <Controls>
+            <Item1 Ref="18" ControlType="XRLabel" Name="lblTotalCallsValue" SizeF="90,25" LocationFloat="5,5" Font="Segoe UI, 16pt, style=Bold" ForeColor="#4a5568" TextAlignment="TopCenter">
+              <ExpressionBindings>
+                <Item1 Ref="19" EventName="BeforePrint" PropertyName="Text" Expression="FormatString('{0:N0}', [TotalCalls])" />
+              </ExpressionBindings>
+            </Item1>
+            <Item2 Ref="20" ControlType="XRLabel" Name="lblTotalCallsCaption" Text="Total Calls" SizeF="90,15" LocationFloat="5,32" Font="Segoe UI, 7pt" ForeColor="#a0aec0" TextAlignment="TopCenter" />
+          </Controls>
+        </Item7>
+        
+        <!-- Card 2: Answered -->
+        <Item8 Ref="21" ControlType="XRPanel" Name="panelAnswered" SizeF="100,55" LocationFloat="125,135" BorderColor="#e2e8f0" Borders="All" BorderWidth="1">
+          <Controls>
+            <Item1 Ref="22" ControlType="XRLabel" Name="lblAnsweredValue" SizeF="90,25" LocationFloat="5,5" Font="Segoe UI, 16pt, style=Bold" ForeColor="#48bb78" TextAlignment="TopCenter">
+              <ExpressionBindings>
+                <Item1 Ref="23" EventName="BeforePrint" PropertyName="Text" Expression="FormatString('{0:N0}', [AnsweredCalls])" />
+              </ExpressionBindings>
+            </Item1>
+            <Item2 Ref="24" ControlType="XRLabel" Name="lblAnsweredCaption" Text="Answered" SizeF="90,15" LocationFloat="5,32" Font="Segoe UI, 7pt" ForeColor="#a0aec0" TextAlignment="TopCenter" />
+          </Controls>
+        </Item8>
+        
+        <!-- Card 3: Abandoned -->
+        <Item9 Ref="25" ControlType="XRPanel" Name="panelAbandoned" SizeF="100,55" LocationFloat="235,135" BorderColor="#e2e8f0" Borders="All" BorderWidth="1">
+          <Controls>
+            <Item1 Ref="26" ControlType="XRLabel" Name="lblAbandonedValue" SizeF="90,25" LocationFloat="5,5" Font="Segoe UI, 16pt, style=Bold" ForeColor="#f56565" TextAlignment="TopCenter">
+              <ExpressionBindings>
+                <Item1 Ref="27" EventName="BeforePrint" PropertyName="Text" Expression="FormatString('{0:N0}', [AbandonedCalls])" />
+              </ExpressionBindings>
+            </Item1>
+            <Item2 Ref="28" ControlType="XRLabel" Name="lblAbandonedCaption" Text="Abandoned" SizeF="90,15" LocationFloat="5,32" Font="Segoe UI, 7pt" ForeColor="#a0aec0" TextAlignment="TopCenter" />
+          </Controls>
+        </Item9>
+        
+        <!-- Card 4: Answer Rate -->
+        <Item10 Ref="29" ControlType="XRPanel" Name="panelAnswerRate" SizeF="100,55" LocationFloat="345,135" BorderColor="#e2e8f0" Borders="All" BorderWidth="1">
+          <Controls>
+            <Item1 Ref="30" ControlType="XRLabel" Name="lblAnswerRateValue" SizeF="90,25" LocationFloat="5,5" Font="Segoe UI, 16pt, style=Bold" ForeColor="#48bb78" TextAlignment="TopCenter">
+              <ExpressionBindings>
+                <Item1 Ref="31" EventName="BeforePrint" PropertyName="Text" Expression="FormatString('{0}%', [AnswerRatePercent])" />
+              </ExpressionBindings>
+            </Item1>
+            <Item2 Ref="32" ControlType="XRLabel" Name="lblAnswerRateCaption" Text="Answer Rate" SizeF="90,15" LocationFloat="5,32" Font="Segoe UI, 7pt" ForeColor="#a0aec0" TextAlignment="TopCenter" />
+          </Controls>
+        </Item10>
+        
+        <!-- Card 5: SLA % -->
+        <Item11 Ref="33" ControlType="XRPanel" Name="panelSLA" SizeF="100,55" LocationFloat="455,135" BorderColor="#e2e8f0" Borders="All" BorderWidth="1">
+          <Controls>
+            <Item1 Ref="34" ControlType="XRLabel" Name="lblSLAValue" SizeF="90,25" LocationFloat="5,5" Font="Segoe UI, 16pt, style=Bold" ForeColor="#4361ee" TextAlignment="TopCenter">
+              <ExpressionBindings>
+                <Item1 Ref="35" EventName="BeforePrint" PropertyName="Text" Expression="FormatString('{0}%', [SLAPercent])" />
+              </ExpressionBindings>
+            </Item1>
+            <Item2 Ref="36" ControlType="XRLabel" Name="lblSLACaption" Text="SLA %" SizeF="90,15" LocationFloat="5,32" Font="Segoe UI, 7pt" ForeColor="#a0aec0" TextAlignment="TopCenter" />
+          </Controls>
+        </Item11>
+        
+        <!-- Card 6: Avg Wait -->
+        <Item12 Ref="37" ControlType="XRPanel" Name="panelAvgWait" SizeF="100,55" LocationFloat="565,135" BorderColor="#e2e8f0" Borders="All" BorderWidth="1">
+          <Controls>
+            <Item1 Ref="38" ControlType="XRLabel" Name="lblAvgWaitValue" SizeF="90,25" LocationFloat="5,5" Font="Segoe UI, 16pt, style=Bold" ForeColor="#e67e22" TextAlignment="TopCenter">
+              <ExpressionBindings>
+                <Item1 Ref="39" EventName="BeforePrint" PropertyName="Text" Expression="[AvgWaitTime]" />
+              </ExpressionBindings>
+            </Item1>
+            <Item2 Ref="40" ControlType="XRLabel" Name="lblAvgWaitCaption" Text="Avg Wait" SizeF="90,15" LocationFloat="5,32" Font="Segoe UI, 7pt" ForeColor="#a0aec0" TextAlignment="TopCenter" />
+          </Controls>
+        </Item12>
+        
+        <!-- Card 7: Avg Talk -->
+        <Item13 Ref="41" ControlType="XRPanel" Name="panelAvgTalk" SizeF="100,55" LocationFloat="675,135" BorderColor="#e2e8f0" Borders="All" BorderWidth="1">
+          <Controls>
+            <Item1 Ref="42" ControlType="XRLabel" Name="lblAvgTalkValue" SizeF="90,25" LocationFloat="5,5" Font="Segoe UI, 16pt, style=Bold" ForeColor="#9b59b6" TextAlignment="TopCenter">
+              <ExpressionBindings>
+                <Item1 Ref="43" EventName="BeforePrint" PropertyName="Text" Expression="[AvgTalkTime]" />
+              </ExpressionBindings>
+            </Item1>
+            <Item2 Ref="44" ControlType="XRLabel" Name="lblAvgTalkCaption" Text="Avg Talk" SizeF="90,15" LocationFloat="5,32" Font="Segoe UI, 7pt" ForeColor="#a0aec0" TextAlignment="TopCenter" />
+          </Controls>
+        </Item13>
+      </Controls>
+    </Item2>
+    
+    <!-- Daily Performance Section -->
+    <Item3 Ref="45" ControlType="DetailReportBand" Name="DetailReportDaily" Level="0" DataSource="#Ref-100" DataMember="DailyPerformance">
+      <Bands>
+        <Item1 Ref="46" ControlType="ReportHeaderBand" Name="DailyHeader" HeightF="45">
+          <Controls>
+            <Item1 Ref="47" ControlType="XRLabel" Name="lblDailyTitle" Text="Daily Performance" SizeF="200,20" LocationFloat="15,5" Font="Segoe UI, 11pt, style=Bold" ForeColor="#2d3748" Padding="2,2,0,0,100" />
+            <!-- Table Header -->
+            <Item2 Ref="48" ControlType="XRTable" Name="tblDailyHeader" SizeF="770,20" LocationFloat="15,25">
+              <Rows>
+                <Item1 Ref="49" ControlType="XRTableRow" Name="rowDailyHeader" Weight="1">
+                  <Cells>
+                    <Item1 Ref="50" ControlType="XRTableCell" Name="cellHDate" Weight="1.6" Text="Date" Font="Segoe UI, 8pt, style=Bold" ForeColor="White" BackColor="#9b59b6" TextAlignment="MiddleCenter" Padding="4,4,0,0,100" />
+                    <Item2 Ref="51" ControlType="XRTableCell" Name="cellHDay" Weight="1.2" Text="Day" Font="Segoe UI, 8pt, style=Bold" ForeColor="White" BackColor="#9b59b6" TextAlignment="MiddleCenter" />
+                    <Item3 Ref="52" ControlType="XRTableCell" Name="cellHCalls" Weight="0.7" Text="Calls" Font="Segoe UI, 8pt, style=Bold" ForeColor="White" BackColor="#9b59b6" TextAlignment="MiddleCenter" />
+                    <Item4 Ref="53" ControlType="XRTableCell" Name="cellHAnswered" Weight="0.7" Text="Ans" Font="Segoe UI, 8pt, style=Bold" ForeColor="White" BackColor="#9b59b6" TextAlignment="MiddleCenter" />
+                    <Item5 Ref="54" ControlType="XRTableCell" Name="cellHAbandoned" Weight="0.7" Text="Abn" Font="Segoe UI, 8pt, style=Bold" ForeColor="White" BackColor="#9b59b6" TextAlignment="MiddleCenter" />
+                    <Item6 Ref="55" ControlType="XRTableCell" Name="cellHRate" Weight="0.7" Text="Rate%" Font="Segoe UI, 8pt, style=Bold" ForeColor="White" BackColor="#9b59b6" TextAlignment="MiddleCenter" />
+                    <Item7 Ref="56" ControlType="XRTableCell" Name="cellHSLA" Weight="0.7" Text="SLA%" Font="Segoe UI, 8pt, style=Bold" ForeColor="White" BackColor="#9b59b6" TextAlignment="MiddleCenter" />
+                    <Item8 Ref="57" ControlType="XRTableCell" Name="cellHAvgWait" Weight="0.9" Text="Avg Wait" Font="Segoe UI, 8pt, style=Bold" ForeColor="White" BackColor="#9b59b6" TextAlignment="MiddleCenter" />
+                    <Item9 Ref="58" ControlType="XRTableCell" Name="cellHAvgTalk" Weight="0.9" Text="Avg Talk" Font="Segoe UI, 8pt, style=Bold" ForeColor="White" BackColor="#9b59b6" TextAlignment="MiddleCenter" />
+                  </Cells>
+                </Item1>
+              </Rows>
+            </Item2>
+          </Controls>
+        </Item1>
+        <Item2 Ref="59" ControlType="DetailBand" Name="DetailDaily" HeightF="18">
+          <Controls>
+            <Item1 Ref="60" ControlType="XRTable" Name="tblDailyData" SizeF="770,18" LocationFloat="15,0">
+              <Rows>
+                <Item1 Ref="61" ControlType="XRTableRow" Name="rowDailyData" Weight="1">
+                  <Cells>
+                    <Item1 Ref="62" ControlType="XRTableCell" Name="cellDate" Weight="1.6" Font="Segoe UI, 8pt" BackColor="White" BorderColor="#e2e8f0" Borders="All" BorderWidth="1" TextAlignment="MiddleLeft" Padding="6,2,0,0,100">
+                      <ExpressionBindings>
+                        <Item1 Ref="63" EventName="BeforePrint" PropertyName="Text" Expression="[DateLabel]" />
+                      </ExpressionBindings>
+                    </Item1>
+                    <Item2 Ref="64" ControlType="XRTableCell" Name="cellDay" Weight="1.2" Font="Segoe UI, 8pt" BackColor="White" BorderColor="#e2e8f0" Borders="All" BorderWidth="1" TextAlignment="MiddleCenter">
+                      <ExpressionBindings>
+                        <Item1 Ref="65" EventName="BeforePrint" PropertyName="Text" Expression="[DayOfWeek]" />
+                      </ExpressionBindings>
+                    </Item2>
+                    <Item3 Ref="66" ControlType="XRTableCell" Name="cellCalls" Weight="0.7" Font="Segoe UI, 8pt" BackColor="White" BorderColor="#e2e8f0" Borders="All" BorderWidth="1" TextAlignment="MiddleCenter">
+                      <ExpressionBindings>
+                        <Item1 Ref="67" EventName="BeforePrint" PropertyName="Text" Expression="[Calls]" />
+                      </ExpressionBindings>
+                    </Item3>
+                    <Item4 Ref="68" ControlType="XRTableCell" Name="cellAnswered" Weight="0.7" Font="Segoe UI, 8pt" ForeColor="#48bb78" BackColor="White" BorderColor="#e2e8f0" Borders="All" BorderWidth="1" TextAlignment="MiddleCenter">
+                      <ExpressionBindings>
+                        <Item1 Ref="69" EventName="BeforePrint" PropertyName="Text" Expression="[Answered]" />
+                      </ExpressionBindings>
+                    </Item4>
+                    <Item5 Ref="70" ControlType="XRTableCell" Name="cellAbandoned" Weight="0.7" Font="Segoe UI, 8pt" ForeColor="#f56565" BackColor="White" BorderColor="#e2e8f0" Borders="All" BorderWidth="1" TextAlignment="MiddleCenter">
+                      <ExpressionBindings>
+                        <Item1 Ref="71" EventName="BeforePrint" PropertyName="Text" Expression="[Abandoned]" />
+                      </ExpressionBindings>
+                    </Item5>
+                    <Item6 Ref="72" ControlType="XRTableCell" Name="cellRate" Weight="0.7" Font="Segoe UI, 8pt" BackColor="White" BorderColor="#e2e8f0" Borders="All" BorderWidth="1" TextAlignment="MiddleCenter">
+                      <ExpressionBindings>
+                        <Item1 Ref="73" EventName="BeforePrint" PropertyName="Text" Expression="FormatString('{0}%', [AnswerRatePct])" />
+                      </ExpressionBindings>
+                    </Item6>
+                    <Item7 Ref="74" ControlType="XRTableCell" Name="cellSLA" Weight="0.7" Font="Segoe UI, 8pt" ForeColor="#4361ee" BackColor="White" BorderColor="#e2e8f0" Borders="All" BorderWidth="1" TextAlignment="MiddleCenter">
+                      <ExpressionBindings>
+                        <Item1 Ref="75" EventName="BeforePrint" PropertyName="Text" Expression="FormatString('{0}%', [SLAPct])" />
+                      </ExpressionBindings>
+                    </Item7>
+                    <Item8 Ref="76" ControlType="XRTableCell" Name="cellAvgWaitD" Weight="0.9" Font="Segoe UI, 8pt" BackColor="White" BorderColor="#e2e8f0" Borders="All" BorderWidth="1" TextAlignment="MiddleCenter">
+                      <ExpressionBindings>
+                        <Item1 Ref="77" EventName="BeforePrint" PropertyName="Text" Expression="[AvgWait]" />
+                      </ExpressionBindings>
+                    </Item8>
+                    <Item9 Ref="78" ControlType="XRTableCell" Name="cellAvgTalkD" Weight="0.9" Font="Segoe UI, 8pt" BackColor="White" BorderColor="#e2e8f0" Borders="All" BorderWidth="1" TextAlignment="MiddleCenter">
+                      <ExpressionBindings>
+                        <Item1 Ref="79" EventName="BeforePrint" PropertyName="Text" Expression="[AvgTalk]" />
+                      </ExpressionBindings>
+                    </Item9>
+                  </Cells>
+                </Item1>
+              </Rows>
+            </Item1>
+          </Controls>
+        </Item2>
+      </Bands>
+      <FilterString>[QueueNumber] = ?QueueNumber</FilterString>
+    </Item3>
+    
+    <!-- Agent Breakdown Section -->
+    <Item4 Ref="80" ControlType="DetailReportBand" Name="DetailReportAgents" Level="1" DataSource="#Ref-200" DataMember="AgentBreakdown">
+      <Bands>
+        <Item1 Ref="81" ControlType="ReportHeaderBand" Name="AgentHeader" HeightF="45">
+          <Controls>
+            <Item1 Ref="82" ControlType="XRLabel" Name="lblAgentTitle" Text="Agent Performance in Queue" SizeF="250,20" LocationFloat="15,10" Font="Segoe UI, 11pt, style=Bold" ForeColor="#2d3748" Padding="2,2,0,0,100" />
+            <Item2 Ref="83" ControlType="XRTable" Name="tblAgentHeader" SizeF="500,20" LocationFloat="15,30">
+              <Rows>
+                <Item1 Ref="84" ControlType="XRTableRow" Name="rowAgentHeader" Weight="1">
+                  <Cells>
+                    <Item1 Ref="85" ControlType="XRTableCell" Name="cellAHAgent" Weight="2" Text="Agent" Font="Segoe UI, 8pt, style=Bold" ForeColor="White" BackColor="#4361ee" TextAlignment="MiddleCenter" Padding="4,4,0,0,100" />
+                    <Item2 Ref="86" ControlType="XRTableCell" Name="cellAHCalls" Weight="0.8" Text="Calls" Font="Segoe UI, 8pt, style=Bold" ForeColor="White" BackColor="#4361ee" TextAlignment="MiddleCenter" />
+                    <Item3 Ref="87" ControlType="XRTableCell" Name="cellAHAnswered" Weight="0.8" Text="Answered" Font="Segoe UI, 8pt, style=Bold" ForeColor="White" BackColor="#4361ee" TextAlignment="MiddleCenter" />
+                    <Item4 Ref="88" ControlType="XRTableCell" Name="cellAHRate" Weight="0.8" Text="Rate %" Font="Segoe UI, 8pt, style=Bold" ForeColor="White" BackColor="#4361ee" TextAlignment="MiddleCenter" />
+                    <Item5 Ref="89" ControlType="XRTableCell" Name="cellAHAvgTalk" Weight="1" Text="Avg Talk" Font="Segoe UI, 8pt, style=Bold" ForeColor="White" BackColor="#4361ee" TextAlignment="MiddleCenter" />
+                    <Item6 Ref="90" ControlType="XRTableCell" Name="cellAHShare" Weight="1" Text="% of Queue" Font="Segoe UI, 8pt, style=Bold" ForeColor="White" BackColor="#4361ee" TextAlignment="MiddleCenter" />
+                  </Cells>
+                </Item1>
+              </Rows>
+            </Item2>
+          </Controls>
+        </Item1>
+        <Item2 Ref="91" ControlType="DetailBand" Name="DetailAgents" HeightF="18">
+          <Controls>
+            <Item1 Ref="92" ControlType="XRTable" Name="tblAgentData" SizeF="500,18" LocationFloat="15,0">
+              <Rows>
+                <Item1 Ref="93" ControlType="XRTableRow" Name="rowAgentData" Weight="1">
+                  <Cells>
+                    <Item1 Ref="94" ControlType="XRTableCell" Name="cellAgentName" Weight="2" Font="Segoe UI, 8pt" BackColor="White" BorderColor="#e2e8f0" Borders="All" BorderWidth="1" TextAlignment="MiddleLeft" Padding="6,2,0,0,100">
+                      <ExpressionBindings>
+                        <Item1 Ref="95" EventName="BeforePrint" PropertyName="Text" Expression="[AgentName]" />
+                      </ExpressionBindings>
+                    </Item1>
+                    <Item2 Ref="96" ControlType="XRTableCell" Name="cellAgentCalls" Weight="0.8" Font="Segoe UI, 8pt" BackColor="White" BorderColor="#e2e8f0" Borders="All" BorderWidth="1" TextAlignment="MiddleCenter">
+                      <ExpressionBindings>
+                        <Item1 Ref="97" EventName="BeforePrint" PropertyName="Text" Expression="[Calls]" />
+                      </ExpressionBindings>
+                    </Item2>
+                    <Item3 Ref="98" ControlType="XRTableCell" Name="cellAgentAnswered" Weight="0.8" Font="Segoe UI, 8pt" ForeColor="#48bb78" BackColor="White" BorderColor="#e2e8f0" Borders="All" BorderWidth="1" TextAlignment="MiddleCenter">
+                      <ExpressionBindings>
+                        <Item1 Ref="99" EventName="BeforePrint" PropertyName="Text" Expression="[Answered]" />
+                      </ExpressionBindings>
+                    </Item3>
+                    <Item4 Ref="100" ControlType="XRTableCell" Name="cellAgentRate" Weight="0.8" Font="Segoe UI, 8pt" BackColor="White" BorderColor="#e2e8f0" Borders="All" BorderWidth="1" TextAlignment="MiddleCenter">
+                      <ExpressionBindings>
+                        <Item1 Ref="101" EventName="BeforePrint" PropertyName="Text" Expression="FormatString('{0}%', [AnswerRatePct])" />
+                      </ExpressionBindings>
+                    </Item4>
+                    <Item5 Ref="102" ControlType="XRTableCell" Name="cellAgentAvgTalk" Weight="1" Font="Segoe UI, 8pt" BackColor="White" BorderColor="#e2e8f0" Borders="All" BorderWidth="1" TextAlignment="MiddleCenter">
+                      <ExpressionBindings>
+                        <Item1 Ref="103" EventName="BeforePrint" PropertyName="Text" Expression="[AvgTalkTime]" />
+                      </ExpressionBindings>
+                    </Item5>
+                    <Item6 Ref="104" ControlType="XRTableCell" Name="cellAgentShare" Weight="1" Font="Segoe UI, 8pt" ForeColor="#9b59b6" BackColor="White" BorderColor="#e2e8f0" Borders="All" BorderWidth="1" TextAlignment="MiddleCenter">
+                      <ExpressionBindings>
+                        <Item1 Ref="105" EventName="BeforePrint" PropertyName="Text" Expression="FormatString('{0}%', [QueueSharePercent])" />
+                      </ExpressionBindings>
+                    </Item6>
+                  </Cells>
+                </Item1>
+              </Rows>
+            </Item1>
+          </Controls>
+        </Item2>
+      </Bands>
+      <FilterString>[QueueNumber] = ?QueueNumber</FilterString>
+    </Item4>
+    
+    <Item5 Ref="106" ControlType="BottomMarginBand" Name="BottomMargin" HeightF="25" />
+  </Bands>
+  <ComponentStorage>
+    <Item1 Ref="0" Name="dsQueueKPIs" Base64="PFNxbERhdGFTb3VyY2UgTmFtZT0iZHNRdWV1ZUtQSXMiPjxDb25uZWN0aW9uIE5hbWU9IjNDWF9FeHBvcnRlciIgQ29ubmVjdGlvblN0cmluZz0iWHBvUHJvdmlkZXI9TVNTcWxTZXJ2ZXI7U2VydmVyPUxBUFRPUC1BNVVJOThOSlxTUUxFWFBSRVNTO0RhdGFiYXNlPVRlc3RfM0NYX0V4cG9ydGVyO1VzZXIgSWQ9c2E7UGFzc3dvcmQ9VjAxUFQweTU7VHJ1c3RTZXJ2ZXJDZXJ0aWZpY2F0ZT1UcnVlO0VuY3J5cHQ9RmFsc2U7IiAvPjxRdWVyeSBUeXBlPSJDdXN0b21TcWxRdWVyeSIgTmFtZT0iUXVldWVLUElzIj48U3FsPlNFTEVDVCAqIEZST00gZGJvLnZ3X1F1ZXVlS1BJc1N1bW1hcnk8L1NxbD48L1F1ZXJ5PjxSZXN1bHRTY2hlbWE+PERhdGFTZXQgTmFtZT0iZHNRdWV1ZUtQSXMiPjxWaWV3IE5hbWU9IlF1ZXVlS1BJcyI+PEZpZWxkIE5hbWU9IlF1ZXVlTnVtYmVyIiBUeXBlPSJTdHJpbmciIC8+PEZpZWxkIE5hbWU9IlF1ZXVlTmFtZSIgVHlwZT0iU3RyaW5nIiAvPjxGaWVsZCBOYW1lPSJUb3RhbENhbGxzIiBUeXBlPSJJbnQzMiIgLz48RmllbGQgTmFtZT0iQW5zd2VyZWRDYWxscyIgVHlwZT0iSW50MzIiIC8+PEZpZWxkIE5hbWU9IkFiYW5kb25lZENhbGxzIiBUeXBlPSJJbnQzMiIgLz48RmllbGQgTmFtZT0iQW5zd2VyUmF0ZVBlcmNlbnQiIFR5cGU9IkludDMyIiAvPjxGaWVsZCBOYW1lPSJTTEFQZXJjZW50IiBUeXBlPSJJbnQzMiIgLz48RmllbGQgTmFtZT0iQXZnV2FpdFRpbWUiIFR5cGU9IlN0cmluZyIgLz48RmllbGQgTmFtZT0iTWF4V2FpdFRpbWUiIFR5cGU9IlN0cmluZyIgLz48RmllbGQgTmFtZT0iQXZnVGFsa1RpbWUiIFR5cGU9IlN0cmluZyIgLz48RmllbGQgTmFtZT0iTWF4VGFsa1RpbWUiIFR5cGU9IlN0cmluZyIgLz48RmllbGQgTmFtZT0iVG90YWxUYWxrVGltZSIgVHlwZT0iU3RyaW5nIiAvPjxGaWVsZCBOYW1lPSJVbmlxdWVBZ2VudHMiIFR5cGU9IkludDMyIiAvPjxGaWVsZCBOYW1lPSJGaXJzdENhbGxEYXRlIiBUeXBlPSJEYXRlVGltZSIgLz48RmllbGQgTmFtZT0iTGFzdENhbGxEYXRlIiBUeXBlPSJEYXRlVGltZSIgLz48RmllbGQgTmFtZT0iUXVldWVSYW5rIiBUeXBlPSJJbnQ2NCIgLz48L1ZpZXc+PC9EYXRhU2V0PjwvUmVzdWx0U2NoZW1hPjxDb25uZWN0aW9uT3B0aW9ucyBDbG9zZUNvbm5lY3Rpb249InRydWUiIC8+PC9TcWxEYXRhU291cmNlPg==" />
+    <Item2 Ref="100" Name="dsDailyPerformance" Base64="PFNxbERhdGFTb3VyY2UgTmFtZT0iZHNEYWlseVBlcmZvcm1hbmNlIj48Q29ubmVjdGlvbiBOYW1lPSIzQ1hfRXhwb3J0ZXIiIENvbm5lY3Rpb25TdHJpbmc9Ilhwb1Byb3ZpZGVyPU1TU3FsU2VydmVyO1NlcnZlcj1MQVBUT1AtQTVVSTk4TkpcU1FMRVhQUkVTUztEYXRhYmFzZT1UZXN0XzNDWF9FeHBvcnRlcjtVc2VyIElkPXNhO1Bhc3N3b3JkPVYwMVBUMHk1O1RydXN0U2VydmVyQ2VydGlmaWNhdGU9VHJ1ZTtFbmNyeXB0PUZhbHNlOyIgLz48UXVlcnkgVHlwZT0iQ3VzdG9tU3FsUXVlcnkiIE5hbWU9IkRhaWx5UGVyZm9ybWFuY2UiPjxTcWw+U0VMRUNUICogRlJPTSBkYm8udndfUXVldWVEYWlseVBlcmZvcm1hbmNlIE9SREVSIEJZIENhbGxEYXRlIERFU0M8L1NxbD48L1F1ZXJ5PjxSZXN1bHRTY2hlbWE+PERhdGFTZXQgTmFtZT0iZHNEYWlseVBlcmZvcm1hbmNlIj48VmlldyBOYW1lPSJEYWlseVBlcmZvcm1hbmNlIj48RmllbGQgTmFtZT0iUXVldWVOdW1iZXIiIFR5cGU9IlN0cmluZyIgLz48RmllbGQgTmFtZT0iQ2FsbERhdGUiIFR5cGU9IkRhdGVUaW1lIiAvPjxGaWVsZCBOYW1lPSJEYXRlTGFiZWwiIFR5cGU9IlN0cmluZyIgLz48RmllbGQgTmFtZT0iRGF5T2ZXZWVrIiBUeXBlPSJTdHJpbmciIC8+PEZpZWxkIE5hbWU9IkNhbGxzIiBUeXBlPSJJbnQzMiIgLz48RmllbGQgTmFtZT0iQW5zd2VyZWQiIFR5cGU9IkludDMyIiAvPjxGaWVsZCBOYW1lPSJBYmFuZG9uZWQiIFR5cGU9IkludDMyIiAvPjxGaWVsZCBOYW1lPSJBbnN3ZXJSYXRlUGN0IiBUeXBlPSJJbnQzMiIgLz48RmllbGQgTmFtZT0iU0xBUGN0IiBUeXBlPSJJbnQzMiIgLz48RmllbGQgTmFtZT0iQXZnV2FpdCIgVHlwZT0iU3RyaW5nIiAvPjxGaWVsZCBOYW1lPSJBdmdUYWxrIiBUeXBlPSJTdHJpbmciIC8+PEZpZWxkIE5hbWU9IlRvdGFsVGFsayIgVHlwZT0iU3RyaW5nIiAvPjwvVmlldz48L0RhdGFTZXQ+PC9SZXN1bHRTY2hlbWE+PENvbm5lY3Rpb25PcHRpb25zIENsb3NlQ29ubmVjdGlvbj0idHJ1ZSIgLz48L1NxbERhdGFTb3VyY2U+" />
+    <Item3 Ref="200" Name="dsAgentBreakdown" Base64="PFNxbERhdGFTb3VyY2UgTmFtZT0iZHNBZ2VudEJyZWFrZG93biI+PENvbm5lY3Rpb24gTmFtZT0iM0NYX0V4cG9ydGVyIiBDb25uZWN0aW9uU3RyaW5nPSJYcG9Qcm92aWRlcj1NU1NxbFNlcnZlcjtTZXJ2ZXI9TEFQVE9QLUE1VUk5OE5KXFNRTEVYUFJFU1M7RGF0YWJhc2U9VGVzdF8zQ1hfRXhwb3J0ZXI7VXNlciBJZD1zYTtQYXNzd29yZD1WMDFQVDB5NTtUcnVzdFNlcnZlckNlcnRpZmljYXRlPVRydWU7RW5jcnlwdD1GYWxzZTsiIC8+PFF1ZXJ5IFR5cGU9IkN1c3RvbVNxbFF1ZXJ5IiBOYW1lPSJBZ2VudEJyZWFrZG93biI+PFNxbD5TRUxFQ1QgKiBGUk9NIGRiby52d19RdWV1ZUFnZW50QnJlYWtkb3duIE9SREVSIEJZIENhbGxzIERFU0M8L1NxbD48L1F1ZXJ5PjxSZXN1bHRTY2hlbWE+PERhdGFTZXQgTmFtZT0iZHNBZ2VudEJyZWFrZG93biI+PFZpZXcgTmFtZT0iQWdlbnRCcmVha2Rvd24iPjxGaWVsZCBOYW1lPSJRdWV1ZU51bWJlciIgVHlwZT0iU3RyaW5nIiAvPjxGaWVsZCBOYW1lPSJBZ2VudEV4dGVuc2lvbiIgVHlwZT0iU3RyaW5nIiAvPjxGaWVsZCBOYW1lPSJBZ2VudE5hbWUiIFR5cGU9IlN0cmluZyIgLz48RmllbGQgTmFtZT0iQ2FsbHMiIFR5cGU9IkludDMyIiAvPjxGaWVsZCBOYW1lPSJBbnN3ZXJlZCIgVHlwZT0iSW50MzIiIC8+PEZpZWxkIE5hbWU9Ik1pc3NlZCIgVHlwZT0iSW50MzIiIC8+PEZpZWxkIE5hbWU9IkFuc3dlclJhdGVQY3QiIFR5cGU9IkludDMyIiAvPjxGaWVsZCBOYW1lPSJBdmdUYWxrVGltZSIgVHlwZT0iU3RyaW5nIiAvPjxGaWVsZCBOYW1lPSJRdWV1ZVNoYXJlUGVyY2VudCIgVHlwZT0iRGVjaW1hbCIgLz48L1ZpZXc+PC9EYXRhU2V0PjwvUmVzdWx0U2NoZW1hPjxDb25uZWN0aW9uT3B0aW9ucyBDbG9zZUNvbm5lY3Rpb249InRydWUiIC8+PC9TcWxEYXRhU291cmNlPg==" />
+  </ComponentStorage>
+  <ObjectStorage>
+    <Item1 ObjectType="DevExpress.XtraReports.Serialization.ObjectStorageInfo, DevExpress.XtraReports.v25.2" Ref="3" Content="System.String" />
+    <Item2 ObjectType="DevExpress.XtraReports.Parameters.StaticListLookUpSettings, DevExpress.XtraReports.v25.2" Ref="4">
+      <LookUpValues>
+        <Item1 Description="Queue 8000 (1,096 calls)" Value="8000" />
+        <Item2 Description="Queue 8008 (521 calls)" Value="8008" />
+        <Item3 Description="Queue 8013 (340 calls)" Value="8013" />
+        <Item4 Description="Queue 8001 (330 calls)" Value="8001" />
+        <Item5 Description="Queue 8003 (301 calls)" Value="8003" />
+        <Item6 Description="Queue 8025 (300 calls)" Value="8025" />
+        <Item7 Description="Queue 8007 (269 calls)" Value="8007" />
+        <Item8 Description="Queue 8015 (140 calls)" Value="8015" />
+        <Item9 Description="Queue 8029 (131 calls)" Value="8029" />
+        <Item10 Description="Queue 8019 (117 calls)" Value="8019" />
+        <Item11 Description="Queue 8018 (93 calls)" Value="8018" />
+        <Item12 Description="Queue 8020 (79 calls)" Value="8020" />
+        <Item13 Description="Queue 8040 (71 calls)" Value="8040" />
+        <Item14 Description="Queue 8036 (58 calls)" Value="8036" />
+        <Item15 Description="Queue 8021 (55 calls)" Value="8021" />
+      </LookUpValues>
+    </Item2>
+  </ObjectStorage>
+</XtraReportsLayoutSerializer>
