@@ -4,6 +4,243 @@ This file tracks daily development progress, bugs fixed, and features implemente
 
 ---
 
+## February 17, 2026 (Monday)
+
+### Focus: Manual Report Creation via Designer UI — Complete
+
+**Session Theme:** Completed the full 14-step manual report creation process entirely from the Report Designer UI. Created `MANUAL_REPORT_CREATION_GUIDE.md` documenting every step for end-user reference.
+
+### Learning Topics Covered
+
+| Topic | Key Takeaways |
+|-------|---------------|
+| **`?paramName` syntax** | In the Data Source Wizard, `?paramName` binds SP parameters to Report Parameters. Equivalent to `[Parameters.paramName]` in XML |
+| **Data source params are immutable** | Cannot edit data source parameter values after creation in Designer UI. Must remove and re-create the data source |
+| **Expression type for all SP params** | All 4 SP parameters (`@period_from`, `@period_to`, `@queue_dns`, `@wait_interval`) can use Expression type with `?paramName` |
+| **Date literal syntax** | DevExpress expressions use `#2026-02-01#` hash syntax for date literals |
+| **AgentDetail vs AgentDetailBand** | Must select "AgentDetail (Detail Report)" not "AgentDetailBand (Detail)" for Data Source binding |
+| **PREVIEW PARAMETERS panel** | Creating Report Parameters auto-generates a parameter panel in Preview mode with RESET/SUBMIT buttons |
+
+### Completed Tasks
+
+#### 1. Manual Report Creation (Steps 1-14)
+- Created new report from scratch in Designer UI
+- Added 3 data sources (KPIs, Chart, Agents) backed by stored procedures
+- Bound 8 KPI cards to `sp_queue_kpi_summary_shushant`
+- Configured area chart (Answered/Abandoned) from `sp_queue_calls_by_date_shushant`
+- Built agent performance table with GroupHeader + DetailBand from `qcall_cent_get_extensions_statistics_by_queues`
+- Created 4 Report Parameters (pPeriodFrom, pPeriodTo, pQueueDns, pWaitInterval)
+- Re-created all 3 data sources with `?paramName` bindings for dynamic parameter support
+- Verified report renders with live data: 130 Total Calls, 7 Answered, 123 Abandoned for Queue 8089
+
+#### 2. Created MANUAL_REPORT_CREATION_GUIDE.md
+- 14-step comprehensive guide for end users
+- Includes Issues & Fixes log (5 issues documented)
+- Common mistakes and troubleshooting sections
+- Key takeaways for future report creation
+
+#### 3. Updated All Project Documentation
+- **FEATURES.md** — Added Phase 2 (Manual Report Creation) as complete, updated milestones
+- **README.md** — Updated phase status, project description, resource links
+- **DEVEXPRESS_COMPONENTS.md** — Added `?paramName` syntax docs, data source re-creation workflow, troubleshooting
+- **REPORT_CATALOG.md** — Added manual test report entry, updated database connections
+
+### Issues Encountered
+
+| Issue | Root Cause | Status |
+|-------|------------|--------|
+| Cannot edit data source params after creation | Designer UI limitation | Workaround: Remove & re-add data source |
+| Wrong band selected for AgentDetail | Two bands with similar names | Use "AgentDetail (Detail Report)" |
+| Schema rebuild error with plain date strings | DevExpress requires `#date#` hash syntax | Use `#2026-02-01#` format |
+| `@wait_interval` restricted to Time type (initial setup) | Designer maps SQL `time` type to Time | Use Expression type with `?pWaitInterval` when binding to Report Parameters |
+
+### Files Modified/Created
+
+| File | Action | Description |
+|------|--------|-------------|
+| `MANUAL_REPORT_CREATION_GUIDE.md` | Created | 14-step manual report creation guide |
+| `FEATURES.md` | Updated | Added Phase 2 completion, updated milestones |
+| `README.md` | Updated | Phase status, description, resource links |
+| `DEVEXPRESS_COMPONENTS.md` | Updated | `?paramName` syntax, troubleshooting |
+| `Documentation/REPORT_CATALOG.md` | Updated | Added manual test report, production DB |
+| `daily_report.md` | Updated | Added today's entry |
+| `Reports/Templates/Similar to samuel sirs report manualtest_2.repx` | Created | Manually built report with dynamic params |
+
+### Next Steps
+- [ ] Test report with different queue DNs (8077, 8089, % for all)
+- [ ] Test report export (PDF, Excel) from Report Viewer
+- [ ] Consider adding more report templates from Designer UI
+- [ ] Evaluate Phase 3 features (database storage, sharing, RBAC)
+
+---
+
+## February 11, 2026 (Tuesday)
+
+### 🎯 Focus: Report Template Data Source Fix - StoredProcQuery Implementation
+
+**Session Theme:** Fixing the "Similar to Samuel Sir's Report" template to use StoredProcQuery instead of CustomSqlQuery with EXEC statements.
+
+### 📚 Learning Topics Covered
+
+| Topic | Key Takeaways |
+|-------|---------------|
+| **StoredProcQuery vs CustomSqlQuery** | DevExpress CustomSqlQuery rejects EXEC statements. Must use StoredProcQuery for stored procedures |
+| **Base64 Encoding in .repx** | Data sources are stored as Base64-encoded XML in ComponentStorage section |
+| **DevExpress SP Validation** | DevExpress validates SP existence in database schema before execution |
+| **Error: StoredProcNotInSchemaValidationException** | SP must exist in database AND be accessible via connection string |
+
+### ✅ Completed Tasks
+
+#### 1. Diagnosed CustomSqlQuery EXEC Error
+- **Problem:** "A custom SQL query should contain only SELECT statements"
+- **Root Cause:** DevExpress CustomSqlQuery doesn't allow EXEC statements
+- **Solution:** Must use `StoredProcQuery` type instead of `CustomSqlQuery`
+
+#### 2. Updated Similar_to_samuel_sirs_report.repx Data Source
+- Decoded existing Base64 data source to understand XML structure
+- Created new StoredProcQuery XML configuration:
+  ```xml
+  <Query Type="StoredProcQuery" Name="KPIs">
+    <ProcName>sp_queue_kpi_summary_shushant</ProcName>
+    <Parameters>
+      <Parameter Name="@period_from" Type="System.DateTime">...</Parameter>
+      <Parameter Name="@period_to" Type="System.DateTime">...</Parameter>
+      <Parameter Name="@queue_dns" Type="System.String">...</Parameter>
+      <Parameter Name="@wait_interval" Type="System.String">...</Parameter>
+    </Parameters>
+  </Query>
+  ```
+- Re-encoded to Base64 and updated .repx file
+
+#### 3. Created sp_queue_kpi_summary_shushant in Production Database
+- **Problem:** "Cannot find the specified stored procedure: sp_queue_kpi_summary_shushant()"
+- **Solution:** Executed CREATE OR ALTER PROCEDURE on production server (3.132.72.134)
+- SP returns: queue_dn, queue_display_name, total_calls, abandoned_calls, answered_calls, answered_percent, answered_within_sla, answered_within_sla_percent, serviced_callbacks, total_talking, mean_talking, avg_waiting
+
+#### 4. Verified SP Works in SSMS
+- Tested with: `EXEC dbo.[sp_queue_kpi_summary_shushant] @period_from='2025-01-01', @period_to='2025-12-31', @queue_dns='8000', @wait_interval='00:00:20'`
+- Returns correct data: Queue 8000 (Relay) - 625 total calls, 602 answered, 96.32% answer rate
+
+### 🐛 Issues Encountered
+
+| Issue | Root Cause | Status |
+|-------|------------|--------|
+| "CustomSqlQuery should contain only SELECT" | EXEC statements not allowed in CustomSqlQuery | ✅ Fixed - Use StoredProcQuery |
+| "Cannot find stored procedure" | SP didn't exist in production database | ✅ Fixed - Created SP |
+| Report loads but preview fails | StoredProcQuery validation checks SP existence | ✅ Fixed |
+
+### 📝 Files Modified
+
+| File | Action | Description |
+|------|--------|-------------|
+| `Reports/Templates/Similar_to_samuel_sirs_report.repx` | Modified | Updated data source from CustomSqlQuery to StoredProcQuery |
+| Production DB: `sp_queue_kpi_summary_shushant` | Created | KPI aggregation stored procedure |
+
+### 🔜 Next Steps
+
+- [ ] Verify report preview shows live data from SP
+- [ ] Add ChartData query using `sp_queue_calls_by_date_shushant`
+- [ ] Add AgentData query using `qcall_cent_get_extensions_statistics_by_queues`
+- [ ] Test parameter binding from UI to stored procedures
+
+---
+
+## February 10, 2026 (Monday)
+
+### 🎯 Focus: Production Database Migration & Stored Procedure Development
+
+**Session Theme:** Moving from test database to production (3.132.72.134) and creating stored procedures based on senior developer's existing `qcall_cent_get_extensions_statistics_by_queues` SP.
+
+### 📚 Learning Topics Covered
+
+| Topic | Key Takeaways |
+|-------|---------------|
+| **Production Database** | Server: 3.132.72.134, Database: "3CX Exporter", User: sa |
+| **CallCent_QueueCalls_View** | Main view for call data - contains all queue call records |
+| **extensions_by_queues_view** | Maps queue_dn to queue_display_name and extension info |
+| **Senior's SP Logic** | `qcall_cent_get_extensions_statistics_by_queues` - authoritative source for calculation logic |
+| **SLA Calculation** | `ring_time <= @wait_interval` for answered calls = within SLA |
+
+### ✅ Completed Tasks
+
+#### 1. Updated Database Connection to Production
+- Modified `appsettings.json` connection string to 3.132.72.134
+- Updated `ReportDataSourceProviders.cs` with production credentials
+- Verified connectivity with sqlcmd
+
+#### 2. Analyzed Senior's Stored Procedure
+- Reviewed `qcall_cent_get_extensions_statistics_by_queues` SP
+- Documented the CTE logic for `queue_all_calls`
+- Understood filtering: `(is_answered = 1 OR ring_time >= @wait_interval)`
+- Created formatted documentation in `SQL/Similar_to_samuel_sirs_report/Agent_table.sql`
+
+#### 3. Created sp_queue_kpi_summary_shushant
+- Based on senior's logic from `qcall_cent_get_extensions_statistics_by_queues`
+- Aggregates to queue level for KPI cards
+- Parameters: @period_from, @period_to, @queue_dns, @wait_interval
+- Output columns match report KPI card bindings
+
+#### 4. Created sp_queue_calls_by_date_shushant
+- For Chart data - daily call trends
+- Groups by queue and call_date
+- Returns: call_date, total_calls, answered_calls, abandoned_calls, answer_rate, sla_percent
+
+#### 5. Created SQL Documentation Folder Structure
+```
+SQL/Similar_to_samuel_sirs_report/
+├── Agent_table.sql           # Senior's SP formatted with comments
+├── sp_queue_kpi_summary.sql  # KPI SP script
+├── sp_queue_calls_by_date.sql # Chart SP script
+└── README.md                 # Documentation
+```
+
+#### 6. Designed Report Layout
+- Created `Similar_to_samuel_sirs_report.repx` template
+- 8 KPI cards: Total Calls, Answered, Abandoned, SLA%, Avg Talk, Total Talk, Avg Wait, Callbacks
+- Chart placeholder for daily trends
+- Agent Performance table header
+
+### 🐛 Issues Encountered
+
+| Issue | Root Cause | Status |
+|-------|------------|--------|
+| Invalid column 'reason' | Column doesn't exist in CallCent_QueueCalls_View | ✅ Fixed - Removed |
+| Missing comma between CTEs | Syntax error in SP | ✅ Fixed |
+| DevExpress CustomSqlQuery validation | EXEC statements rejected | 🔄 In Progress |
+
+### 📝 Files Created
+
+| File | Purpose |
+|------|---------|
+| `SQL/Similar_to_samuel_sirs_report/Agent_table.sql` | Senior's SP with documentation |
+| `SQL/Similar_to_samuel_sirs_report/sp_queue_kpi_summary.sql` | KPI stored procedure |
+| `SQL/Similar_to_samuel_sirs_report/sp_queue_calls_by_date.sql` | Chart stored procedure |
+| `Reports/Templates/Similar_to_samuel_sirs_report.repx` | Report template |
+
+### 📊 Database Objects Status
+
+| Object | Location | Status |
+|--------|----------|--------|
+| `CallCent_QueueCalls_View` | Production DB | ✅ Exists |
+| `extensions_by_queues_view` | Production DB | ✅ Exists |
+| `qcall_cent_get_extensions_statistics_by_queues` | Production DB | ✅ Exists (Senior's) |
+| `sp_queue_kpi_summary_shushant` | Production DB | ✅ Created |
+| `sp_queue_calls_by_date_shushant` | Production DB | ✅ Created |
+
+### 💡 Key Insight: Production Data Range
+
+- Database contains call data from **Dec 2023 to Oct 2025**
+- For testing, use dates within this range
+- Example: `@period_from = '2025-01-01', @period_to = '2025-01-31'`
+
+### 🔜 Next Steps
+
+- [ ] Fix CustomSqlQuery EXEC validation issue
+- [ ] Test report with StoredProcQuery instead
+- [ ] Add parameter UI for end users
+
+---
+
 ## January 29, 2026 (Wednesday)
 
 ### 🎯 Focus: Custom SQL Guide Documentation & Report Designer Troubleshooting

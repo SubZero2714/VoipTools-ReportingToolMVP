@@ -1,22 +1,33 @@
 using DevExpress.XtraReports.UI;
 using DevExpress.XtraReports.Web.Extensions;
+using Microsoft.Extensions.Caching.Memory;
 using System.IO;
 
 namespace ReportingToolMVP.Services
 {
     /// <summary>
-    /// File-based report storage service for saving/loading .repx report templates
-    /// Reports are stored in the Reports folder in the application root
+    /// File-based report storage service for saving/loading .repx report templates.
+    /// Reports are stored in the Reports folder in the application root.
+    /// Uses IMemoryCache to avoid repeated disk reads for unchanged reports.
     /// </summary>
     public class FileReportStorageService : ReportStorageWebExtension
     {
         private readonly string _reportsDirectory;
         private readonly string _templatesDirectory;
         private readonly ILogger<FileReportStorageService> _logger;
+        private readonly IMemoryCache _cache;
 
-        public FileReportStorageService(IWebHostEnvironment environment, ILogger<FileReportStorageService> logger)
+        // Cache keys
+        private const string UrlsCacheKey = "ReportUrls";
+        private static readonly TimeSpan CacheDuration = TimeSpan.FromMinutes(10);
+
+        public FileReportStorageService(
+            IWebHostEnvironment environment,
+            ILogger<FileReportStorageService> logger,
+            IMemoryCache cache)
         {
             _logger = logger;
+            _cache = cache;
             _reportsDirectory = Path.Combine(environment.ContentRootPath, "Reports");
             _templatesDirectory = Path.Combine(_reportsDirectory, "Templates");
             
@@ -113,8 +124,17 @@ namespace ReportingToolMVP.Services
                     }
                 }
 
-                _logger.LogInformation($"Loading report from: {filePath}");
-                return File.ReadAllBytes(filePath);
+                // Use cache with file-modified timestamp as invalidation key
+                var lastWrite = File.GetLastWriteTimeUtc(filePath).Ticks;
+                var cacheKey = $"Report_{url}_{lastWrite}";
+
+                return _cache.GetOrCreate(cacheKey, entry =>
+                {
+                    entry.SetAbsoluteExpiration(CacheDuration);
+                    entry.SetSize(1); // for SizeLimit if ever configured
+                    _logger.LogInformation($"Loading report from disk (cache miss): {filePath}");
+                    return File.ReadAllBytes(filePath);
+                })!;
             }
             catch (Exception ex)
             {
@@ -128,6 +148,16 @@ namespace ReportingToolMVP.Services
         /// Includes both .repx files and code-based reports
         /// </summary>
         public override Dictionary<string, string> GetUrls()
+        {
+            // Cache the URL list to avoid directory scans on every call
+            return _cache.GetOrCreate(UrlsCacheKey, entry =>
+            {
+                entry.SetAbsoluteExpiration(CacheDuration);
+                return BuildReportUrlDictionary();
+            })!;
+        }
+
+        private Dictionary<string, string> BuildReportUrlDictionary()
         {
             var reports = new Dictionary<string, string>();
 
@@ -191,6 +221,8 @@ namespace ReportingToolMVP.Services
                     report.SaveLayoutToXml(stream);
                 }
 
+                // Invalidate caches so next read picks up changes
+                _cache.Remove(UrlsCacheKey);
                 _logger.LogInformation($"Report saved successfully: {url}");
             }
             catch (Exception ex)

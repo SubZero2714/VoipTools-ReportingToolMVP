@@ -1,8 +1,8 @@
 # ReportingToolMVP - Configurable Reporting Tool
 
-**Phase 1 - DevExpress Reporting Integration Complete**
+**Phase 2 - Manual Report Creation via Designer UI Complete**
 
-A standalone .NET 8 Blazor Server application for creating custom reports from the 3CX Exporter database. This is a dedicated reporting tool built to evaluate DevExpress Blazor components and includes a visual WYSIWYG Report Designer with code-based report templates.
+A standalone .NET 8 Blazor Server application for creating custom reports from the 3CX Exporter database. This is a dedicated reporting tool built to evaluate DevExpress Blazor components and includes a visual WYSIWYG Report Designer with stored procedure-backed report templates and dynamic parameter binding.
 
 ## Project Goals
 
@@ -11,14 +11,16 @@ A standalone .NET 8 Blazor Server application for creating custom reports from t
 - Validate DxChart for real-time data visualization  
 - Assess PDF/Excel export functionality
 - Measure performance with 10K+ rows
-- **NEW:** Evaluate DxReportDesigner for code-based reports
+- Evaluate DxReportDesigner for visual report creation
+- **Evaluate manual report creation with stored procedure parameter binding**
 
 ✅ **Build MVP Prototype**
 - Users configure reports via UI (column selection, filtering)
 - Real-time preview in interactive grid + chart
 - Export to PDF/Excel/CSV
-- **NEW:** Queue Dashboard with KPI cards, agent tables, trend charts
-- **NEW:** Code-based report templates with SqlDataSource
+- Queue Dashboard with KPI cards, agent tables, trend charts
+- **Manual report creation from Designer UI with dynamic parameters**
+- Stored procedure-backed data sources with `?paramName` binding
 
 ## Quick Start
 
@@ -94,7 +96,8 @@ ReportingToolMVP/
 ├── appsettings.json          # (gitignored - use .sample)
 ├── FEATURES.md               # Feature tracking & testing
 ├── DEVEXPRESS_COMPONENTS.md  # DevExpress usage guide
-├── REPORT_DESIGNER_GUIDE.md  # Report Designer knowledge base
+├── MANUAL_REPORT_CREATION_GUIDE.md  # Step-by-step manual report creation
+├── STEPS_TO_CREATE_REPX_SAMUEL_REPORT.md  # Backend prerequisites + full guide
 ├── daily_report.md           # Development journal
 └── README.md                 # This file
 ```
@@ -162,11 +165,11 @@ The application connects to the 3CX Exporter database using the connection strin
 
 ## Notes for Next Phases
 
-- **Phase 1:** Add report definition persistence (database tables)
-- **Phase 1:** Add report sharing & role-based access control
-- **Phase 2:** Add scheduled reports & email delivery
-- **Phase 2:** Real-time auto-refresh (SignalR)
-- **Phase 3:** Multi-tenant support
+- **Phase 3:** Add report definition persistence (database tables)
+- **Phase 3:** Add report sharing & role-based access control
+- **Phase 4:** Add scheduled reports & email delivery
+- **Phase 4:** Real-time auto-refresh (SignalR)
+- **Phase 5:** Multi-tenant support
 - **Future:** AI-powered report generation (natural language queries)
 
 ## Troubleshooting
@@ -191,7 +194,9 @@ The application connects to the 3CX Exporter database using the connection strin
 - [EPPlus Documentation](https://epplussoftware.com/)
 - [FEATURES.md](FEATURES.md) - Feature tracking & test criteria
 - [DEVEXPRESS_COMPONENTS.md](DEVEXPRESS_COMPONENTS.md) - DevExpress components usage guide
-- [REPORT_DESIGNER_GUIDE.md](REPORT_DESIGNER_GUIDE.md) - Report Designer knowledge base
+- [MANUAL_REPORT_CREATION_GUIDE.md](MANUAL_REPORT_CREATION_GUIDE.md) - Step-by-step manual report creation (14 steps)
+- [STEPS_TO_CREATE_REPX_SAMUEL_REPORT.md](STEPS_TO_CREATE_REPX_SAMUEL_REPORT.md) - Backend prerequisites + full report creation guide
+- [Documentation/REPORT_CATALOG.md](Documentation/REPORT_CATALOG.md) - Report catalog with all available reports
 
 ## License
 
@@ -204,4 +209,4 @@ VoIPTools - Internal Use Only
 
 ---
 
-*Last Updated: January 20, 2026*
+*Last Updated: February 17, 2026*

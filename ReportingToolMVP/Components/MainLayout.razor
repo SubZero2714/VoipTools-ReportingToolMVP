@@ -12,9 +12,7 @@
     <link rel="stylesheet" href="css/site.css" />
     <link rel="stylesheet" href="_content/DevExpress.Blazor.Themes/blazing-berry.bs5.min.css" />
     <link rel="stylesheet" href="reportbuilder.css" />
-    <!-- DevExpress Reporting CSS -->
-    <link rel="stylesheet" href="_content/DevExpress.Blazor.Reporting.Viewer/css/dx-blazor-reporting-components.bs5.css" />
-    <link rel="stylesheet" href="_content/DevExpress.Blazor.Reporting.JSBasedControls/css/dx-blazor-reporting-components.bs5.css" />
+    <!-- DevExpress Reporting - use auto-bundled assets -->
     <HeadOutlet @rendermode="InteractiveServer" />
 </head>
 
@@ -31,9 +29,7 @@
 
     <script src="_framework/blazor.web.js"></script>
     <script src="_content/DevExpress.Blazor/dx-blazor.js"></script>
-    <!-- DevExpress Reporting JS -->
-    <script src="_content/DevExpress.Blazor.Reporting.Viewer/js/dx-blazor-reporting-components.js"></script>
-    <script src="_content/DevExpress.Blazor.Reporting.JSBasedControls/js/dx-blazor-reporting-components.js"></script>
+    <!-- DevExpress Reporting JS - auto-bundled -->
     <script>
         // File download function for exports
         window.downloadFile = (fileName, base64Content, mimeType) => {

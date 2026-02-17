@@ -11,6 +11,7 @@
 
 | Document | Description |
 |----------|-------------|
+| [MANUAL_REPORT_CREATION_GUIDE.md](../MANUAL_REPORT_CREATION_GUIDE.md) | Step-by-step manual report creation (14 steps) |
 | [COMPREHENSIVE_GUIDE.md](./VoIPToolsDashboard/COMPREHENSIVE_GUIDE.md) | ⭐ **Master reference** - Architecture, data flow, backend, SQL, flow diagrams |
 | [00_Overview.md](./VoIPToolsDashboard/00_Overview.md) | Quick start guide |
 | [02_StepByStep_Guide.md](./VoIPToolsDashboard/02_StepByStep_Guide.md) | Manual report creation walkthrough |
@@ -62,6 +63,32 @@
 
 ---
 
+### 5. Queue Performance Dashboard (Samuel Sir's Report)
+- **File:** `Reports/Templates/Similar_to_samuel_sirs_report.repx`
+- **SQL Scripts:** `SQL/Similar_to_samuel_sirs_report/`
+- **Stored Procedures:**
+  - `sp_queue_kpi_summary_shushant` - Queue-level KPI aggregates
+  - `sp_queue_calls_by_date_shushant` - Daily call trends for chart
+  - `qcall_cent_get_extensions_statistics_by_queues` - Agent performance (existing SP)
+- **Parameters:** Period From, Period To, Queue DNs (comma-separated), Wait Interval (SLA)
+- **3 Data Sources:** sqlDataSource1 (KPIs), sqlDataSource2 (Chart), sqlDataSource3 (Agents)
+- **Parameter Binding:** Uses `?paramName` syntax to bind SP params to Report Parameters
+- **Sections:**
+  - KPI Cards (8 metrics: Total, Answered, Abandoned, SLA %, Avg Wait, Avg Talk, Total Talk, Callbacks)
+  - Call Trends Area Chart (Answered vs Abandoned over time)
+  - Agent Performance Table (6 columns per agent)
+- **Database:** Production (3.132.72.134), `3CX Exporter`
+
+### 6. Queue Performance Dashboard (Manual Test)
+- **File:** `Reports/Templates/Similar to samuel sirs report manualtest_2.repx`
+- **Created via:** Report Designer UI only (no code changes)
+- **Guide:** See `MANUAL_REPORT_CREATION_GUIDE.md` for step-by-step recreation
+- **Same stored procedures and parameters as Report #5**
+- **Status:** ✅ Fully functional with dynamic parameter binding
+- **Key Learning:** Data source parameters bound using `?paramName` syntax in Designer UI
+
+---
+
 ## Phase 2 Reports (Complete) ✅
 
 ### 4. Monthly Summary Report
@@ -83,11 +110,11 @@
 
 ## Phase 2 Reports (Planned) 📋
 
-### 5. Agent Comparison Report
+### 6. Agent Comparison Report
 - **Purpose:** Compare multiple agents side-by-side
 - **Features:** Multi-select agents, comparative bar charts, ranking tables
 
-### 6. Queue Comparison Report
+### 7. Queue Comparison Report
 - **Purpose:** Compare multiple queues side-by-side
 - **Features:** Multi-select queues, comparative metrics, SLA comparison
 
@@ -95,11 +122,11 @@
 
 ## Phase 3 Reports (Planned) 📋
 
-### 7. Hourly Analysis Report
+### 8. Hourly Analysis Report
 - **Purpose:** Hour-by-hour breakdown for a specific date or date range
 - **Features:** Peak hour identification, call volume heatmap
 
-### 8. Weekly Report
+### 9. Weekly Report
 - **Purpose:** Week-over-week comparison and trends
 - **Features:** Weekly KPIs, week comparison tables
 
@@ -164,8 +191,17 @@
 
 ---
 
-## Database Connection
+## Database Connections
 
+### Production (Primary)
+```
+Server: 3.132.72.134
+Database: 3CX Exporter
+User: sa
+Password: V01PT0y5
+```
+
+### Local (Development/Testing)
 ```
 Server: LAPTOP-A5UI98NJ\SQLEXPRESS
 Database: Test_3CX_Exporter
@@ -184,7 +220,9 @@ ReportingToolMVP/
 │       ├── VoIPToolsDashboard.repx
 │       ├── AgentSummaryReport.repx
 │       ├── QueueSummaryReport.repx
-│       └── MonthlySummaryReport.repx
+│       ├── MonthlySummaryReport.repx
+│       ├── Similar_to_samuel_sirs_report.repx
+│       └── Similar to samuel sirs report manualtest_2.repx
 ├── SQL/
 │   ├── VoIPToolsDashboard/
 │   │   ├── 00_CreateAllViews.sql

@@ -21,7 +21,7 @@ namespace ReportingToolMVP.Services
         // Based on callcent_queuecalls table structure
         private static readonly Dictionary<string, string> AllowedColumns = new()
         {
-            { "QueueNumber", "[q_num]" },
+            { "QueueNumber", "[q_num] as [QueueNumber]" },
             { "TotalCalls", "COUNT(*) as [TotalCalls]" },
             { "PolledCount", "SUM([count_polls]) as [PolledCount]" },
             { "DialedCount", "SUM([count_dialed]) as [DialedCount]" },
@@ -64,7 +64,7 @@ namespace ReportingToolMVP.Services
                         ORDER BY c.q_num
                     ";
                     
-                    var queues = (await connection.QueryAsync<QueueBasicInfo>(sql)).ToList();
+                    var queues = (await connection.QueryAsync<QueueBasicInfo>(sql, commandTimeout: 15)).ToList();
                     
                     _logger.LogInformation($"Retrieved {queues.Count} queues from database");
                     return queues;
@@ -122,7 +122,8 @@ namespace ReportingToolMVP.Services
 
                 if (selectedQueueIds != null && selectedQueueIds.Any())
                 {
-                    var queueIdList = string.Join(",", selectedQueueIds.Select(q => q.Trim('"')));
+                    // q_num is varchar - quote values as strings for proper comparison
+                    var queueIdList = string.Join(",", selectedQueueIds.Select(q => $"'{q.Trim('"').Replace("'", "''")}'"));
                     whereClauses.Add($"[q_num] IN ({queueIdList})");
                 }
 
@@ -172,18 +173,20 @@ namespace ReportingToolMVP.Services
                 ";
 
                 _logger.LogInformation($"Executing custom report query:\n{sql}");
+                _logger.LogInformation($"Parameters: StartDate={startDate}, EndDate={endDate}, QueueIds=[{string.Join(",", selectedQueueIds ?? new List<string>())}]");
                 var startTime = DateTime.Now;
 
                 var connectionString = _configuration.GetConnectionString("DefaultConnection");
                 using (var connection = new SqlConnection(connectionString))
                 {
                     await connection.OpenAsync();
+                    _logger.LogInformation("Database connection opened successfully.");
                     
                     var parameters = new DynamicParameters();
                     parameters.Add("@StartDate", startDate);
                     parameters.Add("@EndDate", endDate);
 
-                    var results = (await connection.QueryAsync(sql, parameters)).ToList();
+                    var results = (await connection.QueryAsync(sql, parameters, commandTimeout: 30)).ToList();
                     
                     var executionTime = (DateTime.Now - startTime).TotalSeconds;
                     _logger.LogInformation($"Query executed in {executionTime:F2} seconds. Returned {results.Count} rows.");

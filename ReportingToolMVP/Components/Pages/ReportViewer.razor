@@ -1,10 +1,12 @@
 @page "/reportviewer"
 @page "/reportviewer/{ReportUrl}"
 @using DevExpress.Blazor.Reporting
+@using DevExpress.XtraReports.UI
 @using DevExpress.XtraReports.Web.Extensions
 @rendermode InteractiveServer
 
 @inject ReportStorageWebExtension ReportStorage
+@inject ILogger<ReportViewer> Logger
 
 <PageTitle>Report Viewer - VoIPTools</PageTitle>
 
@@ -38,7 +40,7 @@
                 <span class="oi oi-warning"></span> @ErrorMessage
             </div>
         }
-        else if (string.IsNullOrEmpty(CurrentReportName))
+        else if (CurrentReport == null)
         {
             <div class="empty-state">
                 <div class="empty-icon">📄</div>
@@ -55,10 +57,10 @@
         }
         else
         {
-            <DxReportViewer @ref="ViewerComponent"
-                            ReportName="@CurrentReportName"
-                            Height="calc(100vh - 180px)"
-                            Width="100%" />
+            <div style="width:100%; height:calc(100vh - 180px);">
+                <DxReportViewer @ref="ViewerComponent"
+                                Report="@CurrentReport" />
+            </div>
         }
     </div>
 </div>
@@ -69,6 +71,7 @@
 
     private DxReportViewer? ViewerComponent;
     private string CurrentReportName = string.Empty;
+    private XtraReport? CurrentReport;
     private Dictionary<string, string> AvailableReports = new();
     private string ErrorMessage = string.Empty;
 
@@ -83,11 +86,47 @@
             if (!string.IsNullOrEmpty(ReportUrl))
             {
                 CurrentReportName = ReportUrl;
+                LoadReport(CurrentReportName);
             }
         }
         catch (Exception ex)
         {
             ErrorMessage = $"Error initializing report viewer: {ex.Message}";
+            Logger.LogError(ex, "Error initializing report viewer");
+        }
+    }
+
+    private void LoadReport(string reportName)
+    {
+        try
+        {
+            if (string.IsNullOrEmpty(reportName)) 
+            {
+                CurrentReport = null;
+                return;
+            }
+
+            var reportBytes = ReportStorage.GetData(reportName);
+            if (reportBytes != null && reportBytes.Length > 0)
+            {
+                var report = new XtraReport();
+                using (var stream = new MemoryStream(reportBytes))
+                {
+                    report.LoadLayoutFromXml(stream);
+                }
+                CurrentReport = report;
+                Logger.LogInformation($"Loaded report '{reportName}' ({reportBytes.Length} bytes)");
+            }
+            else
+            {
+                ErrorMessage = $"Report '{reportName}' returned empty data.";
+                Logger.LogWarning($"Report '{reportName}' returned empty data");
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = $"Error loading report '{reportName}': {ex.Message}";
+            Logger.LogError(ex, $"Error loading report '{reportName}'");
         }
     }
 
@@ -95,6 +134,8 @@
     {
         var reportName = e.Value?.ToString();
         CurrentReportName = reportName ?? string.Empty;
+        ErrorMessage = string.Empty;
+        LoadReport(CurrentReportName);
         StateHasChanged();
     }
 }

@@ -14,9 +14,19 @@
 
 <link href="reportbuilder.css" rel="stylesheet" />
 
-<div class="report-builder-container">
+<div class="report-builder-container @(IsPanelCollapsed ? "panel-collapsed" : "")">
     <!-- LEFT SIDEBAR: Filters & Configuration -->
-    <div class="config-panel">
+    <div class="config-panel @(IsPanelCollapsed ? "collapsed" : "")">
+        <div class="panel-toggle-wrapper">
+            <button class="panel-toggle-btn" @onclick="TogglePanel" title="@(IsPanelCollapsed ? "Expand Filters" : "Collapse Filters")">
+                <span class="oi @(IsPanelCollapsed ? "oi-chevron-right" : "oi-chevron-left")"></span>
+            </button>
+            @if (IsPanelCollapsed)
+            {
+                <span class="panel-toggle-label" @onclick="TogglePanel">Filters</span>
+            }
+        </div>
+        <div class="panel-content">
         <!-- Date Range Card -->
         <div class="config-card">
             <div class="card-header-row">
@@ -117,7 +127,8 @@
                        TextChanged="@OnQueueSearchChanged"
                        NullText="🔍 Search queues..."
                        CssClass="queue-search-box" />
-            <DxListBox Data="@FilteredQueues"
+            <DxListBox TData="QueueBasicInfo" TValue="string"
+                       Data="@FilteredQueues"
                        @bind-Values="@SelectedQueues"
                        TextFieldName="QueueName"
                        ValueFieldName="QueueId"
@@ -161,7 +172,8 @@
                     <button class="close-info" @onclick="CloseInfo">×</button>
                 </div>
             }
-            <DxListBox Data="@AvailableColumns"
+            <DxListBox TData="string" TValue="string"
+                       Data="@AvailableColumns"
                        @bind-Values="@SelectedColumns"
                        SelectionMode="ListBoxSelectionMode.Multiple"
                        ShowCheckboxes="true"
@@ -192,24 +204,31 @@
                     <strong>Chart Types:</strong><br/>
                     • <strong>Bar</strong> - Compare values across categories<br/>
                     • <strong>Line</strong> - Show trends over time<br/>
+                    • <strong>Area</strong> - Filled area under the line<br/>
+                    • <strong>Spline</strong> - Smooth curved line<br/>
+                    • <strong>Stacked Bar</strong> - Bars stacked for comparison<br/>
                     • <strong>Pie</strong> - Show proportions of a whole<br/>
+                    • <strong>Donut</strong> - Pie with center cutout<br/>
                     • <strong>None</strong> - No chart, data grid only<br/><br/>
                     <strong>How to use:</strong><br/>
-                    <span class="step">1.</span> Select a Chart Type from dropdown<br/>
+                    <span class="step">1.</span> Select one or more Chart Types from the list<br/>
                     <span class="step">2.</span> Choose X-Axis (categories, e.g., Date)<br/>
                     <span class="step">3.</span> Choose Y-Axis (values, e.g., TotalCalls)<br/>
                     <span class="step">4.</span> Click "Refresh Report" to generate<br/><br/>
-                    <em>💡 Tip: Use Date as X-Axis and TotalCalls as Y-Axis for trends</em>
+                    <em>💡 Tip: Select multiple chart types to compare visualizations side by side</em>
                     <button class="close-info" @onclick="CloseInfo">×</button>
                 </div>
             }
             <div class="form-group">
-                <label>Chart Type:</label>
-                <DxComboBox Data="@ChartTypes"
-                            @bind-Value="@Config.ChartType"
-                            CssClass="dx-combo-chart" />
+                <label>Chart Types: <span class="text-muted">(select multiple)</span></label>
+                <DxListBox TData="string" TValue="string"
+                           Data="@ChartTypes"
+                           @bind-Values="@SelectedChartTypes"
+                           SelectionMode="ListBoxSelectionMode.Multiple"
+                           ShowCheckboxes="true"
+                           CssClass="dx-listbox-charts" />
             </div>
-            @if (Config.ChartType != "None")
+            @if (SelectedChartTypes.Any())
             {
                 <div class="form-group">
                     <label>X-Axis:</label>
@@ -258,6 +277,7 @@
                       RenderStyle="ButtonRenderStyle.Light"
                       CssClass="w-100 mt-2" />
         </div>
+        </div> @* panel-content *@
     </div>
 
     <!-- RIGHT PANEL: Results -->
@@ -365,50 +385,104 @@
                 </Columns>
             </DxGrid>
 
-            <!-- Chart Area -->
-            @if (Config.ChartType != "None" && !string.IsNullOrEmpty(Config.ChartXField) && !string.IsNullOrEmpty(Config.ChartYField))
+            <!-- Chart Area - All Selected Charts -->
+            @if (SelectedChartTypes.Any() && !string.IsNullOrEmpty(Config.ChartXField) && !string.IsNullOrEmpty(Config.ChartYField))
             {
-                <div class="chart-section">
-                    <h5>@Config.ChartType Chart: @Config.ChartYField by @Config.ChartXField</h5>
-                    @if (Config.ChartType == "Bar")
-                    {
-                        <DxChart Data="@GetChartData()" CssClass="report-chart" T="ChartDataPoint">
-                            <DxChartBarSeries T="ChartDataPoint"
-                                              TArgument="string"
-                                              TValue="decimal"
-                                              ArgumentField="x => x.Argument"
-                                              ValueField="x => x.Value"
-                                              Name="@Config.ChartYField" />
-                            <DxChartLegend Visible="true" Position="RelativePosition.Outside" />
-                        </DxChart>
-                    }
-                    else if (Config.ChartType == "Line")
-                    {
-                        <DxChart Data="@GetChartData()" CssClass="report-chart" T="ChartDataPoint">
-                            <DxChartLineSeries T="ChartDataPoint"
-                                               TArgument="string"
-                                               TValue="decimal"
-                                               ArgumentField="x => x.Argument"
-                                               ValueField="x => x.Value"
-                                               Name="@Config.ChartYField" />
-                            <DxChartLegend Visible="true" Position="RelativePosition.Outside" />
-                        </DxChart>
-                    }
-                    else if (Config.ChartType == "Pie")
-                    {
-                        <DxPieChart Data="@GetChartData()" CssClass="report-chart" T="ChartDataPoint">
-                            <DxPieChartSeries T="ChartDataPoint"
-                                              TArgument="string"
-                                              TValue="decimal"
-                                              ArgumentField="x => x.Argument"
-                                              ValueField="x => x.Value"
-                                              Name="@Config.ChartYField">
-                                <DxChartSeriesLabel Visible="true" Position="RelativePosition.Outside" />
-                            </DxPieChartSeries>
-                            <DxChartLegend Visible="true" Position="RelativePosition.Outside" />
-                        </DxPieChart>
-                    }
-                </div>
+                @foreach (var chartType in SelectedChartTypes)
+                {
+                    <div class="chart-section">
+                        <h5><span class="chart-type-badge">@chartType</span> @Config.ChartYField by @Config.ChartXField</h5>
+                        @if (chartType == "Bar")
+                        {
+                            <DxChart Data="@GetChartData()" CssClass="report-chart" T="ChartDataPoint">
+                                <DxChartBarSeries T="ChartDataPoint"
+                                                  TArgument="string"
+                                                  TValue="decimal"
+                                                  ArgumentField="x => x.Argument"
+                                                  ValueField="x => x.Value"
+                                                  Name="@Config.ChartYField" />
+                                <DxChartLegend Visible="true" Position="RelativePosition.Outside" />
+                            </DxChart>
+                        }
+                        else if (chartType == "Line")
+                        {
+                            <DxChart Data="@GetChartData()" CssClass="report-chart" T="ChartDataPoint">
+                                <DxChartLineSeries T="ChartDataPoint"
+                                                   TArgument="string"
+                                                   TValue="decimal"
+                                                   ArgumentField="x => x.Argument"
+                                                   ValueField="x => x.Value"
+                                                   Name="@Config.ChartYField" />
+                                <DxChartLegend Visible="true" Position="RelativePosition.Outside" />
+                            </DxChart>
+                        }
+                        else if (chartType == "Area")
+                        {
+                            <DxChart Data="@GetChartData()" CssClass="report-chart" T="ChartDataPoint">
+                                <DxChartAreaSeries T="ChartDataPoint"
+                                                   TArgument="string"
+                                                   TValue="decimal"
+                                                   ArgumentField="x => x.Argument"
+                                                   ValueField="x => x.Value"
+                                                   Name="@Config.ChartYField" />
+                                <DxChartLegend Visible="true" Position="RelativePosition.Outside" />
+                            </DxChart>
+                        }
+                        else if (chartType == "Spline")
+                        {
+                            <DxChart Data="@GetChartData()" CssClass="report-chart" T="ChartDataPoint">
+                                <DxChartSplineSeries T="ChartDataPoint"
+                                                      TArgument="string"
+                                                      TValue="decimal"
+                                                      ArgumentField="x => x.Argument"
+                                                      ValueField="x => x.Value"
+                                                      Name="@Config.ChartYField" />
+                                <DxChartLegend Visible="true" Position="RelativePosition.Outside" />
+                            </DxChart>
+                        }
+                        else if (chartType == "Stacked Bar")
+                        {
+                            <DxChart Data="@GetChartData()" CssClass="report-chart" T="ChartDataPoint">
+                                <DxChartStackedBarSeries T="ChartDataPoint"
+                                                          TArgument="string"
+                                                          TValue="decimal"
+                                                          ArgumentField="x => x.Argument"
+                                                          ValueField="x => x.Value"
+                                                          Name="@Config.ChartYField" />
+                                <DxChartLegend Visible="true" Position="RelativePosition.Outside" />
+                            </DxChart>
+                        }
+                        else if (chartType == "Pie")
+                        {
+                            <DxPieChart Data="@GetChartData()" CssClass="report-chart" T="ChartDataPoint">
+                                <DxPieChartSeries T="ChartDataPoint"
+                                                  TArgument="string"
+                                                  TValue="decimal"
+                                                  ArgumentField="x => x.Argument"
+                                                  ValueField="x => x.Value"
+                                                  Name="@Config.ChartYField">
+                                    <DxChartSeriesLabel Visible="true" Position="RelativePosition.Outside" />
+                                </DxPieChartSeries>
+                                <DxChartLegend Visible="true" Position="RelativePosition.Outside" />
+                            </DxPieChart>
+                        }
+                        else if (chartType == "Donut")
+                        {
+                            <DxPieChart Data="@GetChartData()" CssClass="report-chart" T="ChartDataPoint"
+                                         InnerRadius="0.5">
+                                <DxPieChartSeries T="ChartDataPoint"
+                                                  TArgument="string"
+                                                  TValue="decimal"
+                                                  ArgumentField="x => x.Argument"
+                                                  ValueField="x => x.Value"
+                                                  Name="@Config.ChartYField">
+                                    <DxChartSeriesLabel Visible="true" Position="RelativePosition.Outside" />
+                                </DxPieChartSeries>
+                                <DxChartLegend Visible="true" Position="RelativePosition.Outside" />
+                            </DxPieChart>
+                        }
+                    </div>
+                }
             }
         }
     </div>
@@ -418,19 +492,21 @@
     private ReportConfig Config = new();
     private List<QueueBasicInfo> AvailableQueues = new();
     private List<string> AvailableColumns = new();
-    private List<string> ChartTypes = new() { "None", "Bar", "Line", "Pie" };
+    private List<string> ChartTypes = new() { "Bar", "Line", "Area", "Spline", "Stacked Bar", "Pie", "Donut" };
     private List<Dictionary<string, object>>? RawReportData = null;
     private List<ExpandoObject>? ReportData = null;
 
     // DevExpress ListBox bindings
     private IEnumerable<string> SelectedQueues { get; set; } = Enumerable.Empty<string>();
     private IEnumerable<string> SelectedColumns { get; set; } = Enumerable.Empty<string>();
+    private IEnumerable<string> SelectedChartTypes { get; set; } = Enumerable.Empty<string>();
 
     // Helper to convert selected columns to list for chart combo
     private List<string> SelectedColumnsList => SelectedColumns.ToList();
 
     private bool IsLoading = false;
     private bool IsExporting = false;
+    private bool IsPanelCollapsed = false;
     private string ErrorMessage = string.Empty;
 
     // Date validation
@@ -460,6 +536,11 @@
     private void CloseInfo()
     {
         ActiveInfo = InfoType.None;
+    }
+
+    private void TogglePanel()
+    {
+        IsPanelCollapsed = !IsPanelCollapsed;
     }
 
     private void OnQueueSearchChanged(string searchText)
@@ -595,7 +676,7 @@
         ReportData = null;
         ErrorMessage = string.Empty;
         DateValidationError = string.Empty;
-        Config.ChartType = "None";
+        SelectedChartTypes = Enumerable.Empty<string>();
         Config.ChartXField = string.Empty;
         Config.ChartYField = string.Empty;
         // Reset dates to defaults
@@ -650,6 +731,8 @@
             var selectedQueueIds = SelectedQueues.ToList();
             var selectedColumns = SelectedColumns.ToList();
 
+            Logger.LogInformation($"RefreshReport: Queues={selectedQueueIds.Count} [{string.Join(",", selectedQueueIds)}], Columns={selectedColumns.Count} [{string.Join(",", selectedColumns)}]");
+
             if (!selectedQueueIds.Any())
             {
                 ErrorMessage = "Please select at least one queue.";
@@ -662,11 +745,22 @@
                 return;
             }
 
-            RawReportData = await ReportService.GetCustomReportDataAsync(
+            // Add timeout to prevent infinite hangs
+            using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(30));
+            var queryTask = ReportService.GetCustomReportDataAsync(
                 Config.StartDate ?? DateTime.Today.AddDays(-7),
                 Config.EndDate ?? DateTime.Today,
                 selectedColumns,
                 selectedQueueIds);
+
+            var completedTask = await Task.WhenAny(queryTask, Task.Delay(30000, cts.Token));
+            if (completedTask != queryTask)
+            {
+                ErrorMessage = "Query timed out after 30 seconds. The database server may be slow or unreachable.";
+                return;
+            }
+
+            RawReportData = await queryTask;
 
             // Convert Dictionary to ExpandoObject for DxGrid binding
             ReportData = RawReportData?.Select(dict =>

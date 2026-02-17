@@ -722,8 +722,9 @@ input[type="date"] {
     display: flex;
     flex-direction: column;
     gap: 0.875rem;
-    overflow-y: auto;
+    overflow: visible;
     padding-right: 0.5rem;
+    transition: min-width 0.3s ease, max-width 0.3s ease;
 }
 
 .config-card {
@@ -1024,6 +1025,33 @@ select.form-control {
     font-size: 0.9rem;
     font-weight: 600;
     color: var(--text-accent);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.chart-type-badge {
+    display: inline-block;
+    background: var(--accent-primary);
+    color: #fff;
+    padding: 0.15rem 0.5rem;
+    border-radius: var(--radius-full);
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Chart ListBox */
+.dx-listbox-charts {
+    max-height: 140px;
+    border-radius: var(--radius-md) !important;
+}
+
+.dx-listbox-charts .dxbl-listbox {
+    border: 1px solid var(--input-border) !important;
+    border-radius: var(--radius-md) !important;
+    background: var(--bg-surface);
 }
 
 /* Results Header */
@@ -1303,4 +1331,93 @@ select.form-control {
     display: flex;
     align-items: center;
     gap: 4px;
+}
+
+/* ============================================
+   Collapsible Panel
+   ============================================ */
+
+.panel-toggle-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+    flex-shrink: 0;
+}
+
+.panel-toggle-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    background: var(--bg-surface);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: var(--text-secondary);
+    padding: 0;
+    flex-shrink: 0;
+}
+
+.panel-toggle-btn:hover {
+    background: var(--accent-primary);
+    border-color: var(--accent-primary);
+    color: #fff;
+    box-shadow: var(--shadow-accent);
+}
+
+.panel-toggle-label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-accent);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+    white-space: nowrap;
+}
+
+.panel-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.875rem;
+    flex: 1;
+    overflow-y: auto;
+    min-height: 0;
+}
+
+.config-panel.collapsed .panel-content {
+    display: none;
+}
+
+.config-panel.collapsed {
+    min-width: 48px;
+    max-width: 48px;
+    align-items: center;
+    overflow: visible;
+}
+
+.config-panel.collapsed .panel-toggle-wrapper {
+    flex-direction: column;
+    align-items: center;
+}
+
+.report-builder-container.panel-collapsed {
+    grid-template-columns: 48px 1fr;
+}
+
+/* ============================================
+   Info Tooltip Z-Index Fix
+   ============================================ */
+
+.info-tooltip {
+    z-index: 50;
+}
+
+/* Ensure DevExpress popups appear above all content */
+.dxbl-popup {
+    z-index: 10000 !important;
 }
