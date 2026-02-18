@@ -113,9 +113,9 @@ $env:ASPNETCORE_ENVIRONMENT = "Development"; dotnet watch run  # Hot reload
 - `SQL/Similar_to_samuel_sirs_report/` – All 3 stored procedure definitions
 
 ## Documentation
-- `DEVELOPER_GUIDE.md` – Comprehensive architecture, data flow, every file explained
-- `SQL_REFERENCE.md` – Complete SP documentation with CTE explanations
-- `MANUAL_REPORT_CREATION_GUIDE.md` – End-user step-by-step report creation guide
+- `documentation/DEVELOPER_GUIDE.md` – Comprehensive architecture, data flow, every file explained
+- `documentation/SQL_REFERENCE.md` – Complete SP documentation with CTE explanations
+- `documentation/MANUAL_REPORT_CREATION_GUIDE.md` – End-user step-by-step report creation guide
 
 ## Test Project
 `ReportingToolMVP.Tests/` contains xUnit integration tests:
