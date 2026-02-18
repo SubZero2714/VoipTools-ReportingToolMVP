@@ -1,0 +1,175 @@
+/* ===== Schedule Reports Page Styles ===== */
+
+.schedule-container {
+    padding: 24px 32px;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+/* Header */
+.schedule-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border-color, #e9ecef);
+}
+
+.schedule-header h3 {
+    margin: 0;
+    font-weight: 700;
+    color: var(--text-primary, #1a1a2e);
+}
+
+.schedule-header h3 .oi {
+    color: var(--accent-blue, #4361ee);
+    margin-right: 8px;
+}
+
+.schedule-header .text-muted {
+    margin: 4px 0 0 0;
+    font-size: 0.9rem;
+}
+
+/* Form Card */
+.schedule-form-card {
+    background: var(--bg-white, #ffffff);
+    border: 1px solid var(--border-color, #e9ecef);
+    border-radius: 12px;
+    box-shadow: var(--shadow-sm, 0 1px 3px rgba(0, 0, 0, 0.08));
+    overflow: hidden;
+}
+
+.form-card-header {
+    background: linear-gradient(135deg, #4361ee 0%, #3a56d4 100%);
+    padding: 16px 24px;
+}
+
+.form-card-header h5 {
+    margin: 0;
+    color: #ffffff;
+    font-weight: 600;
+}
+
+.form-card-body {
+    padding: 24px;
+}
+
+/* Params & Email sections */
+.params-section,
+.email-section {
+    padding: 20px;
+    background: #f8f9fc;
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
+}
+
+.params-section h6,
+.email-section h6 {
+    margin-bottom: 12px;
+    color: #4361ee;
+}
+
+.params-section h6 .oi,
+.email-section h6 .oi {
+    margin-right: 6px;
+}
+
+/* Form Actions */
+.form-actions {
+    display: flex;
+    gap: 8px;
+    padding-top: 16px;
+    border-top: 1px solid #e9ecef;
+}
+
+/* Schedule Table */
+.schedule-table-wrapper {
+    background: var(--bg-white, #ffffff);
+    border: 1px solid var(--border-color, #e9ecef);
+    border-radius: 12px;
+    box-shadow: var(--shadow-sm, 0 1px 3px rgba(0, 0, 0, 0.08));
+    overflow: hidden;
+}
+
+.schedule-table {
+    margin: 0;
+}
+
+.schedule-table thead {
+    background: #f8f9fc;
+}
+
+.schedule-table thead th {
+    padding: 12px 16px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: #6c757d;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 2px solid #e9ecef;
+}
+
+.schedule-table tbody td {
+    padding: 12px 16px;
+    vertical-align: middle;
+}
+
+.schedule-table tbody tr:hover {
+    background: #f8f9fc;
+}
+
+/* Empty State */
+.empty-state {
+    text-align: center;
+    padding: 60px 24px;
+    background: var(--bg-white, #ffffff);
+    border: 2px dashed #dee2e6;
+    border-radius: 12px;
+}
+
+.empty-icon {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 20px;
+    background: linear-gradient(135deg, #4361ee22, #4361ee11);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.empty-icon .oi {
+    font-size: 2rem;
+    color: #4361ee;
+}
+
+.empty-state h5 {
+    font-weight: 600;
+    color: var(--text-primary, #1a1a2e);
+    margin-bottom: 8px;
+}
+
+/* Badge tweaks */
+.badge {
+    font-weight: 500;
+    font-size: 0.75rem;
+    padding: 4px 8px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .schedule-container {
+        padding: 16px;
+    }
+
+    .schedule-header {
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .form-card-body {
+        padding: 16px;
+    }
+}

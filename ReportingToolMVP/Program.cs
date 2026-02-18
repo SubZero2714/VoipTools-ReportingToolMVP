@@ -8,6 +8,12 @@ using ReportingToolMVP.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// ─── Scheduled Reports Services ──────────────────────────────
+builder.Services.AddScoped<IReportScheduleRepository, ReportScheduleRepository>();
+builder.Services.AddSingleton<IEmailService, EmailService>();
+builder.Services.AddSingleton<IReportGeneratorService, ReportGeneratorService>();
+builder.Services.AddHostedService<ReportSchedulerBackgroundService>();
+
 // ─── Response Compression (Brotli + Gzip) ───────────────────────
 // Critical for Blazor Server: compresses SignalR WebSocket frames
 builder.Services.AddResponseCompression(opts =>

@@ -41,6 +41,14 @@
                 <span class="nav-label">Report Viewer</span>
             }
         </a>
+
+        <a href="schedulereports" class="nav-item @(IsActive("schedulereports") ? "active" : "")">
+            <span class="nav-icon oi oi-timer"></span>
+            @if (!IsCollapsed)
+            {
+                <span class="nav-label">Schedule Reports</span>
+            }
+        </a>
     </nav>
 
     <!-- Footer section (optional - for settings/help) -->

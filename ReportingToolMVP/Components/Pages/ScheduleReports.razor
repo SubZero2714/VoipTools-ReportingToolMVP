@@ -1,0 +1,628 @@
+@page "/schedulereports"
+@using ReportingToolMVP.Models
+@using ReportingToolMVP.Services
+@using DevExpress.XtraReports.Web.Extensions
+@rendermode InteractiveServer
+
+@inject IReportScheduleRepository ScheduleRepo
+@inject ReportStorageWebExtension ReportStorage
+@inject ILogger<ScheduleReports> Logger
+
+<PageTitle>Schedule Reports - VoIPTools</PageTitle>
+
+<div class="schedule-container">
+    <!-- Header -->
+    <div class="schedule-header">
+        <div class="header-left">
+            <h3><span class="oi oi-timer"></span> Schedule Reports</h3>
+            <p class="text-muted">Configure automated report generation and email delivery</p>
+        </div>
+        <div class="header-right">
+            <button class="btn btn-primary" @onclick="ShowCreateForm">
+                <span class="oi oi-plus"></span> New Schedule
+            </button>
+        </div>
+    </div>
+
+    <!-- Alert Messages -->
+    @if (!string.IsNullOrEmpty(AlertMessage))
+    {
+        <div class="alert @AlertCssClass alert-dismissible fade show" role="alert">
+            @AlertMessage
+            <button type="button" class="btn-close" @onclick="() => AlertMessage = null"></button>
+        </div>
+    }
+
+    <!-- Schedule List / Form View -->
+    @if (IsEditing)
+    {
+        <!-- ═══════ CREATE / EDIT FORM ═══════ -->
+        <div class="schedule-form-card">
+            <div class="form-card-header">
+                <h5>@(EditingSchedule.Id == 0 ? "Create New Schedule" : "Edit Schedule")</h5>
+            </div>
+            <div class="form-card-body">
+                <div class="row g-3">
+                    <!-- Schedule Name -->
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">Schedule Name <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" @bind="EditingSchedule.ScheduleName"
+                               placeholder="e.g., Weekly Queue Report for Management" />
+                    </div>
+
+                    <!-- Report Selection -->
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">Report Template <span class="text-danger">*</span></label>
+                        <select class="form-select" @bind="EditingSchedule.ReportName">
+                            <option value="">-- Select a report --</option>
+                            @foreach (var report in AvailableReports)
+                            {
+                                <option value="@report.Key">@report.Value</option>
+                            }
+                        </select>
+                    </div>
+
+                    <!-- Frequency -->
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold">Frequency <span class="text-danger">*</span></label>
+                        <select class="form-select" @bind="EditingSchedule.Frequency">
+                            <option value="@ScheduleFrequency.Daily">Daily</option>
+                            <option value="@ScheduleFrequency.Weekly">Weekly</option>
+                            <option value="@ScheduleFrequency.Monthly">Monthly</option>
+                        </select>
+                    </div>
+
+                    <!-- Day of Week (for Weekly) -->
+                    @if (EditingSchedule.Frequency == ScheduleFrequency.Weekly)
+                    {
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold">Day of Week</label>
+                            <select class="form-select" @bind="EditingSchedule.DayOfWeek">
+                                <option value="@DayOfWeek.Sunday">Sunday</option>
+                                <option value="@DayOfWeek.Monday">Monday</option>
+                                <option value="@DayOfWeek.Tuesday">Tuesday</option>
+                                <option value="@DayOfWeek.Wednesday">Wednesday</option>
+                                <option value="@DayOfWeek.Thursday">Thursday</option>
+                                <option value="@DayOfWeek.Friday">Friday</option>
+                                <option value="@DayOfWeek.Saturday">Saturday</option>
+                            </select>
+                        </div>
+                    }
+
+                    <!-- Day of Month (for Monthly) -->
+                    @if (EditingSchedule.Frequency == ScheduleFrequency.Monthly)
+                    {
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold">Day of Month</label>
+                            <select class="form-select" @bind="EditingSchedule.DayOfMonth">
+                                @for (int d = 1; d <= 28; d++)
+                                {
+                                    <option value="@d">@d</option>
+                                }
+                            </select>
+                        </div>
+                    }
+
+                    <!-- Time -->
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold">Time <span class="text-danger">*</span></label>
+                        <input type="time" class="form-control" @bind="EditingSchedule.ScheduledTime" />
+                    </div>
+
+                    <!-- Timezone -->
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold">Timezone</label>
+                        <select class="form-select" @bind="EditingSchedule.Timezone">
+                            @foreach (var tz in AvailableTimezones)
+                            {
+                                <option value="@tz.Id">@tz.DisplayName</option>
+                            }
+                        </select>
+                    </div>
+
+                    <!-- Export Format -->
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold">Export Format</label>
+                        <select class="form-select" @bind="EditingSchedule.ExportFormat">
+                            <option value="@ExportFormat.PDF">PDF</option>
+                            <option value="@ExportFormat.XLSX">Excel (XLSX)</option>
+                            <option value="@ExportFormat.CSV">CSV</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Report Parameters Section -->
+                <div class="params-section mt-4">
+                    <h6 class="fw-bold"><span class="oi oi-cog"></span> Report Parameters</h6>
+                    <p class="text-muted small">Set the parameter values the report will use when generated.</p>
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label">Start Date (pPeriodFrom)</label>
+                            <input type="datetime-local" class="form-control" @bind="ParamPeriodFrom" />
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">End Date (pPeriodTo)</label>
+                            <input type="datetime-local" class="form-control" @bind="ParamPeriodTo" />
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Queue DN (pQueueDns)</label>
+                            <input type="text" class="form-control" @bind="ParamQueueDns" placeholder="e.g., 8077 or % for all" />
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">SLA Threshold seconds (pSlaSeconds)</label>
+                            <input type="number" class="form-control" @bind="ParamSlaSeconds" />
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Wait Interval (pWaitInterval)</label>
+                            <input type="text" class="form-control" @bind="ParamWaitInterval" placeholder="e.g., 00:00:20" />
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Report Timezone (pReportTimezone)</label>
+                            <input type="text" class="form-control" @bind="ParamReportTimezone" placeholder="e.g., India Standard Time" />
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Email Section -->
+                <div class="email-section mt-4">
+                    <h6 class="fw-bold"><span class="oi oi-envelope-closed"></span> Email Configuration</h6>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">To (Email Addresses) <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" @bind="EditingSchedule.EmailTo"
+                                   placeholder="user1@example.com, user2@example.com" />
+                            <div class="form-text">Comma-separated email addresses</div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">CC (Optional)</label>
+                            <input type="text" class="form-control" @bind="EditingSchedule.EmailCc"
+                                   placeholder="manager@example.com" />
+                        </div>
+                        <div class="col-md-12">
+                            <label class="form-label">Custom Subject (Optional)</label>
+                            <input type="text" class="form-control" @bind="EditingSchedule.EmailSubject"
+                                   placeholder="Leave empty for auto-generated subject" />
+                        </div>
+                        <div class="col-md-12">
+                            <label class="form-label">Custom Email Body (Optional)</label>
+                            <textarea class="form-control" rows="3" @bind="EditingSchedule.EmailBody"
+                                      placeholder="Leave empty for default email template. Supports HTML."></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Enabled Toggle -->
+                <div class="mt-4">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" @bind="EditingSchedule.IsEnabled" id="enabledSwitch" />
+                        <label class="form-check-label fw-bold" for="enabledSwitch">
+                            @(EditingSchedule.IsEnabled ? "Schedule is ENABLED" : "Schedule is DISABLED")
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Form Actions -->
+                <div class="form-actions mt-4">
+                    <button class="btn btn-primary" @onclick="SaveSchedule" disabled="@IsSaving">
+                        @if (IsSaving)
+                        {
+                            <span class="spinner-border spinner-border-sm me-1"></span>
+                        }
+                        <span class="oi oi-check"></span> @(EditingSchedule.Id == 0 ? "Create Schedule" : "Save Changes")
+                    </button>
+                    <button class="btn btn-outline-secondary ms-2" @onclick="CancelEdit">
+                        <span class="oi oi-x"></span> Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <!-- ═══════ SCHEDULE LIST ═══════ -->
+        @if (IsLoading)
+        {
+            <div class="text-center py-5">
+                <div class="spinner-border text-primary" role="status"></div>
+                <p class="mt-2 text-muted">Loading schedules...</p>
+            </div>
+        }
+        else if (!Schedules.Any())
+        {
+            <div class="empty-state">
+                <div class="empty-icon">
+                    <span class="oi oi-timer"></span>
+                </div>
+                <h5>No Scheduled Reports</h5>
+                <p class="text-muted">Create your first schedule to automate report generation and email delivery.</p>
+                <button class="btn btn-primary" @onclick="ShowCreateForm">
+                    <span class="oi oi-plus"></span> Create First Schedule
+                </button>
+            </div>
+        }
+        else
+        {
+            <div class="schedule-table-wrapper">
+                <table class="table table-hover schedule-table">
+                    <thead>
+                        <tr>
+                            <th>Status</th>
+                            <th>Schedule Name</th>
+                            <th>Report</th>
+                            <th>Frequency</th>
+                            <th>Recipients</th>
+                            <th>Last Run</th>
+                            <th>Next Run</th>
+                            <th>Runs</th>
+                            <th class="text-end">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var schedule in Schedules)
+                        {
+                            <tr class="@(!schedule.IsEnabled ? "table-secondary" : "")">
+                                <td>
+                                    @if (schedule.IsEnabled)
+                                    {
+                                        <span class="badge bg-success">Active</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary">Disabled</span>
+                                    }
+                                    @if (schedule.LastRunStatus == RunStatus.Failed)
+                                    {
+                                        <span class="badge bg-danger ms-1" title="@schedule.LastRunError">Failed</span>
+                                    }
+                                </td>
+                                <td class="fw-semibold">@schedule.ScheduleName</td>
+                                <td>
+                                    <span class="text-muted small">@FormatReportName(schedule.ReportName)</span>
+                                </td>
+                                <td>@schedule.GetScheduleDescription()</td>
+                                <td>
+                                    <span class="text-truncate d-inline-block" style="max-width: 180px;" title="@schedule.EmailTo">
+                                        @schedule.EmailTo
+                                    </span>
+                                </td>
+                                <td>
+                                    @if (schedule.LastRunUtc.HasValue)
+                                    {
+                                        <span class="small">@schedule.LastRunUtc.Value.ToLocalTime().ToString("MMM dd, hh:mm tt")</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted small">Never</span>
+                                    }
+                                </td>
+                                <td>
+                                    @if (schedule.NextRunUtc.HasValue)
+                                    {
+                                        <span class="small">@schedule.NextRunUtc.Value.ToLocalTime().ToString("MMM dd, hh:mm tt")</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted small">—</span>
+                                    }
+                                </td>
+                                <td>@schedule.RunCount</td>
+                                <td class="text-end">
+                                    <button class="btn btn-sm btn-outline-primary me-1" @onclick="() => EditSchedule(schedule)" title="Edit">
+                                        <span class="oi oi-pencil"></span>
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-success me-1" @onclick="() => ToggleEnabled(schedule)" 
+                                            title="@(schedule.IsEnabled ? "Disable" : "Enable")">
+                                        <span class="oi @(schedule.IsEnabled ? "oi-circle-x" : "oi-circle-check")"></span>
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-danger" @onclick="() => ConfirmDelete(schedule)" title="Delete">
+                                        <span class="oi oi-trash"></span>
+                                    </button>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    }
+
+    <!-- Delete Confirmation Modal -->
+    @if (ShowDeleteConfirm)
+    {
+        <div class="modal-backdrop fade show"></div>
+        <div class="modal fade show d-block" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Delete Schedule</h5>
+                        <button type="button" class="btn-close" @onclick="() => ShowDeleteConfirm = false"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Are you sure you want to delete the schedule <strong>@DeletingSchedule?.ScheduleName</strong>?</p>
+                        <p class="text-muted small">This action cannot be undone.</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" @onclick="() => ShowDeleteConfirm = false">Cancel</button>
+                        <button class="btn btn-danger" @onclick="DeleteSchedule">
+                            <span class="oi oi-trash"></span> Delete
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    // ── State ──
+    private List<ReportSchedule> Schedules = new();
+    private Dictionary<string, string> AvailableReports = new();
+    private List<TimeZoneInfo> AvailableTimezones = new();
+    private bool IsLoading = true;
+    private bool IsEditing = false;
+    private bool IsSaving = false;
+    private bool ShowDeleteConfirm = false;
+    private ReportSchedule? DeletingSchedule;
+
+    // Alert
+    private string? AlertMessage;
+    private string AlertCssClass = "alert-success";
+
+    // Form model
+    private ReportSchedule EditingSchedule = new();
+
+    // Report parameter fields
+    private DateTime ParamPeriodFrom = new DateTime(2026, 2, 1);
+    private DateTime ParamPeriodTo = DateTime.Now.Date;
+    private string ParamQueueDns = "8077";
+    private int ParamSlaSeconds = 20;
+    private string ParamWaitInterval = "00:00:20";
+    private string ParamReportTimezone = "India Standard Time";
+
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Load available timezones
+        AvailableTimezones = TimeZoneInfo.GetSystemTimeZones()
+            .OrderBy(tz => tz.BaseUtcOffset)
+            .ToList();
+
+        // Load available reports from storage
+        LoadAvailableReports();
+
+        // Load existing schedules
+        await LoadSchedulesAsync();
+    }
+
+    private void LoadAvailableReports()
+    {
+        try
+        {
+            var urls = ReportStorage.GetUrls();
+            AvailableReports = urls.ToDictionary(
+                kv => kv.Key,
+                kv => FormatReportName(kv.Key)
+            );
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Failed to load available reports.");
+        }
+    }
+
+    private async Task LoadSchedulesAsync()
+    {
+        IsLoading = true;
+        try
+        {
+            Schedules = await ScheduleRepo.GetAllAsync();
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Failed to load schedules.");
+            ShowAlert($"Error loading schedules: {ex.Message}", false);
+        }
+        finally
+        {
+            IsLoading = false;
+        }
+    }
+
+    // ── Form Actions ──
+
+    private void ShowCreateForm()
+    {
+        EditingSchedule = new ReportSchedule
+        {
+            Frequency = ScheduleFrequency.Weekly,
+            DayOfWeek = DayOfWeek.Monday,
+            DayOfMonth = 1,
+            ScheduledTime = new TimeOnly(8, 0),
+            Timezone = "India Standard Time",
+            ExportFormat = ExportFormat.PDF,
+            IsEnabled = true
+        };
+        ResetParamFields();
+        IsEditing = true;
+    }
+
+    private void EditSchedule(ReportSchedule schedule)
+    {
+        // Clone the schedule for editing
+        EditingSchedule = new ReportSchedule
+        {
+            Id = schedule.Id,
+            ScheduleName = schedule.ScheduleName,
+            ReportName = schedule.ReportName,
+            IsEnabled = schedule.IsEnabled,
+            Frequency = schedule.Frequency,
+            DayOfWeek = schedule.DayOfWeek,
+            DayOfMonth = schedule.DayOfMonth,
+            ScheduledTime = schedule.ScheduledTime,
+            Timezone = schedule.Timezone,
+            ReportParamsJson = schedule.ReportParamsJson,
+            EmailTo = schedule.EmailTo,
+            EmailCc = schedule.EmailCc,
+            EmailSubject = schedule.EmailSubject,
+            EmailBody = schedule.EmailBody,
+            ExportFormat = schedule.ExportFormat,
+            NextRunUtc = schedule.NextRunUtc
+        };
+
+        // Load params into fields
+        var paramDict = schedule.GetReportParams();
+        ParamPeriodFrom = paramDict.TryGetValue("pPeriodFrom", out var pf) && DateTime.TryParse(pf, out var pfDate)
+            ? pfDate : new DateTime(2026, 2, 1);
+        ParamPeriodTo = paramDict.TryGetValue("pPeriodTo", out var pt) && DateTime.TryParse(pt, out var ptDate)
+            ? ptDate : DateTime.Now.Date;
+        ParamQueueDns = paramDict.TryGetValue("pQueueDns", out var qd) ? qd : "8077";
+        ParamSlaSeconds = paramDict.TryGetValue("pSlaSeconds", out var ss) && int.TryParse(ss, out var ssInt)
+            ? ssInt : 20;
+        ParamWaitInterval = paramDict.TryGetValue("pWaitInterval", out var wi) ? wi : "00:00:20";
+        ParamReportTimezone = paramDict.TryGetValue("pReportTimezone", out var rtz) ? rtz : "India Standard Time";
+
+        IsEditing = true;
+    }
+
+    private void CancelEdit()
+    {
+        IsEditing = false;
+        EditingSchedule = new();
+    }
+
+    private async Task SaveSchedule()
+    {
+        // Validate
+        if (string.IsNullOrWhiteSpace(EditingSchedule.ScheduleName))
+        {
+            ShowAlert("Schedule name is required.", false);
+            return;
+        }
+        if (string.IsNullOrWhiteSpace(EditingSchedule.ReportName))
+        {
+            ShowAlert("Please select a report template.", false);
+            return;
+        }
+        if (string.IsNullOrWhiteSpace(EditingSchedule.EmailTo))
+        {
+            ShowAlert("At least one email address is required.", false);
+            return;
+        }
+
+        IsSaving = true;
+
+        try
+        {
+            // Build report params JSON
+            var paramDict = new Dictionary<string, string>
+            {
+                ["pPeriodFrom"] = ParamPeriodFrom.ToString("o"),
+                ["pPeriodTo"] = ParamPeriodTo.ToString("o"),
+                ["pQueueDns"] = ParamQueueDns,
+                ["pSlaSeconds"] = ParamSlaSeconds.ToString(),
+                ["pWaitInterval"] = ParamWaitInterval,
+                ["pReportTimezone"] = ParamReportTimezone
+            };
+            EditingSchedule.SetReportParams(paramDict);
+
+            // Calculate next run
+            EditingSchedule.NextRunUtc = ReportSchedulerBackgroundService.CalculateNextRun(EditingSchedule);
+
+            if (EditingSchedule.Id == 0)
+            {
+                // Create new
+                var newId = await ScheduleRepo.CreateAsync(EditingSchedule);
+                ShowAlert($"Schedule '{EditingSchedule.ScheduleName}' created successfully! Next run: {EditingSchedule.NextRunUtc?.ToLocalTime():MMM dd, yyyy hh:mm tt}", true);
+            }
+            else
+            {
+                // Update existing
+                await ScheduleRepo.UpdateAsync(EditingSchedule);
+                ShowAlert($"Schedule '{EditingSchedule.ScheduleName}' updated successfully!", true);
+            }
+
+            IsEditing = false;
+            await LoadSchedulesAsync();
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Failed to save schedule.");
+            ShowAlert($"Error saving schedule: {ex.Message}", false);
+        }
+        finally
+        {
+            IsSaving = false;
+        }
+    }
+
+    private async Task ToggleEnabled(ReportSchedule schedule)
+    {
+        schedule.IsEnabled = !schedule.IsEnabled;
+        if (schedule.IsEnabled)
+        {
+            schedule.NextRunUtc = ReportSchedulerBackgroundService.CalculateNextRun(schedule);
+        }
+
+        try
+        {
+            await ScheduleRepo.UpdateAsync(schedule);
+            ShowAlert($"Schedule '{schedule.ScheduleName}' {(schedule.IsEnabled ? "enabled" : "disabled")}.", true);
+            await LoadSchedulesAsync();
+        }
+        catch (Exception ex)
+        {
+            ShowAlert($"Error: {ex.Message}", false);
+        }
+    }
+
+    private void ConfirmDelete(ReportSchedule schedule)
+    {
+        DeletingSchedule = schedule;
+        ShowDeleteConfirm = true;
+    }
+
+    private async Task DeleteSchedule()
+    {
+        if (DeletingSchedule == null) return;
+
+        try
+        {
+            await ScheduleRepo.DeleteAsync(DeletingSchedule.Id);
+            ShowAlert($"Schedule '{DeletingSchedule.ScheduleName}' deleted.", true);
+            ShowDeleteConfirm = false;
+            DeletingSchedule = null;
+            await LoadSchedulesAsync();
+        }
+        catch (Exception ex)
+        {
+            ShowAlert($"Error deleting schedule: {ex.Message}", false);
+        }
+    }
+
+    // ── Helpers ──
+
+    private void ResetParamFields()
+    {
+        ParamPeriodFrom = new DateTime(2026, 2, 1);
+        ParamPeriodTo = DateTime.Now.Date;
+        ParamQueueDns = "8077";
+        ParamSlaSeconds = 20;
+        ParamWaitInterval = "00:00:20";
+        ParamReportTimezone = "India Standard Time";
+    }
+
+    private void ShowAlert(string message, bool isSuccess)
+    {
+        AlertMessage = message;
+        AlertCssClass = isSuccess ? "alert-success" : "alert-danger";
+    }
+
+    private static string FormatReportName(string name)
+    {
+        return name
+            .Replace("_", " ")
+            .Replace(".repx", "")
+            .Trim();
+    }
+}
