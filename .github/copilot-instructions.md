@@ -1,13 +1,15 @@
 # VoIPTools Reporting Tool - AI Agent Instructions
 
 ## Project Overview
-.NET 8 Blazor Server reporting application for 3CX call queue analytics. Uses DevExpress XtraReports v25.2.3 with a WYSIWYG Report Designer and Report Viewer. Reports are stored as `.repx` XML templates on the file system.
+.NET 8 Blazor Server reporting application for 3CX call queue analytics. Uses DevExpress XtraReports v25.2.3 with a WYSIWYG Report Designer, Report Viewer, and Scheduled Email Reports. Reports are stored as `.repx` XML templates on the file system.
 
 ## Architecture
 
 ```
 ReportDesigner.razor → DxReportDesigner → FileReportStorageService → Reports/Templates/*.repx
 ReportViewer.razor → DxReportViewer → ReportStorageWebExtension → .repx → SQL Server
+ScheduleReports.razor → ReportScheduleRepository → report_schedules table
+  └→ ReportSchedulerBackgroundService → ReportGeneratorService → EmailService → SMTP
 QueuePerformanceDashboardGenerator.cs → generates .repx on startup with XML post-processing
 ```
 
@@ -18,6 +20,8 @@ QueuePerformanceDashboardGenerator.cs → generates .repx on startup with XML po
   - `sp_queue_stats_summary` – single aggregated row for KPI cards (params: @from, @to, @queue_dns, @sla_seconds, @report_timezone)
   - `sp_queue_stats_daily_summary` – daily call trends for area chart (same 5 params as above)
   - `qcall_cent_get_extensions_statistics_by_queues` – per-agent performance for table (params: @period_from, @period_to, @queue_dns, @wait_interval)
+- 1 Custom Table:
+  - `report_schedules` – stores email schedule configuration, recipients, and run history
 
 ### Key Connection
 - Connection name in .repx: `3CX_Exporter_Production`
@@ -41,6 +45,11 @@ builder.Services.AddScoped<IDataSourceWizardConnectionStringsProvider, ...>();
 builder.Services.AddScoped<IConnectionProviderService, ...>();
 builder.Services.AddScoped<IConnectionProviderFactory, ...>();
 builder.Services.AddScoped<IDBSchemaProviderExFactory, ...>();
+// Scheduled Reports services:
+builder.Services.AddScoped<IReportScheduleRepository, ReportScheduleRepository>();
+builder.Services.AddScoped<EmailService>();
+builder.Services.AddScoped<ReportGeneratorService>();
+builder.Services.AddHostedService<ReportSchedulerBackgroundService>();
 // ...
 app.UseDevExpressBlazorReporting();  // BEFORE MapRazorComponents
 app.MapRazorComponents<App>().AddInteractiveServerRenderMode();
@@ -85,6 +94,7 @@ KeepAliveInterval = 15s
 | `/reportdesigner/{ReportUrl}` | ReportDesigner.razor | Open specific report for editing |
 | `/reportviewer` | ReportViewer.razor | View/export reports with parameter filtering |
 | `/reportviewer/{ReportUrl}` | ReportViewer.razor | Open specific report for viewing |
+| `/schedulereports` | ScheduleReports.razor | Configure automated email report schedules |
 
 ## Developer Workflow
 
@@ -95,7 +105,12 @@ dotnet run                         # https://localhost:7209
 $env:ASPNETCORE_ENVIRONMENT = "Development"; dotnet watch run  # Hot reload
 ```
 
-**First-time setup:** Copy `appsettings.json.sample` → `appsettings.json`, set connection strings.
+**First-time setup:** Copy `appsettings.json.sample` → `appsettings.json`, set connection strings. Set SMTP credentials via `dotnet user-secrets set` (see Secrets Management below).
+
+### Secrets Management
+- **Development:** SMTP credentials stored in .NET User Secrets (`dotnet user-secrets list`)
+- **Production:** Use environment variables with `__` separator (e.g., `SmtpSettings__Host`, `SmtpSettings__Password`)
+- `appsettings.json` contains only empty SMTP placeholders — never commit real credentials
 
 ## CSS & Theme
 - **DevExpress theme:** `blazing-berry.bs5.min.css` (all DX packages must match version)
@@ -106,10 +121,17 @@ $env:ASPNETCORE_ENVIRONMENT = "Development"; dotnet watch run  # Hot reload
 - `Program.cs` – DI registration, middleware pipeline, report generation on startup
 - `Services/FileReportStorageService.cs` – .repx file storage with caching
 - `Services/ReportDataSourceProviders.cs` – 5 DB connection provider classes
+- `Services/ReportScheduleRepository.cs` – ADO.NET CRUD for report_schedules table
+- `Services/EmailService.cs` – SMTP email sender with report attachments
+- `Services/ReportGeneratorService.cs` – Loads .repx, applies params, exports to PDF/XLSX/CSV
+- `Services/ReportSchedulerBackgroundService.cs` – Hosted BackgroundService polling every 60s
+- `Models/ReportSchedule.cs` – Schedule entity with enums (frequency, format, status)
 - `Reports/QueuePerformanceDashboardGenerator.cs` – Code-based .repx generator with XML post-processing
 - `Components/Pages/ReportDesigner.razor` – DxReportDesigner page
 - `Components/Pages/ReportViewer.razor` – DxReportViewer with dropdown selector
-- `Shared/NavMenu.razor` – Sidebar navigation (Designer + Viewer links)
+- `Components/Pages/ScheduleReports.razor` – Schedule management UI (CRUD + enable/disable)
+- `Shared/NavMenu.razor` – Sidebar navigation (Designer + Viewer + Schedule links)
+- `SQL/CreateReportSchedulesTable.sql` – DDL for report_schedules table
 - `SQL/Similar_to_samuel_sirs_report/` – All 3 stored procedure definitions
 
 ## Documentation

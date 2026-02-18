@@ -1,6 +1,6 @@
 # VoIPTools Reporting Tool — Comprehensive Developer Guide
 
-> **Version:** 2.0 | **Last Updated:** February 18, 2026  
+> **Version:** 3.0 | **Last Updated:** February 18, 2026  
 > **Framework:** .NET 8.0 | **UI:** Blazor Server | **Reporting:** DevExpress XtraReports v25.2.3  
 > **Application URL:** `https://localhost:7209`
 
@@ -16,7 +16,7 @@
 6. [Program.cs — Application Startup In Detail](#6-programcs)
 7. [Services Layer — Deep Dive](#7-services-layer)
 8. [Report Generator — QueuePerformanceDashboardGenerator.cs](#8-report-generator)
-9. [Blazor Pages — Designer & Viewer](#9-blazor-pages)
+9. [Blazor Pages — Designer, Viewer & Schedule Reports](#9-blazor-pages)
 10. [Layout & Navigation](#10-layout-and-navigation)
 11. [DevExpress Component Integration](#11-devexpress-integration)
 12. [Database Configuration](#12-database-configuration)
@@ -24,8 +24,10 @@
 14. [Build & Run](#14-build-and-run)
 15. [Report Template (.repx) System](#15-repx-system)
 16. [SignalR & Performance Tuning](#16-signalr-and-performance)
-17. [Troubleshooting](#17-troubleshooting)
-18. [Glossary](#18-glossary)
+17. [Scheduled Reports (Email Delivery)](#17-scheduled-reports)
+18. [Secrets & Configuration Management](#18-secrets-and-configuration)
+19. [Troubleshooting](#19-troubleshooting)
+20. [Glossary](#20-glossary)
 
 ---
 
@@ -47,12 +49,13 @@ This is a **standalone .NET 8 Blazor Server application** for creating, editing,
 └─────────────────────────────────────────────────────────────────┘
 ```
 
-### Two Application Pages
+### Three Application Pages
 
 | Page | Route | Purpose |
 |------|-------|---------|
 | **Report Designer** | `/reportdesigner` | WYSIWYG drag-and-drop report editor. Users create/edit reports with stored procedure data sources, KPI panels, charts, tables. |
 | **Report Viewer** | `/reportviewer` | View saved reports with parameter filtering. Export to PDF, Excel, CSV, HTML, and more. |
+| **Schedule Reports** | `/schedulereports` | Configure automated report generation and email delivery on daily/weekly/monthly schedules. |
 
 ---
 
@@ -106,7 +109,11 @@ This is a **standalone .NET 8 Blazor Server application** for creating, editing,
 │   │  ├── CustomDataSourceWizardConnectionStringsProvider         │       │
 │   │  ├── CustomConnectionProviderService                         │       │
 │   │  ├── CustomConnectionProviderFactory                         │       │
-│   │  └── CustomDBSchemaProviderExFactory                         │       │
+│   │  ├── CustomDBSchemaProviderExFactory                         │       │
+│   │  ├── ReportScheduleRepository (Scoped)                       │       │
+│   │  ├── EmailService (Singleton)                                │       │
+│   │  ├── ReportGeneratorService (Singleton)                      │       │
+│   │  └── ReportSchedulerBackgroundService (Hosted)               │       │
 │   └───────────────────────────┬─────────────────────────────────┘       │
 │                               │                                          │
 │   ┌───────────────────────────┼─────────────────────────────────┐       │
@@ -221,9 +228,10 @@ VoipTools-ReportingToolMVP/                    ← Git repository root
     ├── ReportingToolMVP.csproj                ← Project file with NuGet package references
     ├── Program.cs                             ← ★ Application entry point & DI configuration
     ├── _Imports.razor                         ← Root-level Razor using statements
-    ├── appsettings.json                       ← Production configuration (connection strings)
+    ├── appsettings.json                       ← Configuration (connection strings, SMTP placeholders)
     ├── appsettings.Development.json           ← Development overrides
     ├── appsettings.json.sample                ← Template for new developers
+    │   NOTE: SMTP credentials stored in User Secrets (dev) or env vars (prod)
     │
     ├── DEVELOPER_GUIDE.md                     ← ★ THIS FILE — comprehensive developer manual
     ├── SQL_REFERENCE.md                       ← Complete SQL stored procedure documentation
@@ -238,12 +246,14 @@ VoipTools-ReportingToolMVP/                    ← Git repository root
     │   ├── _Imports.razor                     ← Component-level using statements
     │   └── Pages/
     │       ├── ReportDesigner.razor           ← ★ /reportdesigner — WYSIWYG editor page
-    │       └── ReportViewer.razor             ← ★ /reportviewer — Report viewing/export page
+    │       ├── ReportViewer.razor             ← ★ /reportviewer — Report viewing/export page
+    │       ├── ScheduleReports.razor          ← ★ /schedulereports — Automated email scheduling
+    │       └── ScheduleReports.razor.css      ← Scoped CSS for schedule page
     │
     ├── Shared/                                ← Shared layout components
     │   ├── MainLayout.razor                   ← Page layout with sidebar + content area
     │   ├── MainLayout.razor.css               ← Scoped CSS for layout
-    │   ├── NavMenu.razor                      ← ★ Sidebar navigation (Designer + Viewer links)
+    │   ├── NavMenu.razor                      ← ★ Sidebar navigation (Designer + Viewer + Schedule links)
     │   └── NavMenu.razor.css                  ← Scoped CSS for navigation sidebar
     │
     ├── Pages/                                 ← Non-interactive pages
@@ -251,9 +261,16 @@ VoipTools-ReportingToolMVP/                    ← Git repository root
     │   ├── Error.cshtml                       ← Server error page (500)
     │   └── Error.cshtml.cs                    ← Error page code-behind
     │
+    ├── Models/                                ← Data models
+    │   └── ReportSchedule.cs                  ← Schedule entity + enums (Frequency, Format, RunStatus)
+    │
     ├── Services/                              ← ★ Backend service layer
     │   ├── FileReportStorageService.cs        ← ★ .repx file storage (save/load/list)
-    │   └── ReportDataSourceProviders.cs       ← ★ 5 classes for DB connections in Designer
+    │   ├── ReportDataSourceProviders.cs       ← ★ 5 classes for DB connections in Designer
+    │   ├── ReportScheduleRepository.cs        ← ADO.NET CRUD for report_schedules table
+    │   ├── EmailService.cs                    ← SMTP email sender with attachments
+    │   ├── ReportGeneratorService.cs          ← Server-side PDF/XLSX/CSV export from .repx
+    │   └── ReportSchedulerBackgroundService.cs ← Background service polling (60s) for due schedules
     │
     ├── Reports/                               ← Report generation & templates
     │   ├── QueuePerformanceDashboardGenerator.cs  ← ★ Code-based .repx generator
@@ -265,6 +282,7 @@ VoipTools-ReportingToolMVP/                    ← Git repository root
     │       └── Similar to samuel sirs report*.repx    ← Manual test iterations
     │
     ├── SQL/                                   ← SQL scripts & stored procedures
+    │   ├── CreateReportSchedulesTable.sql     ← ★ DDL for report_schedules table
     │   ├── Similar_to_samuel_sirs_report/     ← ★ Active SP definitions
     │   │   ├── README.md                      ← SP documentation
     │   │   ├── sp_queue_kpi_summary.sql       ← SP 1: KPI aggregation
@@ -412,6 +430,13 @@ builder.Services.AddScoped<IConnectionProviderService, ...>();
 builder.Services.AddScoped<IConnectionProviderFactory, ...>();
 builder.Services.AddScoped<IDBSchemaProviderExFactory, ...>();
 
+// 15. Scheduled Reports services
+//     WHY: Enables automated report generation and email delivery.
+builder.Services.AddScoped<IReportScheduleRepository, ReportScheduleRepository>();
+builder.Services.AddSingleton<IEmailService, EmailService>();
+builder.Services.AddSingleton<IReportGeneratorService, ReportGeneratorService>();
+builder.Services.AddHostedService<ReportSchedulerBackgroundService>();
+
 var app = builder.Build();
 
 // 15. Generate the production report .repx on startup
@@ -451,7 +476,7 @@ MapRazorComponents<App>()                      ← LAST
 
 ## 7. Services Layer
 
-Two files in `Services/` contain all backend logic.
+Six files in `Services/` contain all backend logic.
 
 ### 7.1 FileReportStorageService.cs
 
@@ -544,6 +569,80 @@ At runtime:
 
 > **KEY INSIGHT:** The .repx file stores the connection NAME, not the connection string. The connection string is resolved at runtime by `CustomConnectionProviderService`. This means you can change the database server without modifying any report files.
 
+### 7.3 ReportScheduleRepository.cs
+
+**Purpose:** ADO.NET CRUD operations for the `report_schedules` SQL table.
+
+```
+Interface: IReportScheduleRepository
+│
+├── GetAllAsync()              → All schedules (for UI list)
+├── GetByIdAsync(id)           → Single schedule by ID
+├── GetDueSchedulesAsync(utcNow) → Enabled schedules where next_run_utc <= now
+├── CreateAsync(schedule)      → INSERT + return new ID
+├── UpdateAsync(schedule)      → UPDATE all fields by ID
+├── DeleteAsync(id)            → DELETE by ID
+└── UpdateRunStatusAsync(...)  → Update last_run_status, error, next_run, run_count
+```
+
+**Connection:** Uses `DefaultConnection` from `IConfiguration`. Pure ADO.NET — no Entity Framework.
+
+### 7.4 EmailService.cs
+
+**Purpose:** Sends emails with report file attachments via SMTP.
+
+```
+Interface: IEmailService
+└── SendReportEmailAsync(to, cc, subject, body, attachmentData, fileName, mimeType)
+
+Configuration: SmtpSettings class bound from "SmtpSettings" section
+├── Host           (e.g., smtp.office365.com)
+├── Port           (587)
+├── EnableSsl      (true)
+├── Username       (stored in User Secrets / env vars)
+├── Password       (stored in User Secrets / env vars)
+├── FromAddress    (stored in User Secrets / env vars)
+└── FromDisplayName
+```
+
+**Supports:** Comma/semicolon-separated addresses, HTML body, 30-second timeout.
+
+### 7.5 ReportGeneratorService.cs
+
+**Purpose:** Server-side report generation from `.repx` templates, outputting PDF, XLSX, or CSV byte arrays.
+
+```
+Interface: IReportGeneratorService
+└── GenerateReportAsync(reportName, parameters, format)
+    → Returns (byte[] Data, string FileName, string MimeType)
+
+Flow:
+  1. Load .repx from Templates/ or Reports/ directory
+  2. Set parameter values with automatic type conversion
+  3. Export via DevExpress XtraReport.ExportToPdf / ExportToXlsx / ExportToCsv
+```
+
+### 7.6 ReportSchedulerBackgroundService.cs
+
+**Purpose:** `BackgroundService` that polls every 60 seconds for due report schedules and executes them.
+
+```
+Lifecycle:
+  1. Startup delay: 30 seconds (let app initialize)
+  2. Loop every 60 seconds:
+     a. GetDueSchedulesAsync(utcNow) → find enabled schedules past due
+     b. For each schedule:
+        i.   Mark status = Running
+        ii.  Generate report (PDF/XLSX/CSV)
+        iii. Send email with attachment
+        iv.  Calculate next run time
+        v.   Mark status = Success or Failed
+
+Static helper: CalculateNextRun(schedule)
+  → Computes next UTC run time based on frequency, day of week/month,
+    scheduled time, and timezone
+```
+
 ---
 
 ## 8. Report Generator
@@ -616,7 +715,7 @@ This creates the chain: `[Parameters.pPeriodFrom]` → `@period_from` → SQL Se
 
 ---
 
-## 9. Blazor Pages
+## 9. Blazor Pages — Designer, Viewer & Schedule Reports
 
 ### ReportDesigner.razor
 
@@ -667,6 +766,30 @@ Component: <DxReportViewer>
   - Print button
   - Search within report
 
+### ScheduleReports.razor
+
+```
+Route:     /schedulereports
+Directive: @rendermode InteractiveServer
+Injected:  IReportScheduleRepository, ReportStorageWebExtension, ILogger
+```
+
+**How it works:**
+- On initialization, loads all existing schedules from `report_schedules` table
+- Loads available report templates from `ReportStorage.GetUrls()`
+- Provides a create/edit form with:
+  - Schedule name, report template selection
+  - Frequency picker (Daily / Weekly / Monthly)
+  - Day of week (for Weekly), day of month (for Monthly)
+  - Time and timezone selection
+  - Export format (PDF / XLSX / CSV)
+  - Report parameter inputs (period dates, queue DN, SLA, wait interval, timezone)
+  - Email recipients (To / CC), custom subject and body
+  - Enable/disable toggle
+- Schedule list table with status badges, last run info, and action buttons
+- Delete confirmation modal
+- Enable/disable inline toggle per schedule
+
 ---
 
 ## 10. Layout & Navigation
@@ -709,7 +832,7 @@ Shared/MainLayout.razor        ← Page layout structure (sidebar + content area
 
 ### NavMenu.razor
 
-Collapsible sidebar with two navigation links:
+Collapsible sidebar with three navigation links:
 
 ```
 ┌──────────────────────┐
@@ -717,6 +840,7 @@ Collapsible sidebar with two navigation links:
 ├──────────────────────┤
 │ 🖌️ Report Designer   │  ← href="reportdesigner"
 │ 📄 Report Viewer      │  ← href="reportviewer"
+│ ⏰ Schedule Reports   │  ← href="schedulereports"
 ├──────────────────────┤
 │ ⚙️ Settings           │  ← Placeholder (not implemented)
 └──────────────────────┘
@@ -1008,7 +1132,153 @@ ctx.Context.Response.Headers.Append("Cache-Control", "public,max-age=604800,immu
 
 ---
 
-## 17. Troubleshooting
+## 17. Scheduled Reports (Email Delivery)
+
+### Overview
+
+The application includes an automated report scheduling system that generates reports on a configurable schedule and delivers them via email as PDF, XLSX, or CSV attachments.
+
+### Architecture
+
+```
+┌─────────────────────────────────┐
+│  ScheduleReports.razor (UI)     │  ← User configures schedules
+│  /schedulereports               │
+└───────────────┬─────────────────┘
+                │ CRUD operations
+                ▼
+┌─────────────────────────────────┐
+│  ReportScheduleRepository       │  ← ADO.NET ↔ report_schedules table
+│  (IReportScheduleRepository)    │
+└───────────────┬─────────────────┘
+                │
+                ▼
+┌─────────────────────────────────┐
+│  report_schedules (SQL table)   │  ← Persists schedule config, run history
+│  Server: 3.132.72.134           │
+└───────────────┬─────────────────┘
+                │ Polled every 60s
+                ▼
+┌─────────────────────────────────┐
+│  ReportSchedulerBackgroundService│  ← BackgroundService (hosted)
+│  (polls for due schedules)      │
+│                                 │
+│  For each due schedule:         │
+│  ├── ReportGeneratorService     │  ← Loads .repx, exports to PDF/XLSX/CSV
+│  └── EmailService               │  ← Sends email via SMTP with attachment
+└─────────────────────────────────┘
+```
+
+### Database Table: `report_schedules`
+
+Created by `SQL/CreateReportSchedulesTable.sql`. Key columns:
+
+| Column | Type | Purpose |
+|--------|------|---------|
+| `schedule_name` | NVARCHAR(200) | User-friendly name |
+| `report_name` | NVARCHAR(500) | .repx filename (without extension) |
+| `frequency` | NVARCHAR(20) | Daily, Weekly, or Monthly |
+| `day_of_week` | INT | 0=Sun..6=Sat (Weekly only) |
+| `day_of_month` | INT | 1-28 (Monthly only) |
+| `scheduled_time` | TIME | Time of day to run |
+| `timezone` | NVARCHAR(100) | IANA/Windows timezone ID |
+| `report_params_json` | NVARCHAR(MAX) | JSON dict of report parameter values |
+| `email_to` / `email_cc` | NVARCHAR(MAX) | Comma-separated email addresses |
+| `export_format` | NVARCHAR(10) | PDF, XLSX, or CSV |
+| `next_run_utc` | DATETIME2 | Pre-calculated next execution time |
+| `last_run_status` | NVARCHAR(20) | Success, Failed, or Running |
+
+Index: `IX_report_schedules_next_run` on `(is_enabled, next_run_utc)` for efficient polling.
+
+### Model: `ReportSchedule.cs`
+
+```csharp
+// Enums
+public enum ScheduleFrequency { Daily, Weekly, Monthly }
+public enum ExportFormat { PDF, XLSX, CSV }
+public enum RunStatus { Success, Failed, Running }
+
+// Entity class maps 1:1 to the SQL table
+// Helper methods:
+//   GetReportParams() / SetReportParams() — JSON ↔ Dictionary<string,string>
+//   GetScheduleDescription() — "Daily at 08:00 AM (India Standard Time)"
+```
+
+---
+
+## 18. Secrets & Configuration Management
+
+### Configuration Hierarchy (Priority: highest → lowest)
+
+```
+1. Environment Variables     ← Production (SmtpSettings__Host, etc.)
+2. User Secrets              ← Development (dotnet user-secrets)
+3. appsettings.{Environment}.json
+4. appsettings.json          ← Contains empty SMTP placeholders
+```
+
+.NET 8's `WebApplication.CreateBuilder()` loads all these sources automatically. Higher-priority sources override lower ones.
+
+### Development: User Secrets
+
+SMTP credentials are stored outside the repository using .NET User Secrets:
+
+```powershell
+# View all secrets
+dotnet user-secrets list
+
+# Set a secret
+dotnet user-secrets set "SmtpSettings:Username" "mail@voiptools.com"
+dotnet user-secrets set "SmtpSettings:Password" "your-password"
+
+# Clear all secrets
+dotnet user-secrets clear
+```
+
+Secrets are stored at: `%APPDATA%\Microsoft\UserSecrets\{UserSecretsId}\secrets.json`
+
+The `UserSecretsId` is defined in `ReportingToolMVP.csproj`.
+
+### Production: Environment Variables
+
+Use the `__` (double underscore) separator to map to JSON hierarchy:
+
+| appsettings.json Path | Environment Variable |
+|----------------------|---------------------|
+| `SmtpSettings:Host` | `SmtpSettings__Host` |
+| `SmtpSettings:Port` | `SmtpSettings__Port` |
+| `SmtpSettings:EnableSsl` | `SmtpSettings__EnableSsl` |
+| `SmtpSettings:Username` | `SmtpSettings__Username` |
+| `SmtpSettings:Password` | `SmtpSettings__Password` |
+| `SmtpSettings:FromAddress` | `SmtpSettings__FromAddress` |
+| `SmtpSettings:FromDisplayName` | `SmtpSettings__FromDisplayName` |
+
+Set on Windows (machine-level, persists across reboots):
+```powershell
+[Environment]::SetEnvironmentVariable("SmtpSettings__Host", "smtp.office365.com", "Machine")
+[Environment]::SetEnvironmentVariable("SmtpSettings__Username", "mail@voiptools.com", "Machine")
+# ... etc.
+```
+
+### What's in appsettings.json (safe for git)
+
+```json
+"SmtpSettings": {
+  "Host": "",
+  "Port": 587,
+  "EnableSsl": true,
+  "Username": "",
+  "Password": "",
+  "FromAddress": "",
+  "FromDisplayName": "VoIPTools Reporting"
+}
+```
+
+> **IMPORTANT:** Never commit real SMTP credentials to `appsettings.json`. The file contains only empty placeholders and structural defaults.
+
+---
+
+## 19. Troubleshooting
 
 ### Common Issues
 
@@ -1035,7 +1305,7 @@ ctx.Context.Response.Headers.Append("Cache-Control", "public,max-age=604800,immu
 
 ---
 
-## 18. Glossary
+## 20. Glossary
 
 | Term | Definition |
 |------|-----------|
@@ -1058,6 +1328,10 @@ ctx.Context.Response.Headers.Append("Cache-Control", "public,max-age=604800,immu
 | **XRTable** | DevExpress report control for tabular data with rows and cells |
 | **XtraReport** | DevExpress root report object (the "document" containing all bands, sources, params) |
 | **?paramName** | Syntax in Data Source Wizard to bind SP parameters to Report Parameters |
+| **BackgroundService** | .NET hosted service that runs continuously in the background (used for schedule polling) |
+| **report_schedules** | SQL table storing schedule configuration, email recipients, and run history |
+| **User Secrets** | .NET development-time secret storage outside the project directory |
+| **SmtpSettings** | Configuration section for outbound email (host, port, credentials) |
 
 ---
 

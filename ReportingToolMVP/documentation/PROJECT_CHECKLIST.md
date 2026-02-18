@@ -3,7 +3,7 @@
 
 > **Purpose:** Master checklist tracking all completed work, pending tasks, and strategic items for the VoIPTools Reporting Tool product launch.  
 > **Created:** February 18, 2026  
-> **Last Updated:** February 18, 2026  
+> **Last Updated:** February 19, 2026  
 > **Owner:** Shushant  
 > **Status:** Active Development (MVP Phase)
 
@@ -108,7 +108,7 @@
 | 4.2 | Report selector dropdown in Viewer | ✅ | Lists all `.repx` templates |
 | 4.3 | Removed Report Builder tab (cleanup) | ✅ | Was prototype, no longer needed |
 | 4.4 | Removed Test Suite tab (cleanup) | ✅ | Moved to separate test project |
-| 4.5 | Schedule Reports tab | 🔄 | New feature — email scheduling |
+| 4.5 | Schedule Reports tab | ✅ | Route: `/schedulereports` |
 | 4.6 | CSS theming (blazing-berry DevExpress theme) | ✅ | Custom site.css overrides |
 
 ---
@@ -140,13 +140,14 @@
 
 | # | Task | Status | Notes |
 |---|------|--------|-------|
-| 7.1 | Schedule Reports Blazor page + UI | 🔄 | Tab for configuring email schedules |
-| 7.2 | ReportSchedule data model | 🔄 | Schedule config entity |
-| 7.3 | SQL table for schedule persistence | 🔄 | `report_schedules` table |
-| 7.4 | Email service (SMTP) | 🔄 | Send reports as PDF attachments |
-| 7.5 | Background scheduler service | 🔄 | Checks and executes due schedules |
-| 7.6 | SMTP configuration in appsettings | 🔄 | Host, port, credentials |
-| 7.7 | Nav menu tab for Schedule Reports | 🔄 | New sidebar entry |
+| 7.1 | Schedule Reports Blazor page + UI | ✅ | `ScheduleReports.razor` + CSS |
+| 7.2 | ReportSchedule data model | ✅ | `Models/ReportSchedule.cs` with enums |
+| 7.3 | SQL table for schedule persistence | ✅ | `report_schedules` deployed to production |
+| 7.4 | Email service (SMTP) | ✅ | `EmailService.cs` via smtp.office365.com |
+| 7.5 | Background scheduler service | ✅ | `ReportSchedulerBackgroundService.cs` (60s poll) |
+| 7.6 | SMTP configuration in appsettings | ✅ | Placeholders in appsettings, real creds in User Secrets |
+| 7.7 | Nav menu tab for Schedule Reports | ✅ | ⏰ Schedule Reports in sidebar |
+| 7.8 | Secrets management (User Secrets + env vars) | ✅ | `dotnet user-secrets` for dev, env vars for prod |
 
 ---
 
@@ -185,7 +186,7 @@
 | 8.4.1 | Identify how to incorporate report + designer into Exporter | 🔲 | Team | High |
 | 8.4.2 | Organize 100+ reports in a logical way for customer discovery | 🔲 | Team | High |
 | 8.4.3 | Report Designer manual — check DevExpress white-label docs | 🔲 | Team | Medium |
-| 8.4.4 | Handle scheduled reports (architecture decision) | 🔄 | Team | High |
+| 8.4.4 | Handle scheduled reports (architecture decision) | ✅ | Team | High |
 
 ### 8.5 Go-to-Market & Support
 | # | Task | Status | Owner | Priority |
@@ -205,12 +206,12 @@
 | Chart Persistence Fix | 6 | 6 | 0 | 0 |
 | Database (SPs & Views) | 7 | 7 | 0 | 0 |
 | Report Templates | 11 | 11 | 0 | 0 |
-| UI & Navigation | 6 | 5 | 1 | 0 |
+| UI & Navigation | 6 | 6 | 0 | 0 |
 | Documentation | 5 | 5 | 0 | 0 |
 | Testing | 4 | 4 | 0 | 0 |
-| Scheduled Reports (Email) | 7 | 0 | 7 | 0 |
-| Pre-Release Strategic | 16 | 0 | 1 | 15 |
-| **TOTAL** | **78** | **54** | **9** | **15** |
+| Scheduled Reports (Email) | 8 | 8 | 0 | 0 |
+| Pre-Release Strategic | 16 | 1 | 0 | 15 |
+| **TOTAL** | **79** | **63** | **1** | **15** |
 
 ---
 
