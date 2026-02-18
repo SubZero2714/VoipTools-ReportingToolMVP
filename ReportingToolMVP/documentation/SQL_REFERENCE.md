@@ -9,8 +9,8 @@
 
 1. [Overview](#1-overview)
 2. [Shared Concepts — Read This First](#2-shared-concepts)
-3. [SP 1: sp_queue_kpi_summary_shushant — KPI Cards](#3-sp-1-kpi-cards)
-4. [SP 2: sp_queue_calls_by_date_shushant — Daily Chart Data](#4-sp-2-daily-chart-data)
+3. [SP 1: sp_queue_stats_summary — KPI Cards](#3-sp-1-kpi-cards)
+4. [SP 2: sp_queue_stats_daily_summary — Daily Chart Data](#4-sp-2-daily-chart-data)
 5. [SP 3: qcall_cent_get_extensions_statistics_by_queues — Agent Table](#5-sp-3-agent-table)
 6. [Database Schema Reference](#6-database-schema-reference)
 7. [How the Application Uses These SPs](#7-application-usage)
@@ -28,12 +28,12 @@ The Queue Performance Dashboard report uses **three stored procedures**, each fe
 │                                                             │
 │  ┌─────────────────────────────────────────────────────┐   │
 │  │  KPI CARDS (8 metrics)                               │   │
-│  │  ← sp_queue_kpi_summary_shushant (1 row)            │   │
+│  │  ← sp_queue_stats_summary (1 row)                    │   │
 │  └─────────────────────────────────────────────────────┘   │
 │                                                             │
 │  ┌─────────────────────────────────────────────────────┐   │
 │  │  AREA CHART (Answered vs Abandoned over time)        │   │
-│  │  ← sp_queue_calls_by_date_shushant (1 row/day)     │   │
+│  │  ← sp_queue_stats_daily_summary (1 row/day)          │   │
 │  └─────────────────────────────────────────────────────┘   │
 │                                                             │
 │  ┌─────────────────────────────────────────────────────┐   │
@@ -52,87 +52,113 @@ All three SPs share **identical parameters** and use the **same base CTE** (`que
 
 ### 2.1 Common Parameters
 
-All three SPs accept the same four parameters:
+The KPI and Chart SPs (`sp_queue_stats_summary`, `sp_queue_stats_daily_summary`) share 5 parameters:
 
 | Parameter | SQL Type | Example | Description |
 |-----------|----------|---------|-------------|
-| `@period_from` | `DATETIMEOFFSET` | `'2025-06-01 00:00:00'` | Start of the reporting period (inclusive) |
-| `@period_to` | `DATETIMEOFFSET` | `'2026-02-12 23:59:59'` | End of the reporting period (inclusive) |
-| `@queue_dns` | `VARCHAR(MAX)` | `'8000,8089'` | Comma-separated queue DN numbers. Empty string or NULL = all queues |
-| `@wait_interval` | `TIME` | `'00:00:20'` | SLA threshold. Also used to filter out "instant" abandoned calls |
+| `@from` | `DATETIMEOFFSET` | `'2026-02-01 00:00:00 +00:00'` | Start of the reporting period (inclusive, UTC) |
+| `@to` | `DATETIMEOFFSET` | `'2026-02-17 00:00:00 +00:00'` | End of the reporting period (exclusive, UTC) |
+| `@queue_dns` | `VARCHAR(MAX)` | `'8000,8089'` | **REQUIRED:** Comma-separated queue DN numbers |
+| `@sla_seconds` | `INT` | `20` | SLA threshold in seconds (default: 20) |
+| `@report_timezone` | `VARCHAR(100)` | `'India Standard Time'` | Timezone for date display (NULL = UTC) |
+
+The Agent SP (`qcall_cent_get_extensions_statistics_by_queues`) uses different parameter names:
+
+| Parameter | SQL Type | Example | Description |
+|-----------|----------|---------|-------------|
+| `@period_from` | `DATETIMEOFFSET` | `'2026-02-01 00:00:00'` | Start of the reporting period (inclusive) |
+| `@period_to` | `DATETIMEOFFSET` | `'2026-02-17 23:59:59'` | End of the reporting period (inclusive) |
+| `@queue_dns` | `VARCHAR(MAX)` | `'8000,8089'` | Comma-separated queue DN numbers |
+| `@wait_interval` | `TIME` | `'00:00:20'` | SLA threshold as TIME. Also filters out instant abandoned calls |
 
 **Why `DATETIMEOFFSET`?** The 3CX database stores timestamps with timezone offsets. Using `DATETIMEOFFSET` ensures correct comparison without implicit conversion.
 
-**Why `VARCHAR(MAX)` for queue DNs?** Allows passing any number of queues as a single comma-separated string. The SP uses `STRING_SPLIT()` to parse individual values. This approach avoids table-valued parameters which complicate the DevExpress Data Source Wizard.
+**Why `VARCHAR(MAX)` for queue DNs?** Allows passing any number of queues as a single comma-separated string. The SPs use `STRING_SPLIT()` to parse individual values. This approach avoids table-valued parameters which complicate the DevExpress Data Source Wizard.
 
-### 2.2 The Base CTE — `queue_all_calls`
+**Key Differences:**
+- KPI/Chart SPs use `@from`/`@to` (exclusive end); Agent SP uses `@period_from`/`@period_to` (inclusive end with BETWEEN)
+- KPI/Chart SPs use `@sla_seconds` (INT); Agent SP uses `@wait_interval` (TIME)
+- KPI/Chart SPs support `@report_timezone` for timezone-aware date display; Agent SP does not
 
-All three SPs begin with the same CTE (Common Table Expression) to select qualifying calls:
+### 2.2 Base Query Pattern
+
+The KPI and Chart SPs (`sp_queue_stats_summary`, `sp_queue_stats_daily_summary`) use a direct JOIN between `queue_view` and `callcent_queuecalls_view`:
+
+```sql
+FROM dbo.queue_view qv
+INNER JOIN dbo.callcent_queuecalls_view q
+    ON q.q_num = qv.dn
+   AND q.time_start >= @from
+   AND q.time_start <  @to
+WHERE qv.dn IN (SELECT TRIM(value) FROM STRING_SPLIT(@queue_dns, ','))
+```
+
+The Agent SP (`qcall_cent_get_extensions_statistics_by_queues`) uses a CTE called `queue_all_calls` that filters on date range, queue, and call quality:
 
 ```sql
 ;WITH queue_all_calls AS
 (
     SELECT
-        qcv.q_num AS queue_dn,           -- Which queue handled this call
-        qcv.to_dn AS extension_dn,       -- Which agent was assigned
-        qcv.ts_servicing,                 -- Talk duration (as TIME)
-        qcv.is_answered,                  -- 1 = answered, 0 = abandoned
-        qcv.call_history_id,              -- Unique call identifier
-        DATEDIFF(SECOND, 0, qcv.ring_time) AS ring_seconds,      -- Ring/wait time in seconds
-        DATEDIFF(SECOND, 0, qcv.ts_servicing) AS talk_seconds,   -- Talk time in seconds
-        -- SP2 also includes: CAST(qcv.time_start AS DATE) AS call_date
-        -- SP1 also includes: is_within_sla calculation
+        qcv.q_num AS queue_dn,
+        qcv.to_dn AS extension_dn,
+        qcv.ts_servicing,
+        qcv.is_answered,
+        qcv.call_history_id,
+        DATEDIFF(SECOND, 0, qcv.ring_time) AS ring_seconds,
+        DATEDIFF(SECOND, 0, qcv.ts_servicing) AS talk_seconds
 
     FROM CallCent_QueueCalls_View qcv WITH (NOLOCK)
     WHERE
-        -- Filter 1: Date range
         qcv.time_start BETWEEN @period_from AND @period_to
-
-        -- Filter 2: Queue selection (empty/NULL = all queues)
         AND (
-            @queue_dns = '' 
-            OR @queue_dns IS NULL 
+            @queue_dns = '' OR @queue_dns IS NULL 
             OR qcv.q_num IN (SELECT LTRIM(value) FROM string_split(@queue_dns, ','))
         )
-
-        -- Filter 3: Call quality — include answered OR sufficiently-waited calls
         AND (qcv.is_answered = 1 OR qcv.ring_time >= @wait_interval)
 )
 ```
 
-#### Why is this CTE the foundation?
+> **Note:** The KPI/Chart SPs use `queue_view` (an expanded queue metadata view) JOINed with `callcent_queuecalls_view` (call records). The Agent SP uses `CallCent_QueueCalls_View` directly with a call-quality filter via `@wait_interval`.
 
-Every metric in the dashboard must use the **exact same set of calls**. If SP1 counts 150 total calls and SP2 shows 160 total calls across dates, the dashboard would be inconsistent. By sharing the same CTE logic, all three SPs are guaranteed to use the same data.
+#### Why consistent filtering matters
 
-### 2.3 Understanding the Three Filters
+Every metric in the dashboard must use the **exact same set of calls**. If SP1 counts 150 total calls and SP2 shows 160 total calls across dates, the dashboard would be inconsistent.
+
+### 2.3 Understanding the Key Filters
 
 #### Filter 1: Date Range
+
+KPI/Chart SPs use exclusive end range:
+```sql
+q.time_start >= @from AND q.time_start < @to
+```
+
+Agent SP uses inclusive BETWEEN:
 ```sql
 qcv.time_start BETWEEN @period_from AND @period_to
 ```
+
 Selects calls that **started** within the specified period. `time_start` is the timestamp when the call entered the queue.
 
 #### Filter 2: Queue Selection
+
+KPI/Chart SPs (**@queue_dns is REQUIRED**):
+```sql
+qv.dn IN (SELECT TRIM(value) FROM STRING_SPLIT(@queue_dns, ','))
+```
+
+Agent SP (optional — empty/NULL = all queues):
 ```sql
 @queue_dns = '' OR @queue_dns IS NULL 
 OR qcv.q_num IN (SELECT LTRIM(value) FROM string_split(@queue_dns, ','))
 ```
 
-Three scenarios:
-| Input | Behavior |
-|-------|----------|
-| `@queue_dns = ''` | All queues included (no filter) |
-| `@queue_dns = NULL` | All queues included (no filter) |
-| `@queue_dns = '8000,8089'` | Only queues 8000 and 8089 |
-
-`STRING_SPLIT(@queue_dns, ',')` breaks comma-separated values into a table. `LTRIM(value)` handles whitespace (`'8000, 8089'` → `['8000', '8089']`).
-
-#### Filter 3: Call Quality
+#### Filter 3: Call Quality (Agent SP only)
 ```sql
 qcv.is_answered = 1 OR qcv.ring_time >= @wait_interval
 ```
 
-This is the most important filter. It excludes **"instant drops"** — calls that hung up almost immediately. The logic:
+This filter is used by the Agent SP to exclude **"instant drops"** — calls that hung up almost immediately. The KPI/Chart SPs include all calls (answered + abandoned) without call-quality filtering, using `@sla_seconds` only for the SLA metric calculations.
 
 | Call Status | Ring Time vs SLA | Included? | Reasoning |
 |-------------|------------------|-----------|-----------|
@@ -162,28 +188,34 @@ These are **pre-existing views** in the 3CX Exporter database (managed by 3CX). 
 
 ---
 
-## 3. SP 1: `sp_queue_kpi_summary_shushant` — KPI Cards
+## 3. SP 1: `sp_queue_stats_summary` — KPI Cards
 
 ### Purpose
 
-Returns a **single row** with 12 aggregated metrics across all selected queues. This row feeds the 8 KPI cards in the report header.
+Returns a **single row** with aggregated metrics across all selected queues. This row feeds the 8 KPI cards in the report header.
 
 ### Output — Always Exactly 1 Row
 
 | Column | Type | Example | KPI Card |
 |--------|------|---------|----------|
-| `queue_dn` | varchar | `'8000,8089'` | Filter info display |
-| `queue_display_name` | varchar | `'Multiple Queues (2)'` | Filter info display |
+| `queue_group` | varchar | `'SUMMARY'` | Fixed label |
+| `description` | varchar | `'8000,8089'` | Filter info display (equals `@queue_dns` input) |
 | `total_calls` | int | `487` | Card 1: Total Calls |
 | `abandoned_calls` | int | `52` | Card 2: Abandoned |
 | `answered_calls` | int | `435` | Card 3: Answered |
 | `answered_percent` | decimal(5,2) | `89.32` | Card 4: Answer Rate |
-| `answered_within_sla` | int | `380` | Card 5: Within SLA |
-| `answered_within_sla_percent` | decimal(5,2) | `87.36` | Card 6: SLA % |
-| `serviced_callbacks` | int | `0` | Card 7: Callbacks (reserved) |
-| `total_talking` | time | `12:45:30` | Card 8: Total Talk Time |
-| `mean_talking` | time | `00:01:45` | (Used in report expressions) |
-| `avg_waiting` | time | `00:00:23` | (Used in report expressions) |
+| `answered_within_sla` | int | `380` | Within SLA count |
+| `answered_within_sla_percent` | decimal(5,2) | `87.36` | Card 5: SLA % |
+| `serviced_callbacks` | int | `0` | Card 8: Callbacks |
+| `total_talking` | time | `12:45:30` | Card 6: Total Talk Time |
+| `mean_talking_time` | time | `00:01:45` | Card 5: Avg Talk |
+| `avg_wait_time` | time | `00:00:23` | Card 7: Avg Wait |
+| `longest_wait_time` | time | `00:02:10` | Longest wait time |
+| `period_from_utc` | datetimeoffset | `2026-02-01 00:00:00 +00:00` | Report period info |
+| `period_to_utc` | datetimeoffset | `2026-02-17 00:00:00 +00:00` | Report period info |
+| `period_from_local` | datetimeoffset | `2026-02-01 05:30:00 +05:30` | Timezone-adjusted period |
+| `period_to_local` | datetimeoffset | `2026-02-17 05:30:00 +05:30` | Timezone-adjusted period |
+| `report_timezone_used` | varchar | `'India Standard Time'` | Which timezone was applied |
 
 ### How It Works — Step by Step
 
@@ -252,51 +284,54 @@ Version 2 removes `GROUP BY` entirely → always 1 aggregated row → KPI cards 
 
 ---
 
-## 4. SP 2: `sp_queue_calls_by_date_shushant` — Daily Chart Data
+## 4. SP 2: `sp_queue_stats_daily_summary` — Daily Chart Data
 
 ### Purpose
 
-Returns **one row per calendar day** with call volume metrics. This feeds the area chart showing "Answered vs Abandoned" trends over time.
+Returns **one row per calendar day** (in local timezone) with call volume metrics. This feeds the area chart showing "Answered vs Abandoned" trends over time. Uses a date-range CTE to ensure days with zero calls still appear.
 
 ### Output — 1 Row Per Day
 
 | Column | Type | Example | Chart Usage |
 |--------|------|---------|-------------|
-| `queue_dn` | varchar | `'8000,8089'` | (Not used by chart) |
-| `call_date` | date | `2026-02-01` | **X-axis** (ArgumentDataMember) |
+| `report_date_local` | date | `2026-02-01` | **X-axis** (ArgumentDataMember) — date in local timezone |
 | `total_calls` | int | `23` | Available for tooltips |
-| `answered_calls` | int | `20` | **Series 1 value** (Area, green) |
 | `abandoned_calls` | int | `3` | **Series 2 value** (Area, red) |
+| `answered_calls` | int | `20` | **Series 1 value** (Area, green) |
+| `answered_percent` | decimal(5,2) | `86.96` | Available for tooltips |
 | `answered_within_sla` | int | `18` | Available for tooltips |
-| `answer_rate` | decimal(5,2) | `86.96` | Available for tooltips |
-| `sla_percent` | decimal(5,2) | `90.00` | Available for tooltips |
+| `answered_within_sla_percent` | decimal(5,2) | `90.00` | Available for tooltips |
+| `serviced_callbacks` | int | `0` | Available for tooltips |
+| `total_talking` | time | `02:15:30` | Daily total talk time |
+| `mean_talking_time` | time | `00:06:47` | Daily avg talk time |
+| `avg_wait_time` | time | `00:00:12` | Daily avg wait time |
+| `longest_wait_time` | time | `00:01:45` | Daily max wait time |
+| `period_from_utc` | datetimeoffset | `2026-02-01 00:00:00 +00:00` | Report period info |
+| `period_to_utc` | datetimeoffset | `2026-02-17 00:00:00 +00:00` | Report period info |
+| `period_from_local` | datetimeoffset | `2026-02-01 05:30:00 +05:30` | Timezone-adjusted period |
+| `period_to_local` | datetimeoffset | `2026-02-17 05:30:00 +05:30` | Timezone-adjusted period |
+| `report_timezone_used` | varchar | `'India Standard Time'` | Which timezone was applied |
 
 ### How It Works — Step by Step
 
 ```
-Step 1: CTE queue_all_calls
-        Same as SP1, but ADDS:
-        CAST(qcv.time_start AS DATE) AS call_date
-        This extracts just the date part (no time) for grouping
+Step 1: DateRange CTE — recursive date series
+        Generates one row per day from @from to @to-1 day (in local timezone)
+        using CAST(@from AT TIME ZONE 'UTC' AT TIME ZONE @report_timezone AS DATE)
 
-Step 2: Final SELECT — GROUP BY call_date ONLY
-        Each day gets ONE row with aggregated metrics
-        ORDER BY call_date (chronological)
+Step 2: DailyStats CTE — aggregate call data per local date
+        Joins queue_view + callcent_queuecalls_view
+        Converts time_start to local timezone date for grouping
+        GROUP BY local date
+
+Step 3: Final SELECT — LEFT JOIN DateRange with DailyStats
+        Ensures days with ZERO calls still appear (with 0 values)
+        ORDER BY report_date_local (chronological)
 ```
 
-### Why `GROUP BY call_date` Only (Not Per-Queue)?
+### Why Date Range CTE?
 
-Version 1 grouped by `(queue_dn, call_date)`. For multi-queue input like `'8000,8089'`:
-
-```
-WRONG (v1):
-call_date   | queue_dn | answered | abandoned
-2026-02-01  | 8000     | 12       | 2
-2026-02-01  | 8089     | 8        | 1         ← TWO points on same date!
-
-CORRECT (v2):
-call_date   | answered | abandoned
-2026-02-01  | 20       | 3                    ← ONE point per date
+Unlike the old SP which only returned days that had calls, the new SP generates a complete date sequence using a recursive CTE. Days with no calls get ISNULL-filled zeros. This prevents gaps in the area chart's X-axis.
 ```
 
 With per-queue grouping, the chart shows overlapping/stacked data points for the same date, which is confusing and incorrect for a consolidated view.
@@ -470,23 +505,27 @@ The generator creates three `SqlDataSource` objects, one per SP:
 ```
 SqlDataSource "dsKPIs"
   └── StoredProcQuery("KPIs")
-      └── SP: sp_queue_kpi_summary_shushant
-      └── Params: @period_from → [Parameters.pPeriodFrom]
-                  @period_to → [Parameters.pPeriodTo]
+      └── SP: sp_queue_stats_summary
+      └── Params: @from → [Parameters.pPeriodFrom]
+                  @to → [Parameters.pPeriodTo]
                   @queue_dns → [Parameters.pQueueDns]
-                  @wait_interval → [Parameters.pWaitInterval]
+                  @sla_seconds → [Parameters.pSlaSeconds]
+                  @report_timezone → [Parameters.pReportTimezone]
       └── Used by: KPI card labels (XRLabel expressions)
 
 SqlDataSource "dsChartData"
   └── StoredProcQuery("ChartData")
-      └── SP: sp_queue_calls_by_date_shushant
-      └── Params: (same 4 as above)
+      └── SP: sp_queue_stats_daily_summary
+      └── Params: (same 5 as above)
       └── Used by: XRChart with 2 Area series
 
 SqlDataSource "dsAgents"
   └── StoredProcQuery("Agents")
       └── SP: qcall_cent_get_extensions_statistics_by_queues
-      └── Params: (same 4 as above)
+      └── Params: @period_from → [Parameters.pPeriodFrom]
+                  @period_to → [Parameters.pPeriodTo]
+                  @queue_dns → [Parameters.pQueueDns]
+                  @wait_interval → [Parameters.pWaitInterval]
       └── Used by: DetailReportBand with agent table
 ```
 
@@ -495,23 +534,28 @@ SqlDataSource "dsAgents"
 ```
 User types in Preview → Report Parameter → Expression → SP Parameter → SQL WHERE clause
 
-Example:
+Example (KPI/Chart SPs):
 User enters: "2026-02-01" in Start Date field
   → pPeriodFrom report parameter = 2026-02-01T00:00:00
     → Expression: [Parameters.pPeriodFrom]
-      → QueryParameter: @period_from = [Parameters.pPeriodFrom]
-        → SQL: WHERE qcv.time_start BETWEEN '2026-02-01T00:00:00' AND ...
+      → QueryParameter: @from = [Parameters.pPeriodFrom]
+        → SQL: WHERE q.time_start >= '2026-02-01T00:00:00' AND q.time_start < @to
+
+Example (Agent SP):
+Same flow but parameter names differ:
+  → QueryParameter: @period_from = [Parameters.pPeriodFrom]
+    → SQL: WHERE qcv.time_start BETWEEN '2026-02-01T00:00:00' AND @period_to
 ```
 
 ### In the Report Designer (Manual Report Creation)
 
 When creating a report manually in the Designer, the user:
-1. Opens Data Source Wizard
-2. Selects connection "3CX_Exporter_Production"
-3. Chooses "Stored Procedure" query type
-4. Selects the SP name from dropdown
-5. For each parameter, initially hardcodes test values
-6. After creating report parameters, rebinds SP parameters using `?paramName` syntax
+1. Creates 6 Report Parameters (pPeriodFrom, pPeriodTo, pQueueDns, pWaitInterval, pSlaSeconds, pReportTimezone)
+2. Opens Data Source Wizard
+3. Selects connection "3CX_Exporter_Production"
+4. Chooses "Stored Procedure" query type
+5. Selects the SP name from dropdown
+6. Uses `?paramName` syntax to bind SP parameters to Report Parameters directly
 
 See `MANUAL_REPORT_CREATION_GUIDE.md` for the complete step-by-step process.
 
@@ -523,25 +567,27 @@ See `MANUAL_REPORT_CREATION_GUIDE.md` for the complete step-by-step process.
 
 **SP 1 — KPI Summary:**
 ```sql
-EXEC dbo.[sp_queue_kpi_summary_shushant]
-    @period_from = '2025-06-01 00:00:00',
-    @period_to = '2026-02-12 23:59:59',
-    @queue_dns = '8000',
-    @wait_interval = '00:00:20';
+EXEC dbo.[sp_queue_stats_summary]
+    @from            = '2026-02-01 00:00:00 +00:00',
+    @to              = '2026-02-17 00:00:00 +00:00',
+    @queue_dns       = '8000',
+    @sla_seconds     = 20,
+    @report_timezone = 'India Standard Time';
 ```
 
-Expected: Exactly **1 row** with 12 columns.
+Expected: Exactly **1 row** with 18 columns.
 
 **SP 2 — Daily Chart Data:**
 ```sql
-EXEC dbo.[sp_queue_calls_by_date_shushant]
-    @period_from = '2025-06-01 00:00:00',
-    @period_to = '2026-02-12 23:59:59',
-    @queue_dns = '8000',
-    @wait_interval = '00:00:20';
+EXEC dbo.[sp_queue_stats_daily_summary]
+    @from            = '2026-02-01 00:00:00 +00:00',
+    @to              = '2026-02-17 00:00:00 +00:00',
+    @queue_dns       = '8000',
+    @sla_seconds     = 20,
+    @report_timezone = 'India Standard Time';
 ```
 
-Expected: **One row per day** that had calls, ordered by date.
+Expected: **One row per day** in the date range (including zero-call days), ordered by `report_date_local`.
 
 **SP 3 — Agent Statistics:**
 ```sql

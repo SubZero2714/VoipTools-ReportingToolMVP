@@ -100,14 +100,15 @@ dotnet run
 
 > This is the primary deliverable — validate thoroughly.
 
-### 5.1 KPI Cards (use Queue 8000, Jun 2025 - Oct 2025, Wait 00:00:20)
+### 5.1 KPI Cards (use Queue 8000, Feb 01–17 2026, SLA 20s, India Standard Time)
 Run this SQL to get expected values:
 ```sql
-EXEC dbo.sp_queue_kpi_summary_shushant 
-    @period_from = '2025-06-01 00:00:00 +00:00',
-    @period_to   = '2025-10-31 23:59:59 +00:00',
-    @queue_dns   = '8000',
-    @wait_interval = '00:00:20';
+EXEC dbo.sp_queue_stats_summary
+    @from            = '2026-02-01 00:00:00 +00:00',
+    @to              = '2026-02-17 00:00:00 +00:00',
+    @queue_dns       = '8000',
+    @sla_seconds     = 20,
+    @report_timezone = 'India Standard Time';
 ```
 
 - [ ] Total Calls matches SQL

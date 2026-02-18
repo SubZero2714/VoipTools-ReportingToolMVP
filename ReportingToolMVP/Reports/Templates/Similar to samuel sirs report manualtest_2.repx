@@ -1,257 +1,276 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<XtraReportsLayoutSerializer SerializerVersion="25.2.3.0" Ref="1" ControlType="DevExpress.XtraReports.UI.XtraReport, DevExpress.XtraReports.v25.2, Version=25.2.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a" Name="QueuePerformanceDashboard" DisplayName="Similar to samuel sirs report manualtest_2" Landscape="true" Margins="30, 28.958332, 30, 30" PaperKind="Custom" PageWidthF="1100" PageHeightF="850" Version="25.2" DataMember="sp_queue_kpi_summary_shushant" DataSource="#Ref-0">
+<?xml version="1.0" encoding="utf-8"?>
+<XtraReportsLayoutSerializer SerializerVersion="25.2.3.0" Ref="1" ControlType="DevExpress.XtraReports.UI.XtraReport, DevExpress.XtraReports.v25.2, Version=25.2.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a" Name="QueuePerformanceDashboard" DisplayName="Similar to samuel sirs report manualtest_2" Landscape="true" Margins="30, 28.958332, 30, 30" PaperKind="Custom" PageWidthF="1100" PageHeightF="850" Version="25.2" DataMember="sp_queue_stats_summary" DataSource="#Ref-0">
   <Parameters>
     <Item1 Ref="3" Description="Start Date" ValueInfo="2026-02-01" Name="pPeriodFrom" Type="#Ref-2" />
-    <Item2 Ref="4" Description="End Date" ValueInfo="2026-02-17" Name="pPeriodTo" Type="#Ref-2" />
-    <Item3 Ref="6" Description="Queue DN (e.g., 8077 or % for all)" ValueInfo="8089" Name="pQueueDns" />
-    <Item4 Ref="7" Description="SLA Threshold" ValueInfo="00:00:20" Name="pWaitInterval" />
+    <Item2 Ref="4" Description="End Date" ValueInfo="2026-02-18" Name="pPeriodTo" Type="#Ref-2" />
+    <Item3 Ref="6" Description="Queue DN (e.g. 8000,8089)" ValueInfo="8000,8089" Name="pQueueDns" />
+    <Item4 Ref="7" Description="SLA Threshold (HH:MM:SS)" ValueInfo="00:00:20" Name="pWaitInterval" />
+    <Item5 Ref="9" Description="SLA Seconds (e.g. 20)" ValueInfo="20" Name="pSlaSeconds" Type="#Ref-8" />
+    <Item6 Ref="10" Description="Report Timezone" ValueInfo="India Standard Time" Name="pReportTimezone" />
   </Parameters>
   <Bands>
-    <Item1 Ref="8" ControlType="TopMarginBand" Name="TopMargin1" HeightF="30" />
-    <Item2 Ref="9" ControlType="ReportHeaderBand" Name="ReportHeader1" HeightF="580">
+    <Item1 Ref="11" ControlType="TopMarginBand" Name="TopMargin1" HeightF="30" />
+    <Item2 Ref="12" ControlType="ReportHeaderBand" Name="ReportHeader1" HeightF="580">
       <Controls>
-        <Item1 Ref="10" ControlType="XRPictureBox" Name="pictureBox1" ImageSource="img,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" Sizing="ZoomImage" SizeF="100,51.024307" LocationFloat="17.416664,14.583333" />
-        <Item2 Ref="12" ControlType="XRChart" Name="chart1" DataSource="#Ref-11" SizeF="947.87103,300" LocationFloat="16.666666,240.41667" BorderColor="Black" Borders="None">
-          <Chart Ref="13">
-            <DataContainer Ref="14" DataMember="sp_queue_calls_by_date_shushant" ValidateDataMembers="true">
+        <Item1 Ref="13" ControlType="XRLabel" Name="lblReportDate" TextAlignment="TopRight" SizeF="180,12" LocationFloat="773.50397,69.62499" Font="Segoe UI, 7pt" ForeColor="255,160,174,192" Padding="2,2,0,0,100">
+          <ExpressionBindings>
+            <Item1 Ref="14" EventName="BeforePrint" PropertyName="Text" Expression="'Generated: ' + FormatString('{0:MM-dd-yyyy hh:mm tt}', Now())" />
+          </ExpressionBindings>
+        </Item1>
+        <Item2 Ref="15" ControlType="XRPictureBox" Name="pictureBox1" ImageSource="img,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" Sizing="ZoomImage" SizeF="100,51.024307" LocationFloat="17.416664,14.583333" />
+        <Item3 Ref="17" ControlType="XRChart" Name="chart1" DataSource="#Ref-16" SizeF="947.87103,300" LocationFloat="16.666666,240.41667" BorderColor="Black" Borders="None">
+          <Chart Ref="18">
+            <DataContainer Ref="19" DataMember="sp_queue_stats_daily_summary" ValidateDataMembers="false">
               <SeriesSerializable>
-                <Item1 Ref="15" Name="Answered" SeriesID="0" ArgumentDataMember="call_date" ValueDataMembersSerializable="answered_calls">
-                  <View Ref="16" Color="255,46,204,113" TypeNameSerializable="AreaSeriesView">
-                    <EmptyPointOptions Ref="17">
-                      <FillStyle Ref="18" FillMode="Solid" />
+                <Item1 Ref="20" Name="Answered" SeriesID="0" ArgumentDataMember="report_date_local" ValueDataMembersSerializable="answered_calls">
+                  <View Ref="21" Color="255,46,204,113" TypeNameSerializable="AreaSeriesView">
+                    <EmptyPointOptions Ref="22">
+                      <FillStyle Ref="23" FillMode="Solid" />
                     </EmptyPointOptions>
                   </View>
                 </Item1>
-                <Item2 Ref="19" Name="Abandoned" SeriesID="1" ArgumentDataMember="call_date" ValueDataMembersSerializable="abandoned_calls">
-                  <View Ref="20" Color="255,209,15,15" TypeNameSerializable="AreaSeriesView">
-                    <EmptyPointOptions Ref="21">
-                      <FillStyle Ref="22" FillMode="Solid" />
+                <Item2 Ref="24" Name="Abandoned" SeriesID="1" ArgumentDataMember="report_date_local" ValueDataMembersSerializable="abandoned_calls">
+                  <View Ref="25" Color="255,209,15,15" TypeNameSerializable="AreaSeriesView">
+                    <EmptyPointOptions Ref="26">
+                      <FillStyle Ref="27" FillMode="Solid" />
                     </EmptyPointOptions>
                   </View>
                 </Item2>
               </SeriesSerializable>
             </DataContainer>
-            <Diagram Ref="23" TypeNameSerializable="XYDiagram">
-              <AxisX Ref="24" VisibleInPanesSerializable="-1">
-                <WholeRange Ref="25" StartSideMargin="0" EndSideMargin="0" />
+            <Diagram Ref="28" TypeNameSerializable="XYDiagram">
+              <AxisX Ref="29" VisibleInPanesSerializable="-1">
+                <WholeRange Ref="30" StartSideMargin="0" EndSideMargin="0" />
               </AxisX>
-              <AxisY Ref="26" VisibleInPanesSerializable="-1" />
+              <AxisY Ref="31" VisibleInPanesSerializable="-1" />
             </Diagram>
-            <Legend Ref="27" AlignmentHorizontal="Center" AlignmentVertical="BottomOutside" Direction="LeftToRight" />
-            <OptionsPrint Ref="28" ImageFormat="Metafile" />
+            <Legend Ref="32" AlignmentHorizontal="Center" AlignmentVertical="BottomOutside" Direction="LeftToRight" />
+            <OptionsPrint Ref="33" ImageFormat="Metafile" />
           </Chart>
-        </Item2>
-        <Item3 Ref="29" ControlType="XRLabel" Name="lblAgentTitle" Text="Agent Performance" SizeF="250,20" LocationFloat="21.041666,552.9167" Font="Segoe UI, 11pt, style=Bold" ForeColor="255,45,55,72" Padding="2,2,0,0,100" />
-        <Item4 Ref="30" ControlType="XRLabel" Name="lblChartTitle" Text="Call Trends by Date" SizeF="250,20" LocationFloat="17.416664,201.875" Font="Segoe UI, 11pt, style=Bold" ForeColor="255,45,55,72" Padding="2,2,0,0,100" />
-        <Item5 Ref="31" ControlType="XRPanel" Name="pnlCard8" SizeF="118,55" LocationFloat="846.5417,102.083336" BackColor="White" BorderColor="255,226,232,240" Borders="All" BorderWidth="1">
+        </Item3>
+        <Item4 Ref="34" ControlType="XRLabel" Name="lblAgentTitle" Text="Agent Performance" SizeF="250,20" LocationFloat="21.041666,552.9167" Font="Segoe UI, 11pt, style=Bold" ForeColor="255,45,55,72" Padding="2,2,0,0,100" />
+        <Item5 Ref="35" ControlType="XRLabel" Name="lblChartTitle" Text="Call Trends by Date" SizeF="250,20" LocationFloat="17.416664,201.875" Font="Segoe UI, 11pt, style=Bold" ForeColor="255,45,55,72" Padding="2,2,0,0,100" />
+        <Item6 Ref="36" ControlType="XRPanel" Name="pnlCard8" SizeF="118,55" LocationFloat="846.5417,102.083336" BackColor="White" BorderColor="255,226,232,240" Borders="All" BorderWidth="1">
           <Controls>
-            <Item1 Ref="32" ControlType="XRPanel" Name="pnlCard8Accent" SizeF="4,55" LocationFloat="0,0" BackColor="255,72,187,120" />
-            <Item2 Ref="33" ControlType="XRLabel" Name="pnlCard8Value" TextAlignment="MiddleCenter" SizeF="105,22" LocationFloat="8,5" Font="Segoe UI, 13pt, style=Bold" ForeColor="255,72,187,120" Padding="2,2,0,0,100">
+            <Item1 Ref="37" ControlType="XRPanel" Name="pnlCard8Accent" SizeF="4,55" LocationFloat="0,0" BackColor="255,72,187,120" />
+            <Item2 Ref="38" ControlType="XRLabel" Name="pnlCard8Value" TextAlignment="MiddleCenter" SizeF="105,22" LocationFloat="8,5" Font="Segoe UI, 13pt, style=Bold" ForeColor="255,72,187,120" Padding="2,2,0,0,100">
               <ExpressionBindings>
-                <Item1 Ref="34" EventName="BeforePrint" PropertyName="Text" Expression="FormatString('{0:N0}', [serviced_callbacks])" />
+                <Item1 Ref="39" EventName="BeforePrint" PropertyName="Text" Expression="FormatString('{0:N0}', [serviced_callbacks])" />
               </ExpressionBindings>
             </Item2>
-            <Item3 Ref="35" ControlType="XRLabel" Name="pnlCard8Label" Text="Callbacks" TextAlignment="MiddleCenter" SizeF="105,14" LocationFloat="8,32" Font="Segoe UI, 7pt" ForeColor="255,113,128,150" Padding="2,2,0,0,100" />
-          </Controls>
-        </Item5>
-        <Item6 Ref="36" ControlType="XRPanel" Name="pnlCard7" SizeF="118,55" LocationFloat="728.5417,102.083336" BackColor="White" BorderColor="255,226,232,240" Borders="All" BorderWidth="1">
-          <Controls>
-            <Item1 Ref="37" ControlType="XRPanel" Name="pnlCard7Accent" SizeF="4,55" LocationFloat="0,0" BackColor="255,56,178,172" />
-            <Item2 Ref="38" ControlType="XRLabel" Name="pnlCard7Value" TextAlignment="MiddleCenter" SizeF="105,22" LocationFloat="8,5" Font="Segoe UI, 11pt, style=Bold" ForeColor="255,56,178,172" Padding="2,2,0,0,100">
-              <ExpressionBindings>
-                <Item1 Ref="39" EventName="BeforePrint" PropertyName="Text" Expression="[avg_waiting]" />
-              </ExpressionBindings>
-            </Item2>
-            <Item3 Ref="40" ControlType="XRLabel" Name="pnlCard7Label" Text="Avg Wait" TextAlignment="MiddleCenter" SizeF="105,14" LocationFloat="8,32" Font="Segoe UI, 7pt" ForeColor="255,113,128,150" Padding="2,2,0,0,100" />
+            <Item3 Ref="40" ControlType="XRLabel" Name="pnlCard8Label" Text="Callbacks" TextAlignment="MiddleCenter" SizeF="105,14" LocationFloat="8,32" Font="Segoe UI, 7pt" ForeColor="255,113,128,150" Padding="2,2,0,0,100" />
           </Controls>
         </Item6>
-        <Item7 Ref="41" ControlType="XRPanel" Name="pnlCard6" SizeF="118,55" LocationFloat="610.5417,102.083336" BackColor="White" BorderColor="255,226,232,240" Borders="All" BorderWidth="1">
+        <Item7 Ref="41" ControlType="XRPanel" Name="pnlCard7" SizeF="118,55" LocationFloat="728.5417,102.083336" BackColor="White" BorderColor="255,226,232,240" Borders="All" BorderWidth="1">
           <Controls>
-            <Item1 Ref="42" ControlType="XRPanel" Name="pnlCard6Accent" SizeF="4,55" LocationFloat="0,0" BackColor="255,237,137,54" />
-            <Item2 Ref="43" ControlType="XRLabel" Name="pnlCard6Value" TextAlignment="MiddleCenter" SizeF="105,22" LocationFloat="8,5" Font="Segoe UI, 11pt, style=Bold" ForeColor="255,237,137,54" Padding="2,2,0,0,100">
+            <Item1 Ref="42" ControlType="XRPanel" Name="pnlCard7Accent" SizeF="4,55" LocationFloat="0,0" BackColor="255,56,178,172" />
+            <Item2 Ref="43" ControlType="XRLabel" Name="pnlCard7Value" TextAlignment="MiddleCenter" SizeF="105,22" LocationFloat="8,5" Font="Segoe UI, 11pt, style=Bold" ForeColor="255,56,178,172" Padding="2,2,0,0,100">
               <ExpressionBindings>
-                <Item1 Ref="44" EventName="BeforePrint" PropertyName="Text" Expression="[total_talking]" />
+                <Item1 Ref="44" EventName="BeforePrint" PropertyName="Text" Expression="[avg_wait_time]" />
               </ExpressionBindings>
             </Item2>
-            <Item3 Ref="45" ControlType="XRLabel" Name="pnlCard6Label" Text="Total Talk" TextAlignment="MiddleCenter" SizeF="105,14" LocationFloat="8,32" Font="Segoe UI, 7pt" ForeColor="255,113,128,150" Padding="2,2,0,0,100" />
+            <Item3 Ref="45" ControlType="XRLabel" Name="pnlCard7Label" Text="Avg Wait" TextAlignment="MiddleCenter" SizeF="105,14" LocationFloat="8,32" Font="Segoe UI, 7pt" ForeColor="255,113,128,150" Padding="2,2,0,0,100" />
           </Controls>
         </Item7>
-        <Item8 Ref="46" ControlType="XRPanel" Name="pnlCard5" SizeF="118,55" LocationFloat="489.41666,102.083336" BackColor="White" BorderColor="255,226,232,240" Borders="All" BorderWidth="1">
+        <Item8 Ref="46" ControlType="XRPanel" Name="pnlCard6" SizeF="118,55" LocationFloat="610.5417,102.083336" BackColor="White" BorderColor="255,226,232,240" Borders="All" BorderWidth="1">
           <Controls>
-            <Item1 Ref="47" ControlType="XRPanel" Name="pnlCard5Accent" SizeF="4,55" LocationFloat="0,0" BackColor="255,67,97,238" />
-            <Item2 Ref="48" ControlType="XRLabel" Name="pnlCard5Value" TextAlignment="MiddleCenter" SizeF="105,22" LocationFloat="8,5" Font="Segoe UI, 11pt, style=Bold" ForeColor="255,45,55,72" Padding="2,2,0,0,100">
+            <Item1 Ref="47" ControlType="XRPanel" Name="pnlCard6Accent" SizeF="4,55" LocationFloat="0,0" BackColor="255,237,137,54" />
+            <Item2 Ref="48" ControlType="XRLabel" Name="pnlCard6Value" TextAlignment="MiddleCenter" SizeF="105,22" LocationFloat="8,5" Font="Segoe UI, 11pt, style=Bold" ForeColor="255,237,137,54" Padding="2,2,0,0,100">
               <ExpressionBindings>
-                <Item1 Ref="49" EventName="BeforePrint" PropertyName="Text" Expression="[mean_talking]" />
+                <Item1 Ref="49" EventName="BeforePrint" PropertyName="Text" Expression="[total_talking]" />
               </ExpressionBindings>
             </Item2>
-            <Item3 Ref="50" ControlType="XRLabel" Name="pnlCard5Label" Text="Avg Talk" TextAlignment="MiddleCenter" SizeF="105,14" LocationFloat="8,32" Font="Segoe UI, 7pt" ForeColor="255,113,128,150" Padding="2,2,0,0,100" />
+            <Item3 Ref="50" ControlType="XRLabel" Name="pnlCard6Label" Text="Total Talk" TextAlignment="MiddleCenter" SizeF="105,14" LocationFloat="8,32" Font="Segoe UI, 7pt" ForeColor="255,113,128,150" Padding="2,2,0,0,100" />
           </Controls>
         </Item8>
-        <Item9 Ref="51" ControlType="XRPanel" Name="pnlCard4" SizeF="118,55" LocationFloat="371.41666,102.083336" BackColor="White" BorderColor="255,226,232,240" Borders="All" BorderWidth="1">
+        <Item9 Ref="51" ControlType="XRPanel" Name="pnlCard5" SizeF="118,55" LocationFloat="489.41666,102.083336" BackColor="White" BorderColor="255,226,232,240" Borders="All" BorderWidth="1">
           <Controls>
-            <Item1 Ref="52" ControlType="XRPanel" Name="pnlCard4Accent" SizeF="4,55" LocationFloat="0,0" BackColor="255,155,89,182" />
-            <Item2 Ref="53" ControlType="XRLabel" Name="pnlCard4Value" TextAlignment="MiddleCenter" SizeF="105,22" LocationFloat="8,5" Font="Segoe UI, 13pt, style=Bold" ForeColor="255,155,89,182" Padding="2,2,0,0,100">
+            <Item1 Ref="52" ControlType="XRPanel" Name="pnlCard5Accent" SizeF="4,55" LocationFloat="0,0" BackColor="255,67,97,238" />
+            <Item2 Ref="53" ControlType="XRLabel" Name="pnlCard5Value" TextAlignment="MiddleCenter" SizeF="105,22" LocationFloat="8,5" Font="Segoe UI, 11pt, style=Bold" ForeColor="255,45,55,72" Padding="2,2,0,0,100">
               <ExpressionBindings>
-                <Item1 Ref="54" EventName="BeforePrint" PropertyName="Text" Expression="FormatString('{0:N1}%', [answered_within_sla_percent])" />
+                <Item1 Ref="54" EventName="BeforePrint" PropertyName="Text" Expression="[mean_talking_time]" />
               </ExpressionBindings>
             </Item2>
-            <Item3 Ref="55" ControlType="XRLabel" Name="pnlCard4Label" Text="SLA %" TextAlignment="MiddleCenter" SizeF="103.95508,15.039062" LocationFloat="8.333333,32" Font="Segoe UI, 7pt" ForeColor="255,113,128,150" Padding="2,2,0,0,100" />
+            <Item3 Ref="55" ControlType="XRLabel" Name="pnlCard5Label" Text="Avg Talk" TextAlignment="MiddleCenter" SizeF="105,14" LocationFloat="8,32" Font="Segoe UI, 7pt" ForeColor="255,113,128,150" Padding="2,2,0,0,100" />
           </Controls>
         </Item9>
-        <Item10 Ref="56" ControlType="XRPanel" Name="pnlCard3" SizeF="118,55" LocationFloat="253.41667,102.083336" BackColor="White" BorderColor="255,226,232,240" Borders="All" BorderWidth="1">
+        <Item10 Ref="56" ControlType="XRPanel" Name="pnlCard4" SizeF="118,55" LocationFloat="371.41666,102.083336" BackColor="White" BorderColor="255,226,232,240" Borders="All" BorderWidth="1">
           <Controls>
-            <Item1 Ref="57" ControlType="XRPanel" Name="pnlCard3Accent" SizeF="4,55" LocationFloat="0,0" BackColor="255,245,101,101" />
-            <Item2 Ref="58" ControlType="XRLabel" Name="pnlCard3Value" TextAlignment="MiddleCenter" SizeF="105,22" LocationFloat="8,5" Font="Segoe UI, 13pt, style=Bold" ForeColor="255,245,101,101" Padding="2,2,0,0,100">
+            <Item1 Ref="57" ControlType="XRPanel" Name="pnlCard4Accent" SizeF="4,55" LocationFloat="0,0" BackColor="255,155,89,182" />
+            <Item2 Ref="58" ControlType="XRLabel" Name="pnlCard4Value" TextAlignment="MiddleCenter" SizeF="105,22" LocationFloat="8,5" Font="Segoe UI, 13pt, style=Bold" ForeColor="255,155,89,182" Padding="2,2,0,0,100">
               <ExpressionBindings>
-                <Item1 Ref="59" EventName="BeforePrint" PropertyName="Text" Expression="FormatString('{0:N0}', [abandoned_calls])" />
+                <Item1 Ref="59" EventName="BeforePrint" PropertyName="Text" Expression="FormatString('{0:N1}%', [answered_within_sla_percent])" />
               </ExpressionBindings>
             </Item2>
-            <Item3 Ref="60" ControlType="XRLabel" Name="pnlCard3Label" Text="Abandoned" TextAlignment="MiddleCenter" SizeF="105,14" LocationFloat="8,32" Font="Segoe UI, 7pt" ForeColor="255,113,128,150" Padding="2,2,0,0,100" />
+            <Item3 Ref="60" ControlType="XRLabel" Name="pnlCard4Label" Text="SLA %" TextAlignment="MiddleCenter" SizeF="103.95508,15.039062" LocationFloat="8.333333,32" Font="Segoe UI, 7pt" ForeColor="255,113,128,150" Padding="2,2,0,0,100" />
           </Controls>
         </Item10>
-        <Item11 Ref="61" ControlType="XRPanel" Name="pnlCard2" SizeF="118,55" LocationFloat="135.41667,102.083336" BackColor="White" BorderColor="255,226,232,240" Borders="All" BorderWidth="1">
+        <Item11 Ref="61" ControlType="XRPanel" Name="pnlCard3" SizeF="118,55" LocationFloat="253.41667,102.083336" BackColor="White" BorderColor="255,226,232,240" Borders="All" BorderWidth="1">
           <Controls>
-            <Item1 Ref="62" ControlType="XRPanel" Name="pnlCard2Accent" SizeF="4,55" LocationFloat="0,0" BackColor="255,72,187,120" />
-            <Item2 Ref="63" ControlType="XRLabel" Name="pnlCard2Value" TextAlignment="MiddleCenter" SizeF="105,22" LocationFloat="8,5" Font="Segoe UI, 13pt, style=Bold" ForeColor="255,72,187,120" Padding="2,2,0,0,100">
+            <Item1 Ref="62" ControlType="XRPanel" Name="pnlCard3Accent" SizeF="4,55" LocationFloat="0,0" BackColor="255,245,101,101" />
+            <Item2 Ref="63" ControlType="XRLabel" Name="pnlCard3Value" TextAlignment="MiddleCenter" SizeF="105,22" LocationFloat="8,5" Font="Segoe UI, 13pt, style=Bold" ForeColor="255,245,101,101" Padding="2,2,0,0,100">
               <ExpressionBindings>
-                <Item1 Ref="64" EventName="BeforePrint" PropertyName="Text" Expression="FormatString('{0:N0}', [answered_calls])" />
+                <Item1 Ref="64" EventName="BeforePrint" PropertyName="Text" Expression="FormatString('{0:N0}', [abandoned_calls])" />
               </ExpressionBindings>
             </Item2>
-            <Item3 Ref="65" ControlType="XRLabel" Name="pnlCard2Label" Text="Answered" TextAlignment="MiddleCenter" SizeF="105,14" LocationFloat="8,32" Font="Segoe UI, 7pt" ForeColor="255,113,128,150" Padding="2,2,0,0,100" />
+            <Item3 Ref="65" ControlType="XRLabel" Name="pnlCard3Label" Text="Abandoned" TextAlignment="MiddleCenter" SizeF="105,14" LocationFloat="8,32" Font="Segoe UI, 7pt" ForeColor="255,113,128,150" Padding="2,2,0,0,100" />
           </Controls>
         </Item11>
-        <Item12 Ref="66" ControlType="XRPanel" Name="pnlCard1" SizeF="118,55" LocationFloat="17.416666,102.083336" BackColor="White" BorderColor="255,226,232,240" Borders="All" BorderWidth="1">
+        <Item12 Ref="66" ControlType="XRPanel" Name="pnlCard2" SizeF="118,55" LocationFloat="135.41667,102.083336" BackColor="White" BorderColor="255,226,232,240" Borders="All" BorderWidth="1">
           <Controls>
-            <Item1 Ref="67" ControlType="XRPanel" Name="pnlCard1Accent" SizeF="4,55" LocationFloat="0,0" BackColor="255,67,97,238" />
-            <Item2 Ref="68" ControlType="XRLabel" Name="pnlCard1Value" TextAlignment="MiddleCenter" SizeF="105,22" LocationFloat="8,5" Font="Segoe UI, 13pt, style=Bold" ForeColor="255,45,55,72" Padding="2,2,0,0,100">
+            <Item1 Ref="67" ControlType="XRPanel" Name="pnlCard2Accent" SizeF="4,55" LocationFloat="0,0" BackColor="255,72,187,120" />
+            <Item2 Ref="68" ControlType="XRLabel" Name="pnlCard2Value" TextAlignment="MiddleCenter" SizeF="105,22" LocationFloat="8,5" Font="Segoe UI, 13pt, style=Bold" ForeColor="255,72,187,120" Padding="2,2,0,0,100">
               <ExpressionBindings>
-                <Item1 Ref="69" EventName="BeforePrint" PropertyName="Text" Expression="FormatString('{0:N0}', [total_calls])" />
+                <Item1 Ref="69" EventName="BeforePrint" PropertyName="Text" Expression="FormatString('{0:N0}', [answered_calls])" />
               </ExpressionBindings>
             </Item2>
-            <Item3 Ref="70" ControlType="XRLabel" Name="pnlCard1Label" Text="Total Calls" TextAlignment="MiddleCenter" SizeF="105,14" LocationFloat="8,32" Font="Segoe UI, 7pt" ForeColor="255,113,128,150" Padding="2,2,0,0,100" />
+            <Item3 Ref="70" ControlType="XRLabel" Name="pnlCard2Label" Text="Answered" TextAlignment="MiddleCenter" SizeF="105,14" LocationFloat="8,32" Font="Segoe UI, 7pt" ForeColor="255,113,128,150" Padding="2,2,0,0,100" />
           </Controls>
         </Item12>
-        <Item13 Ref="71" ControlType="XRPanel" Name="pnlFilterInfo" SizeF="280,55" LocationFloat="684.54565,14.624997" BackColor="255,248,250,252" BorderColor="255,226,232,240" Borders="All" BorderWidth="1">
+        <Item13 Ref="71" ControlType="XRPanel" Name="pnlCard1" SizeF="118,55" LocationFloat="17.416666,102.083336" BackColor="White" BorderColor="255,226,232,240" Borders="All" BorderWidth="1">
           <Controls>
-            <Item1 Ref="72" ControlType="XRLabel" Name="lblQueueFilter" Text="test" SizeF="260,14" LocationFloat="8.958333,5" Font="Segoe UI, 8pt, style=Bold" ForeColor="255,67,97,238" Padding="2,2,0,0,100">
+            <Item1 Ref="72" ControlType="XRPanel" Name="pnlCard1Accent" SizeF="4,55" LocationFloat="0,0" BackColor="255,67,97,238" />
+            <Item2 Ref="73" ControlType="XRLabel" Name="pnlCard1Value" TextAlignment="MiddleCenter" SizeF="105,22" LocationFloat="8,5" Font="Segoe UI, 13pt, style=Bold" ForeColor="255,45,55,72" Padding="2,2,0,0,100">
               <ExpressionBindings>
-                <Item1 Ref="73" EventName="BeforePrint" PropertyName="Text" Expression="'Queue DN: ' + [queue_dn] + ' - ' + [queue_display_name]" />
-              </ExpressionBindings>
-            </Item1>
-            <Item2 Ref="74" ControlType="XRLabel" Name="lblDateRange" Text="Test" SizeF="260,14" LocationFloat="10,22" Font="Segoe UI, 8pt" ForeColor="255,113,128,150" Padding="2,2,0,0,100">
-              <ExpressionBindings>
-                <Item1 Ref="75" EventName="BeforePrint" PropertyName="Text" Expression="'Period: ' + FormatString('{0:MMM dd, yyyy}', #2026-02-01#) + ' - ' + FormatString('{0:MMM dd, yyyy}', #2026-02-16#)" />
+                <Item1 Ref="74" EventName="BeforePrint" PropertyName="Text" Expression="FormatString('{0:N0}', [total_calls])" />
               </ExpressionBindings>
             </Item2>
-            <Item3 Ref="76" ControlType="XRLabel" Name="lblSLAInfo" SizeF="260,12" LocationFloat="10,38" Font="Segoe UI, 7pt" ForeColor="255,160,174,192" Padding="2,2,0,0,100">
+            <Item3 Ref="75" ControlType="XRLabel" Name="pnlCard1Label" Text="Total Calls" TextAlignment="MiddleCenter" SizeF="105,14" LocationFloat="8,32" Font="Segoe UI, 7pt" ForeColor="255,113,128,150" Padding="2,2,0,0,100" />
+          </Controls>
+        </Item13>
+        <Item14 Ref="76" ControlType="XRPanel" Name="pnlFilterInfo" SizeF="280,55" LocationFloat="684.54565,14.624997" BackColor="255,248,250,252" BorderColor="255,226,232,240" Borders="All" BorderWidth="1">
+          <Controls>
+            <Item1 Ref="77" ControlType="XRLabel" Name="lblQueueFilter" Text="test" SizeF="260,14" LocationFloat="8.958333,5" Font="Segoe UI, 8pt, style=Bold" ForeColor="255,67,97,238" Padding="2,2,0,0,100">
               <ExpressionBindings>
-                <Item1 Ref="77" EventName="BeforePrint" PropertyName="Text" Expression="'SLA Threshold: 00:00:20'" />
+                <Item1 Ref="78" EventName="BeforePrint" PropertyName="Text" Expression="'Queue DN: ' + [description]" />
+              </ExpressionBindings>
+            </Item1>
+            <Item2 Ref="79" ControlType="XRLabel" Name="lblDateRange" Text="Test" SizeF="260,14" LocationFloat="10,22" Font="Segoe UI, 8pt" ForeColor="255,113,128,150" Padding="2,2,0,0,100">
+              <ExpressionBindings>
+                <Item1 Ref="80" EventName="BeforePrint" PropertyName="Text" Expression="'Period: ' + FormatString('{0:MMM dd, yyyy}', [Parameters.pPeriodFrom]) + ' - ' + FormatString('{0:MMM dd, yyyy}', [Parameters.pPeriodTo])" />
+              </ExpressionBindings>
+            </Item2>
+            <Item3 Ref="81" ControlType="XRLabel" Name="lblSLAInfo" SizeF="260,12" LocationFloat="10,38" Font="Segoe UI, 7pt" ForeColor="255,160,174,192" Padding="2,2,0,0,100">
+              <ExpressionBindings>
+                <Item1 Ref="82" EventName="BeforePrint" PropertyName="Text" Expression="'SLA Threshold: ' + ToStr([Parameters.pSlaSeconds]) + ' seconds'" />
               </ExpressionBindings>
             </Item3>
           </Controls>
-        </Item13>
-        <Item14 Ref="78" ControlType="XRLabel" Name="lblSubtitle" Text="Queue Performance Dashboard (Production)" SizeF="350,16" LocationFloat="117.916664,49.666664" Font="Segoe UI, 9pt" ForeColor="255,113,128,150" Padding="2,2,0,0,100" />
-        <Item15 Ref="79" ControlType="XRLabel" Name="lblTitle" Text="VoIPTools Customer Service" SizeF="400,32" LocationFloat="117.916664,14.624998" Font="Segoe UI, 20pt, style=Bold" ForeColor="255,67,97,238" Padding="2,2,0,0,100" />
+        </Item14>
+        <Item15 Ref="83" ControlType="XRLabel" Name="lblSubtitle" Text="Queue Performance Dashboard (Production)" SizeF="350,16" LocationFloat="117.916664,49.666664" Font="Segoe UI, 9pt" ForeColor="255,113,128,150" Padding="2,2,0,0,100" />
+        <Item16 Ref="84" ControlType="XRLabel" Name="lblTitle" Text="VoIPTools Customer Service" SizeF="400,32" LocationFloat="117.916664,14.624998" Font="Segoe UI, 20pt, style=Bold" ForeColor="255,67,97,238" Padding="2,2,0,0,100" />
       </Controls>
     </Item2>
-    <Item3 Ref="80" ControlType="DetailBand" Name="Detail1" HeightF="0" Visible="false" />
-    <Item4 Ref="82" ControlType="DetailReportBand" Name="AgentDetail" Level="0" DataMember="qcall_cent_get_extensions_statistics_by_queues" DataSource="#Ref-81">
+    <Item3 Ref="85" ControlType="DetailBand" Name="Detail1" HeightF="0" Visible="false" />
+    <Item4 Ref="87" ControlType="DetailReportBand" Name="AgentDetail" Level="0" DataMember="qcall_cent_get_extensions_statistics_by_queues" DataSource="#Ref-86">
       <Bands>
-        <Item1 Ref="83" ControlType="GroupHeaderBand" Name="GroupHeader1" RepeatEveryPage="true" HeightF="25">
+        <Item1 Ref="88" ControlType="GroupHeaderBand" Name="GroupHeader1" RepeatEveryPage="true" HeightF="25">
           <Controls>
-            <Item1 Ref="84" ControlType="XRTable" Name="table1" TextAlignment="MiddleLeft" SizeF="980.0002,25" LocationFloat="0,0" Padding="2,2,0,0,96">
+            <Item1 Ref="89" ControlType="XRTable" Name="table1" TextAlignment="MiddleLeft" SizeF="980.0002,25" LocationFloat="0,0" Padding="2,2,0,0,96">
               <Rows>
-                <Item1 Ref="85" ControlType="XRTableRow" Name="tableRow1" Weight="1">
+                <Item1 Ref="90" ControlType="XRTableRow" Name="tableRow1" Weight="1">
                   <Cells>
-                    <Item1 Ref="86" ControlType="XRTableCell" Name="tableCell1" Weight="3.4378514769510495" Multiline="true" Text="Agent" TextAlignment="MiddleLeft" Font="Segoe UI, 9.75pt, style=Bold" ForeColor="White" BackColor="255,74,85,104">
-                      <StylePriority Ref="87" UseFont="false" UseForeColor="false" UseBackColor="false" UseTextAlignment="false" />
+                    <Item1 Ref="91" ControlType="XRTableCell" Name="tableCell1" Weight="3.4378514769510495" Multiline="true" Text="Agent" TextAlignment="MiddleLeft" Font="Segoe UI, 9.75pt, style=Bold" ForeColor="White" BackColor="255,74,85,104">
+                      <StylePriority Ref="92" UseFont="false" UseForeColor="false" UseBackColor="false" UseTextAlignment="false" />
                     </Item1>
-                    <Item2 Ref="88" ControlType="XRTableCell" Name="tableCell2" Weight="1.3751400507452805" Multiline="true" Text="Answered Calls" TextAlignment="MiddleCenter" Font="Segoe UI, 9.75pt, style=Bold" ForeColor="White" BackColor="255,74,85,104">
-                      <StylePriority Ref="89" UseFont="false" UseForeColor="false" UseBackColor="false" UseTextAlignment="false" />
+                    <Item2 Ref="93" ControlType="XRTableCell" Name="tableCell2" Weight="1.3751400507452805" Multiline="true" Text="Answered Calls" TextAlignment="MiddleCenter" Font="Segoe UI, 9.75pt, style=Bold" ForeColor="White" BackColor="255,74,85,104">
+                      <StylePriority Ref="94" UseFont="false" UseForeColor="false" UseBackColor="false" UseTextAlignment="false" />
                     </Item2>
-                    <Item3 Ref="90" ControlType="XRTableCell" Name="tableCell3" Weight="1.3751403931357165" Multiline="true" Text="Avg Answered" TextAlignment="MiddleCenter" Font="Segoe UI, 9.75pt, style=Bold" ForeColor="White" BackColor="255,74,85,104">
-                      <StylePriority Ref="91" UseFont="false" UseForeColor="false" UseBackColor="false" UseTextAlignment="false" />
+                    <Item3 Ref="95" ControlType="XRTableCell" Name="tableCell3" Weight="1.3751403931357165" Multiline="true" Text="Avg Answered" TextAlignment="MiddleCenter" Font="Segoe UI, 9.75pt, style=Bold" ForeColor="White" BackColor="255,74,85,104">
+                      <StylePriority Ref="96" UseFont="false" UseForeColor="false" UseBackColor="false" UseTextAlignment="false" />
                     </Item3>
-                    <Item4 Ref="92" ControlType="XRTableCell" Name="tableCell4" Weight="1.3751400115558803" Multiline="true" Text="Avg Talk Time" TextAlignment="MiddleCenter" Font="Segoe UI, 9.75pt, style=Bold" ForeColor="White" BackColor="255,74,85,104">
-                      <StylePriority Ref="93" UseFont="false" UseForeColor="false" UseBackColor="false" UseTextAlignment="false" />
+                    <Item4 Ref="97" ControlType="XRTableCell" Name="tableCell4" Weight="1.3751400115558803" Multiline="true" Text="Avg Talk Time" TextAlignment="MiddleCenter" Font="Segoe UI, 9.75pt, style=Bold" ForeColor="White" BackColor="255,74,85,104">
+                      <StylePriority Ref="98" UseFont="false" UseForeColor="false" UseBackColor="false" UseTextAlignment="false" />
                     </Item4>
-                    <Item5 Ref="94" ControlType="XRTableCell" Name="tableCell6" Weight="1.1001121204000865" Multiline="true" Text="Q Time" TextAlignment="MiddleCenter" Font="Segoe UI, 9.75pt, style=Bold" ForeColor="White" BackColor="255,74,85,104">
-                      <StylePriority Ref="95" UseFont="false" UseForeColor="false" UseBackColor="false" UseTextAlignment="false" />
+                    <Item5 Ref="99" ControlType="XRTableCell" Name="tableCell6" Weight="1.1001121204000865" Multiline="true" Text="Q Time" TextAlignment="MiddleCenter" Font="Segoe UI, 9.75pt, style=Bold" ForeColor="White" BackColor="255,74,85,104">
+                      <StylePriority Ref="100" UseFont="false" UseForeColor="false" UseBackColor="false" UseTextAlignment="false" />
                     </Item5>
-                    <Item6 Ref="96" ControlType="XRTableCell" Name="tableCell7" Weight="0.9625980429366335" Multiline="true" Text="In Q%" TextAlignment="MiddleCenter" Font="Segoe UI, 9.75pt, style=Bold" ForeColor="White" BackColor="255,74,85,104">
-                      <StylePriority Ref="97" UseFont="false" UseForeColor="false" UseBackColor="false" UseTextAlignment="false" />
+                    <Item6 Ref="101" ControlType="XRTableCell" Name="tableCell7" Weight="0.9625980429366335" Multiline="true" Text="In Q%" TextAlignment="MiddleCenter" Font="Segoe UI, 9.75pt, style=Bold" ForeColor="White" BackColor="255,74,85,104">
+                      <StylePriority Ref="102" UseFont="false" UseForeColor="false" UseBackColor="false" UseTextAlignment="false" />
                     </Item6>
                   </Cells>
                 </Item1>
               </Rows>
-              <StylePriority Ref="98" UseTextAlignment="false" />
+              <StylePriority Ref="103" UseTextAlignment="false" />
             </Item1>
           </Controls>
         </Item1>
-        <Item2 Ref="99" ControlType="DetailBand" Name="AgentDetailBand" HeightF="25" EvenStyleName="EvenRow">
+        <Item2 Ref="104" ControlType="DetailBand" Name="AgentDetailBand" HeightF="25" EvenStyleName="EvenRow">
           <Controls>
-            <Item1 Ref="100" ControlType="XRTable" Name="table2" TextAlignment="MiddleCenter" SizeF="980.0192,25" LocationFloat="0,0" Padding="2,2,0,0,96">
+            <Item1 Ref="105" ControlType="XRTable" Name="table2" TextAlignment="MiddleCenter" SizeF="980.0192,25" LocationFloat="0,0" Padding="2,2,0,0,96">
               <Rows>
-                <Item1 Ref="101" ControlType="XRTableRow" Name="tableRow2" Weight="1">
+                <Item1 Ref="106" ControlType="XRTableRow" Name="tableRow2" Weight="1">
                   <Cells>
-                    <Item1 Ref="102" ControlType="XRTableCell" Name="tableCell8" Weight="1.088611095969454" Multiline="true" Text="tableCell8" TextAlignment="MiddleLeft">
+                    <Item1 Ref="107" ControlType="XRTableCell" Name="tableCell8" Weight="1.088611095969454" Multiline="true" Text="tableCell8" TextAlignment="MiddleLeft">
                       <ExpressionBindings>
-                        <Item1 Ref="103" EventName="BeforePrint" PropertyName="Text" Expression="[extension_dn] + ' - ' + [extension_display_name]" />
+                        <Item1 Ref="108" EventName="BeforePrint" PropertyName="Text" Expression="[extension_dn] + ' - ' + [extension_display_name]" />
                       </ExpressionBindings>
-                      <StylePriority Ref="104" UseTextAlignment="false" />
+                      <StylePriority Ref="109" UseTextAlignment="false" />
                     </Item1>
-                    <Item2 Ref="105" ControlType="XRTableCell" Name="tableCell9" Weight="0.43362216104142143" Multiline="true" Text="tableCell9">
+                    <Item2 Ref="110" ControlType="XRTableCell" Name="tableCell9" Weight="0.43362216104142143" Multiline="true" Text="tableCell9">
                       <ExpressionBindings>
-                        <Item1 Ref="106" EventName="BeforePrint" PropertyName="Text" Expression="FormatString('{0:N0}', [extension_answered_count])" />
+                        <Item1 Ref="111" EventName="BeforePrint" PropertyName="Text" Expression="FormatString('{0:N0}', [extension_answered_count])" />
                       </ExpressionBindings>
                     </Item2>
-                    <Item3 Ref="107" ControlType="XRTableCell" Name="tableCell10" Weight="0.4373277331134698" Multiline="true" Text="tableCell10">
+                    <Item3 Ref="112" ControlType="XRTableCell" Name="tableCell10" Weight="0.4373277331134698" Multiline="true" Text="tableCell10">
                       <ExpressionBindings>
-                        <Item1 Ref="108" EventName="BeforePrint" PropertyName="Text" Expression="[avg_answer_time]" />
+                        <Item1 Ref="113" EventName="BeforePrint" PropertyName="Text" Expression="[avg_answer_time]" />
                       </ExpressionBindings>
                     </Item3>
-                    <Item4 Ref="109" ControlType="XRTableCell" Name="tableCell11" Weight="0.4354446612044829" Multiline="true" Text="tableCell11">
+                    <Item4 Ref="114" ControlType="XRTableCell" Name="tableCell11" Weight="0.4354446612044829" Multiline="true" Text="tableCell11">
                       <ExpressionBindings>
-                        <Item1 Ref="110" EventName="BeforePrint" PropertyName="Text" Expression="[avg_talk_time]" />
+                        <Item1 Ref="115" EventName="BeforePrint" PropertyName="Text" Expression="[avg_talk_time]" />
                       </ExpressionBindings>
                     </Item4>
-                    <Item5 Ref="111" ControlType="XRTableCell" Name="tableCell13" Weight="0.3483315124070526" Multiline="true" Text="tableCell13">
+                    <Item5 Ref="116" ControlType="XRTableCell" Name="tableCell13" Weight="0.3483315124070526" Multiline="true" Text="tableCell13">
                       <ExpressionBindings>
-                        <Item1 Ref="112" EventName="BeforePrint" PropertyName="Text" Expression="'-'" />
+                        <Item1 Ref="117" EventName="BeforePrint" PropertyName="Text" Expression="'-'" />
                       </ExpressionBindings>
                     </Item5>
-                    <Item6 Ref="113" ControlType="XRTableCell" Name="tableCell14" Weight="0.30483551604730763" Multiline="true" Text="tableCell14">
+                    <Item6 Ref="118" ControlType="XRTableCell" Name="tableCell14" Weight="0.30483551604730763" Multiline="true" Text="tableCell14">
                       <ExpressionBindings>
-                        <Item1 Ref="114" EventName="BeforePrint" PropertyName="Text" Expression="'-'" />
+                        <Item1 Ref="119" EventName="BeforePrint" PropertyName="Text" Expression="'-'" />
                       </ExpressionBindings>
                     </Item6>
                   </Cells>
                 </Item1>
               </Rows>
-              <StylePriority Ref="115" UseTextAlignment="false" />
+              <StylePriority Ref="120" UseTextAlignment="false" />
             </Item1>
           </Controls>
         </Item2>
       </Bands>
     </Item4>
-    <Item5 Ref="116" ControlType="PageFooterBand" Name="PageFooter1" HeightF="23.958332" />
-    <Item6 Ref="117" ControlType="BottomMarginBand" Name="BottomMargin1" HeightF="30" />
+    <Item5 Ref="121" ControlType="PageFooterBand" Name="PageFooter1" HeightF="23.958332">
+      <Controls>
+        <Item1 Ref="122" ControlType="XRPageInfo" Name="pageInfo2" TextFormatString="Page {0} of {1}" TextAlignment="TopRight" SizeF="200,23.94531" LocationFloat="772.9167,0" Font="Times New Roman, 7pt" ForeColor="255,160,174,192" Padding="2,2,0,0,100">
+          <StylePriority Ref="123" UseFont="false" UseForeColor="false" UseTextAlignment="false" />
+        </Item1>
+        <Item2 Ref="124" ControlType="XRPageInfo" Name="pageInfo1" PageInfo="DateTime" SizeF="196.87498,23.94531" LocationFloat="0,0" Font="Segoe UI, 7pt" ForeColor="255,160,174,192" Padding="2,2,0,0,100">
+          <StylePriority Ref="125" UseFont="false" UseForeColor="false" />
+        </Item2>
+      </Controls>
+    </Item5>
+    <Item6 Ref="126" ControlType="BottomMarginBand" Name="BottomMargin1" HeightF="30" />
   </Bands>
   <StyleSheet>
-    <Item1 Ref="118" Name="EvenRow" BorderStyle="Inset" BackColor="255,248,250,252" StringFormat="Near;Near;0;None;Character;Default" />
+    <Item1 Ref="127" Name="EvenRow" BorderStyle="Inset" BackColor="255,248,250,252" StringFormat="Near;Near;0;None;Character;Default" />
   </StyleSheet>
   <ParameterPanelLayoutItems>
-    <Item1 Ref="119" LayoutItemType="Parameter" Parameter="#Ref-3" />
-    <Item2 Ref="120" LayoutItemType="Parameter" Parameter="#Ref-4" />
-    <Item3 Ref="121" LayoutItemType="Parameter" Parameter="#Ref-6" />
-    <Item4 Ref="122" LayoutItemType="Parameter" Parameter="#Ref-7" />
+    <Item1 Ref="128" LayoutItemType="Parameter" Parameter="#Ref-3" />
+    <Item2 Ref="129" LayoutItemType="Parameter" Parameter="#Ref-4" />
+    <Item3 Ref="130" LayoutItemType="Parameter" Parameter="#Ref-6" />
+    <Item4 Ref="131" LayoutItemType="Parameter" Parameter="#Ref-7" />
+    <Item5 Ref="132" LayoutItemType="Parameter" Parameter="#Ref-9" />
+    <Item6 Ref="133" LayoutItemType="Parameter" Parameter="#Ref-10" />
   </ParameterPanelLayoutItems>
   <ComponentStorage>
-    <Item1 Ref="0" ObjectType="DevExpress.DataAccess.Sql.SqlDataSource,DevExpress.DataAccess.v25.2" Name="sqlDataSource1" Base64="PFNxbERhdGFTb3VyY2UgTmFtZT0ic3FsRGF0YVNvdXJjZTEiPjxDb25uZWN0aW9uIE5hbWU9IjNDWF9FeHBvcnRlcl9Qcm9kdWN0aW9uIiBDb25uZWN0aW9uU3RyaW5nPSJYcG9Qcm92aWRlcj1NU1NxbFNlcnZlcjtEYXRhIFNvdXJjZT0zLjEzMi43Mi4xMzQ7SW5pdGlhbCBDYXRhbG9nPTNDWCBFeHBvcnRlcjtVc2VyIElkPXNhO1Bhc3N3b3JkPVYwMVBUMHk1O1RydXN0U2VydmVyQ2VydGlmaWNhdGU9VHJ1ZTtFbmNyeXB0PUZhbHNlOyIgLz48UXVlcnkgVHlwZT0iU3RvcmVkUHJvY1F1ZXJ5IiBOYW1lPSJzcF9xdWV1ZV9rcGlfc3VtbWFyeV9zaHVzaGFudCI+PFBhcmFtZXRlciBOYW1lPSJAcGVyaW9kX2Zyb20iIFR5cGU9IkRldkV4cHJlc3MuRGF0YUFjY2Vzcy5FeHByZXNzaW9uIj4oU3lzdGVtLk9iamVjdCwgU3lzdGVtLlByaXZhdGUuQ29yZUxpYiwgVmVyc2lvbj04LjAuMC4wLCBDdWx0dXJlPW5ldXRyYWwsIFB1YmxpY0tleVRva2VuPTdjZWM4NWQ3YmVhNzc5OGUpKD9wUGVyaW9kRnJvbSk8L1BhcmFtZXRlcj48UGFyYW1ldGVyIE5hbWU9IkBwZXJpb2RfdG8iIFR5cGU9IkRldkV4cHJlc3MuRGF0YUFjY2Vzcy5FeHByZXNzaW9uIj4oU3lzdGVtLk9iamVjdCwgU3lzdGVtLlByaXZhdGUuQ29yZUxpYiwgVmVyc2lvbj04LjAuMC4wLCBDdWx0dXJlPW5ldXRyYWwsIFB1YmxpY0tleVRva2VuPTdjZWM4NWQ3YmVhNzc5OGUpKD9wUGVyaW9kVG8pPC9QYXJhbWV0ZXI+PFBhcmFtZXRlciBOYW1lPSJAcXVldWVfZG5zIiBUeXBlPSJEZXZFeHByZXNzLkRhdGFBY2Nlc3MuRXhwcmVzc2lvbiI+KFN5c3RlbS5TdHJpbmcpKD9wUXVldWVEbnMpPC9QYXJhbWV0ZXI+PFBhcmFtZXRlciBOYW1lPSJAd2FpdF9pbnRlcnZhbCIgVHlwZT0iU3lzdGVtLlRpbWVPbmx5Ij4wMDowMDwvUGFyYW1ldGVyPjxQcm9jTmFtZT5zcF9xdWV1ZV9rcGlfc3VtbWFyeV9zaHVzaGFudDwvUHJvY05hbWU+PC9RdWVyeT48UmVzdWx0U2NoZW1hPjxEYXRhU2V0IE5hbWU9InNxbERhdGFTb3VyY2UxIj48VmlldyBOYW1lPSJzcF9xdWV1ZV9rcGlfc3VtbWFyeV9zaHVzaGFudCI+PEZpZWxkIE5hbWU9InF1ZXVlX2RuIiBUeXBlPSJTdHJpbmciIC8+PEZpZWxkIE5hbWU9InF1ZXVlX2Rpc3BsYXlfbmFtZSIgVHlwZT0iU3RyaW5nIiAvPjxGaWVsZCBOYW1lPSJ0b3RhbF9jYWxscyIgVHlwZT0iSW50MzIiIC8+PEZpZWxkIE5hbWU9ImFiYW5kb25lZF9jYWxscyIgVHlwZT0iSW50MzIiIC8+PEZpZWxkIE5hbWU9ImFuc3dlcmVkX2NhbGxzIiBUeXBlPSJJbnQzMiIgLz48RmllbGQgTmFtZT0iYW5zd2VyZWRfcGVyY2VudCIgVHlwZT0iRGVjaW1hbCIgLz48RmllbGQgTmFtZT0iYW5zd2VyZWRfd2l0aGluX3NsYSIgVHlwZT0iSW50MzIiIC8+PEZpZWxkIE5hbWU9ImFuc3dlcmVkX3dpdGhpbl9zbGFfcGVyY2VudCIgVHlwZT0iRGVjaW1hbCIgLz48RmllbGQgTmFtZT0ic2VydmljZWRfY2FsbGJhY2tzIiBUeXBlPSJJbnQzMiIgLz48RmllbGQgTmFtZT0idG90YWxfdGFsa2luZyIgVHlwZT0iVW5rbm93biIgLz48RmllbGQgTmFtZT0ibWVhbl90YWxraW5nIiBUeXBlPSJVbmtub3duIiAvPjxGaWVsZCBOYW1lPSJhdmdfd2FpdGluZyIgVHlwZT0iVW5rbm93biIgLz48L1ZpZXc+PC9EYXRhU2V0PjwvUmVzdWx0U2NoZW1hPjxDb25uZWN0aW9uT3B0aW9ucyBDbG9zZUNvbm5lY3Rpb249InRydWUiIC8+PC9TcWxEYXRhU291cmNlPg==" />
-    <Item2 Ref="11" ObjectType="DevExpress.DataAccess.Sql.SqlDataSource,DevExpress.DataAccess.v25.2" Name="sqlDataSource2" Base64="PFNxbERhdGFTb3VyY2UgTmFtZT0ic3FsRGF0YVNvdXJjZTIiPjxDb25uZWN0aW9uIE5hbWU9IjNDWF9FeHBvcnRlcl9Qcm9kdWN0aW9uIiBDb25uZWN0aW9uU3RyaW5nPSJYcG9Qcm92aWRlcj1NU1NxbFNlcnZlcjtEYXRhIFNvdXJjZT0zLjEzMi43Mi4xMzQ7SW5pdGlhbCBDYXRhbG9nPTNDWCBFeHBvcnRlcjtVc2VyIElkPXNhO1Bhc3N3b3JkPVYwMVBUMHk1O1RydXN0U2VydmVyQ2VydGlmaWNhdGU9VHJ1ZTtFbmNyeXB0PUZhbHNlOyIgLz48UXVlcnkgVHlwZT0iU3RvcmVkUHJvY1F1ZXJ5IiBOYW1lPSJzcF9xdWV1ZV9jYWxsc19ieV9kYXRlX3NodXNoYW50Ij48UGFyYW1ldGVyIE5hbWU9IkBwZXJpb2RfZnJvbSIgVHlwZT0iRGV2RXhwcmVzcy5EYXRhQWNjZXNzLkV4cHJlc3Npb24iPihTeXN0ZW0uT2JqZWN0LCBTeXN0ZW0uUHJpdmF0ZS5Db3JlTGliLCBWZXJzaW9uPTguMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49N2NlYzg1ZDdiZWE3Nzk4ZSkoP3BQZXJpb2RGcm9tKTwvUGFyYW1ldGVyPjxQYXJhbWV0ZXIgTmFtZT0iQHBlcmlvZF90byIgVHlwZT0iRGV2RXhwcmVzcy5EYXRhQWNjZXNzLkV4cHJlc3Npb24iPihTeXN0ZW0uT2JqZWN0LCBTeXN0ZW0uUHJpdmF0ZS5Db3JlTGliLCBWZXJzaW9uPTguMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49N2NlYzg1ZDdiZWE3Nzk4ZSkoP3BQZXJpb2RUbyk8L1BhcmFtZXRlcj48UGFyYW1ldGVyIE5hbWU9IkBxdWV1ZV9kbnMiIFR5cGU9IkRldkV4cHJlc3MuRGF0YUFjY2Vzcy5FeHByZXNzaW9uIj4oU3lzdGVtLlN0cmluZykoP3BRdWV1ZURucyk8L1BhcmFtZXRlcj48UGFyYW1ldGVyIE5hbWU9IkB3YWl0X2ludGVydmFsIiBUeXBlPSJTeXN0ZW0uVGltZU9ubHkiPjAwOjAwPC9QYXJhbWV0ZXI+PFByb2NOYW1lPnNwX3F1ZXVlX2NhbGxzX2J5X2RhdGVfc2h1c2hhbnQ8L1Byb2NOYW1lPjwvUXVlcnk+PFJlc3VsdFNjaGVtYT48RGF0YVNldCBOYW1lPSJzcWxEYXRhU291cmNlMiI+PFZpZXcgTmFtZT0ic3BfcXVldWVfY2FsbHNfYnlfZGF0ZV9zaHVzaGFudCI+PEZpZWxkIE5hbWU9InF1ZXVlX2RuIiBUeXBlPSJTdHJpbmciIC8+PEZpZWxkIE5hbWU9ImNhbGxfZGF0ZSIgVHlwZT0iRGF0ZVRpbWUiIC8+PEZpZWxkIE5hbWU9InRvdGFsX2NhbGxzIiBUeXBlPSJJbnQzMiIgLz48RmllbGQgTmFtZT0iYW5zd2VyZWRfY2FsbHMiIFR5cGU9IkludDMyIiAvPjxGaWVsZCBOYW1lPSJhYmFuZG9uZWRfY2FsbHMiIFR5cGU9IkludDMyIiAvPjxGaWVsZCBOYW1lPSJhbnN3ZXJlZF93aXRoaW5fc2xhIiBUeXBlPSJJbnQzMiIgLz48RmllbGQgTmFtZT0iYW5zd2VyX3JhdGUiIFR5cGU9IkRlY2ltYWwiIC8+PEZpZWxkIE5hbWU9InNsYV9wZXJjZW50IiBUeXBlPSJEZWNpbWFsIiAvPjwvVmlldz48L0RhdGFTZXQ+PC9SZXN1bHRTY2hlbWE+PENvbm5lY3Rpb25PcHRpb25zIENsb3NlQ29ubmVjdGlvbj0idHJ1ZSIgLz48L1NxbERhdGFTb3VyY2U+" />
-    <Item3 Ref="81" ObjectType="DevExpress.DataAccess.Sql.SqlDataSource,DevExpress.DataAccess.v25.2" Name="sqlDataSource3" Base64="PFNxbERhdGFTb3VyY2UgTmFtZT0ic3FsRGF0YVNvdXJjZTMiPjxDb25uZWN0aW9uIE5hbWU9IjNDWF9FeHBvcnRlcl9Qcm9kdWN0aW9uIiBDb25uZWN0aW9uU3RyaW5nPSJYcG9Qcm92aWRlcj1NU1NxbFNlcnZlcjtEYXRhIFNvdXJjZT0zLjEzMi43Mi4xMzQ7SW5pdGlhbCBDYXRhbG9nPTNDWCBFeHBvcnRlcjtVc2VyIElkPXNhO1Bhc3N3b3JkPVYwMVBUMHk1O1RydXN0U2VydmVyQ2VydGlmaWNhdGU9VHJ1ZTtFbmNyeXB0PUZhbHNlOyIgLz48UXVlcnkgVHlwZT0iU3RvcmVkUHJvY1F1ZXJ5IiBOYW1lPSJxY2FsbF9jZW50X2dldF9leHRlbnNpb25zX3N0YXRpc3RpY3NfYnlfcXVldWVzIj48UGFyYW1ldGVyIE5hbWU9IkBwZXJpb2RfZnJvbSIgVHlwZT0iRGV2RXhwcmVzcy5EYXRhQWNjZXNzLkV4cHJlc3Npb24iPihTeXN0ZW0uT2JqZWN0LCBTeXN0ZW0uUHJpdmF0ZS5Db3JlTGliLCBWZXJzaW9uPTguMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49N2NlYzg1ZDdiZWE3Nzk4ZSkoP3BQZXJpb2RGcm9tKTwvUGFyYW1ldGVyPjxQYXJhbWV0ZXIgTmFtZT0iQHBlcmlvZF90byIgVHlwZT0iRGV2RXhwcmVzcy5EYXRhQWNjZXNzLkV4cHJlc3Npb24iPihTeXN0ZW0uT2JqZWN0LCBTeXN0ZW0uUHJpdmF0ZS5Db3JlTGliLCBWZXJzaW9uPTguMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49N2NlYzg1ZDdiZWE3Nzk4ZSkoP3BQZXJpb2RUbyk8L1BhcmFtZXRlcj48UGFyYW1ldGVyIE5hbWU9IkBxdWV1ZV9kbnMiIFR5cGU9IkRldkV4cHJlc3MuRGF0YUFjY2Vzcy5FeHByZXNzaW9uIj4oU3lzdGVtLlN0cmluZykoP3BRdWV1ZURucyk8L1BhcmFtZXRlcj48UGFyYW1ldGVyIE5hbWU9IkB3YWl0X2ludGVydmFsIiBUeXBlPSJTeXN0ZW0uVGltZU9ubHkiPjAwOjAwPC9QYXJhbWV0ZXI+PFByb2NOYW1lPnFjYWxsX2NlbnRfZ2V0X2V4dGVuc2lvbnNfc3RhdGlzdGljc19ieV9xdWV1ZXM8L1Byb2NOYW1lPjwvUXVlcnk+PFJlc3VsdFNjaGVtYT48RGF0YVNldCBOYW1lPSJzcWxEYXRhU291cmNlMyI+PFZpZXcgTmFtZT0icWNhbGxfY2VudF9nZXRfZXh0ZW5zaW9uc19zdGF0aXN0aWNzX2J5X3F1ZXVlcyI+PEZpZWxkIE5hbWU9InF1ZXVlX2RuIiBUeXBlPSJTdHJpbmciIC8+PEZpZWxkIE5hbWU9InF1ZXVlX2Rpc3BsYXlfbmFtZSIgVHlwZT0iU3RyaW5nIiAvPjxGaWVsZCBOYW1lPSJleHRlbnNpb25fZG4iIFR5cGU9IlN0cmluZyIgLz48RmllbGQgTmFtZT0iZXh0ZW5zaW9uX2Rpc3BsYXlfbmFtZSIgVHlwZT0iU3RyaW5nIiAvPjxGaWVsZCBOYW1lPSJxdWV1ZV9yZWNlaXZlZF9jb3VudCIgVHlwZT0iSW50MzIiIC8+PEZpZWxkIE5hbWU9ImV4dGVuc2lvbl9hbnN3ZXJlZF9jb3VudCIgVHlwZT0iSW50MzIiIC8+PEZpZWxkIE5hbWU9InRhbGtfdGltZSIgVHlwZT0iVW5rbm93biIgLz48RmllbGQgTmFtZT0iYXZnX3RhbGtfdGltZSIgVHlwZT0iVW5rbm93biIgLz48RmllbGQgTmFtZT0iYXZnX2Fuc3dlcl90aW1lIiBUeXBlPSJVbmtub3duIiAvPjwvVmlldz48L0RhdGFTZXQ+PC9SZXN1bHRTY2hlbWE+PENvbm5lY3Rpb25PcHRpb25zIENsb3NlQ29ubmVjdGlvbj0idHJ1ZSIgLz48L1NxbERhdGFTb3VyY2U+" />
+    <Item1 Ref="0" ObjectType="DevExpress.DataAccess.Sql.SqlDataSource,DevExpress.DataAccess.v25.2" Name="sqlDataSource1" Base64="PFNxbERhdGFTb3VyY2UgTmFtZT0ic3FsRGF0YVNvdXJjZTEiPjxDb25uZWN0aW9uIE5hbWU9IjNDWF9FeHBvcnRlcl9Qcm9kdWN0aW9uIiBDb25uZWN0aW9uU3RyaW5nPSJYcG9Qcm92aWRlcj1NU1NxbFNlcnZlcjtEYXRhIFNvdXJjZT0zLjEzMi43Mi4xMzQ7SW5pdGlhbCBDYXRhbG9nPTNDWCBFeHBvcnRlcjtVc2VyIElkPXNhO1Bhc3N3b3JkPVYwMVBUMHk1O1RydXN0U2VydmVyQ2VydGlmaWNhdGU9VHJ1ZTtFbmNyeXB0PUZhbHNlOyIgLz48UXVlcnkgVHlwZT0iU3RvcmVkUHJvY1F1ZXJ5IiBOYW1lPSJzcF9xdWV1ZV9zdGF0c19zdW1tYXJ5Ij48UGFyYW1ldGVyIE5hbWU9IkBmcm9tIiBUeXBlPSJEZXZFeHByZXNzLkRhdGFBY2Nlc3MuRXhwcmVzc2lvbiI+KFN5c3RlbS5PYmplY3QsIFN5c3RlbS5Qcml2YXRlLkNvcmVMaWIsIFZlcnNpb249OC4wLjAuMCwgQ3VsdHVyZT1uZXV0cmFsLCBQdWJsaWNLZXlUb2tlbj03Y2VjODVkN2JlYTc3OThlKSg/cFBlcmlvZEZyb20pPC9QYXJhbWV0ZXI+PFBhcmFtZXRlciBOYW1lPSJAdG8iIFR5cGU9IkRldkV4cHJlc3MuRGF0YUFjY2Vzcy5FeHByZXNzaW9uIj4oU3lzdGVtLk9iamVjdCwgU3lzdGVtLlByaXZhdGUuQ29yZUxpYiwgVmVyc2lvbj04LjAuMC4wLCBDdWx0dXJlPW5ldXRyYWwsIFB1YmxpY0tleVRva2VuPTdjZWM4NWQ3YmVhNzc5OGUpKD9wUGVyaW9kVG8pPC9QYXJhbWV0ZXI+PFBhcmFtZXRlciBOYW1lPSJAcXVldWVfZG5zIiBUeXBlPSJEZXZFeHByZXNzLkRhdGFBY2Nlc3MuRXhwcmVzc2lvbiI+KFN5c3RlbS5TdHJpbmcpKD9wUXVldWVEbnMpPC9QYXJhbWV0ZXI+PFBhcmFtZXRlciBOYW1lPSJAc2xhX3NlY29uZHMiIFR5cGU9IkRldkV4cHJlc3MuRGF0YUFjY2Vzcy5FeHByZXNzaW9uIj4oU3lzdGVtLkludDMyKSg/cFNsYVNlY29uZHMpPC9QYXJhbWV0ZXI+PFBhcmFtZXRlciBOYW1lPSJAcmVwb3J0X3RpbWV6b25lIiBUeXBlPSJEZXZFeHByZXNzLkRhdGFBY2Nlc3MuRXhwcmVzc2lvbiI+KFN5c3RlbS5TdHJpbmcpKD9wUmVwb3J0VGltZXpvbmUpPC9QYXJhbWV0ZXI+PFByb2NOYW1lPnNwX3F1ZXVlX3N0YXRzX3N1bW1hcnk8L1Byb2NOYW1lPjwvUXVlcnk+PFJlc3VsdFNjaGVtYT48RGF0YVNldCBOYW1lPSJzcWxEYXRhU291cmNlMSI+PFZpZXcgTmFtZT0ic3BfcXVldWVfc3RhdHNfc3VtbWFyeSI+PEZpZWxkIE5hbWU9InF1ZXVlX2dyb3VwIiBUeXBlPSJTdHJpbmciIC8+PEZpZWxkIE5hbWU9ImRlc2NyaXB0aW9uIiBUeXBlPSJTdHJpbmciIC8+PEZpZWxkIE5hbWU9InRvdGFsX2NhbGxzIiBUeXBlPSJJbnQzMiIgLz48RmllbGQgTmFtZT0iYWJhbmRvbmVkX2NhbGxzIiBUeXBlPSJJbnQzMiIgLz48RmllbGQgTmFtZT0iYW5zd2VyZWRfY2FsbHMiIFR5cGU9IkludDMyIiAvPjxGaWVsZCBOYW1lPSJhbnN3ZXJlZF9wZXJjZW50IiBUeXBlPSJEZWNpbWFsIiAvPjxGaWVsZCBOYW1lPSJhbnN3ZXJlZF93aXRoaW5fc2xhIiBUeXBlPSJJbnQzMiIgLz48RmllbGQgTmFtZT0iYW5zd2VyZWRfd2l0aGluX3NsYV9wZXJjZW50IiBUeXBlPSJEZWNpbWFsIiAvPjxGaWVsZCBOYW1lPSJzZXJ2aWNlZF9jYWxsYmFja3MiIFR5cGU9IkludDMyIiAvPjxGaWVsZCBOYW1lPSJ0b3RhbF90YWxraW5nIiBUeXBlPSJVbmtub3duIiAvPjxGaWVsZCBOYW1lPSJtZWFuX3RhbGtpbmdfdGltZSIgVHlwZT0iVW5rbm93biIgLz48RmllbGQgTmFtZT0iYXZnX3dhaXRfdGltZSIgVHlwZT0iVW5rbm93biIgLz48RmllbGQgTmFtZT0ibG9uZ2VzdF93YWl0X3RpbWUiIFR5cGU9IlVua25vd24iIC8+PEZpZWxkIE5hbWU9InBlcmlvZF9mcm9tX3V0YyIgVHlwZT0iVW5rbm93biIgLz48RmllbGQgTmFtZT0icGVyaW9kX3RvX3V0YyIgVHlwZT0iVW5rbm93biIgLz48RmllbGQgTmFtZT0icGVyaW9kX2Zyb21fbG9jYWwiIFR5cGU9IlVua25vd24iIC8+PEZpZWxkIE5hbWU9InBlcmlvZF90b19sb2NhbCIgVHlwZT0iVW5rbm93biIgLz48RmllbGQgTmFtZT0icmVwb3J0X3RpbWV6b25lX3VzZWQiIFR5cGU9IlN0cmluZyIgLz48L1ZpZXc+PC9EYXRhU2V0PjwvUmVzdWx0U2NoZW1hPjxDb25uZWN0aW9uT3B0aW9ucyBDbG9zZUNvbm5lY3Rpb249InRydWUiIC8+PC9TcWxEYXRhU291cmNlPg==" />
+    <Item2 Ref="16" ObjectType="DevExpress.DataAccess.Sql.SqlDataSource,DevExpress.DataAccess.v25.2" Name="sqlDataSource2" Base64="PFNxbERhdGFTb3VyY2UgTmFtZT0ic3FsRGF0YVNvdXJjZTIiPjxDb25uZWN0aW9uIE5hbWU9IjNDWF9FeHBvcnRlcl9Qcm9kdWN0aW9uIiBDb25uZWN0aW9uU3RyaW5nPSJYcG9Qcm92aWRlcj1NU1NxbFNlcnZlcjtEYXRhIFNvdXJjZT0zLjEzMi43Mi4xMzQ7SW5pdGlhbCBDYXRhbG9nPTNDWCBFeHBvcnRlcjtVc2VyIElkPXNhO1Bhc3N3b3JkPVYwMVBUMHk1O1RydXN0U2VydmVyQ2VydGlmaWNhdGU9VHJ1ZTtFbmNyeXB0PUZhbHNlOyIgLz48UXVlcnkgVHlwZT0iU3RvcmVkUHJvY1F1ZXJ5IiBOYW1lPSJzcF9xdWV1ZV9zdGF0c19kYWlseV9zdW1tYXJ5Ij48UGFyYW1ldGVyIE5hbWU9IkBmcm9tIiBUeXBlPSJEZXZFeHByZXNzLkRhdGFBY2Nlc3MuRXhwcmVzc2lvbiI+KFN5c3RlbS5PYmplY3QsIFN5c3RlbS5Qcml2YXRlLkNvcmVMaWIsIFZlcnNpb249OC4wLjAuMCwgQ3VsdHVyZT1uZXV0cmFsLCBQdWJsaWNLZXlUb2tlbj03Y2VjODVkN2JlYTc3OThlKSg/cFBlcmlvZEZyb20pPC9QYXJhbWV0ZXI+PFBhcmFtZXRlciBOYW1lPSJAdG8iIFR5cGU9IkRldkV4cHJlc3MuRGF0YUFjY2Vzcy5FeHByZXNzaW9uIj4oU3lzdGVtLk9iamVjdCwgU3lzdGVtLlByaXZhdGUuQ29yZUxpYiwgVmVyc2lvbj04LjAuMC4wLCBDdWx0dXJlPW5ldXRyYWwsIFB1YmxpY0tleVRva2VuPTdjZWM4NWQ3YmVhNzc5OGUpKD9wUGVyaW9kVG8pPC9QYXJhbWV0ZXI+PFBhcmFtZXRlciBOYW1lPSJAcXVldWVfZG5zIiBUeXBlPSJEZXZFeHByZXNzLkRhdGFBY2Nlc3MuRXhwcmVzc2lvbiI+KFN5c3RlbS5TdHJpbmcpKD9wUXVldWVEbnMpPC9QYXJhbWV0ZXI+PFBhcmFtZXRlciBOYW1lPSJAc2xhX3NlY29uZHMiIFR5cGU9IkRldkV4cHJlc3MuRGF0YUFjY2Vzcy5FeHByZXNzaW9uIj4oU3lzdGVtLkludDMyKSg/cFNsYVNlY29uZHMpPC9QYXJhbWV0ZXI+PFBhcmFtZXRlciBOYW1lPSJAcmVwb3J0X3RpbWV6b25lIiBUeXBlPSJEZXZFeHByZXNzLkRhdGFBY2Nlc3MuRXhwcmVzc2lvbiI+KFN5c3RlbS5TdHJpbmcpKD9wUmVwb3J0VGltZXpvbmUpPC9QYXJhbWV0ZXI+PFByb2NOYW1lPnNwX3F1ZXVlX3N0YXRzX2RhaWx5X3N1bW1hcnk8L1Byb2NOYW1lPjwvUXVlcnk+PFJlc3VsdFNjaGVtYT48RGF0YVNldCBOYW1lPSJzcWxEYXRhU291cmNlMiI+PFZpZXcgTmFtZT0ic3BfcXVldWVfc3RhdHNfZGFpbHlfc3VtbWFyeSI+PEZpZWxkIE5hbWU9InJlcG9ydF9kYXRlX2xvY2FsIiBUeXBlPSJEYXRlVGltZSIgLz48RmllbGQgTmFtZT0idG90YWxfY2FsbHMiIFR5cGU9IkludDMyIiAvPjxGaWVsZCBOYW1lPSJhYmFuZG9uZWRfY2FsbHMiIFR5cGU9IkludDMyIiAvPjxGaWVsZCBOYW1lPSJhbnN3ZXJlZF9jYWxscyIgVHlwZT0iSW50MzIiIC8+PEZpZWxkIE5hbWU9ImFuc3dlcmVkX3BlcmNlbnQiIFR5cGU9IkRlY2ltYWwiIC8+PEZpZWxkIE5hbWU9ImFuc3dlcmVkX3dpdGhpbl9zbGEiIFR5cGU9IkludDMyIiAvPjxGaWVsZCBOYW1lPSJhbnN3ZXJlZF93aXRoaW5fc2xhX3BlcmNlbnQiIFR5cGU9IkRlY2ltYWwiIC8+PEZpZWxkIE5hbWU9InNlcnZpY2VkX2NhbGxiYWNrcyIgVHlwZT0iSW50MzIiIC8+PEZpZWxkIE5hbWU9InRvdGFsX3RhbGtpbmciIFR5cGU9IlVua25vd24iIC8+PEZpZWxkIE5hbWU9Im1lYW5fdGFsa2luZ190aW1lIiBUeXBlPSJVbmtub3duIiAvPjxGaWVsZCBOYW1lPSJhdmdfd2FpdF90aW1lIiBUeXBlPSJVbmtub3duIiAvPjxGaWVsZCBOYW1lPSJsb25nZXN0X3dhaXRfdGltZSIgVHlwZT0iVW5rbm93biIgLz48RmllbGQgTmFtZT0icGVyaW9kX2Zyb21fdXRjIiBUeXBlPSJVbmtub3duIiAvPjxGaWVsZCBOYW1lPSJwZXJpb2RfdG9fdXRjIiBUeXBlPSJVbmtub3duIiAvPjxGaWVsZCBOYW1lPSJwZXJpb2RfZnJvbV9sb2NhbCIgVHlwZT0iVW5rbm93biIgLz48RmllbGQgTmFtZT0icGVyaW9kX3RvX2xvY2FsIiBUeXBlPSJVbmtub3duIiAvPjxGaWVsZCBOYW1lPSJyZXBvcnRfdGltZXpvbmVfdXNlZCIgVHlwZT0iU3RyaW5nIiAvPjwvVmlldz48L0RhdGFTZXQ+PC9SZXN1bHRTY2hlbWE+PENvbm5lY3Rpb25PcHRpb25zIENsb3NlQ29ubmVjdGlvbj0idHJ1ZSIgLz48L1NxbERhdGFTb3VyY2U+" />
+    <Item3 Ref="86" ObjectType="DevExpress.DataAccess.Sql.SqlDataSource,DevExpress.DataAccess.v25.2" Name="sqlDataSource3" Base64="PFNxbERhdGFTb3VyY2UgTmFtZT0ic3FsRGF0YVNvdXJjZTMiPjxDb25uZWN0aW9uIE5hbWU9IjNDWF9FeHBvcnRlcl9Qcm9kdWN0aW9uIiBDb25uZWN0aW9uU3RyaW5nPSJYcG9Qcm92aWRlcj1NU1NxbFNlcnZlcjtEYXRhIFNvdXJjZT0zLjEzMi43Mi4xMzQ7SW5pdGlhbCBDYXRhbG9nPTNDWCBFeHBvcnRlcjtVc2VyIElkPXNhO1Bhc3N3b3JkPVYwMVBUMHk1O1RydXN0U2VydmVyQ2VydGlmaWNhdGU9VHJ1ZTtFbmNyeXB0PUZhbHNlOyIgLz48UXVlcnkgVHlwZT0iU3RvcmVkUHJvY1F1ZXJ5IiBOYW1lPSJxY2FsbF9jZW50X2dldF9leHRlbnNpb25zX3N0YXRpc3RpY3NfYnlfcXVldWVzIj48UGFyYW1ldGVyIE5hbWU9IkBwZXJpb2RfZnJvbSIgVHlwZT0iRGV2RXhwcmVzcy5EYXRhQWNjZXNzLkV4cHJlc3Npb24iPihTeXN0ZW0uT2JqZWN0LCBTeXN0ZW0uUHJpdmF0ZS5Db3JlTGliLCBWZXJzaW9uPTguMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49N2NlYzg1ZDdiZWE3Nzk4ZSkoP3BQZXJpb2RGcm9tKTwvUGFyYW1ldGVyPjxQYXJhbWV0ZXIgTmFtZT0iQHBlcmlvZF90byIgVHlwZT0iRGV2RXhwcmVzcy5EYXRhQWNjZXNzLkV4cHJlc3Npb24iPihTeXN0ZW0uT2JqZWN0LCBTeXN0ZW0uUHJpdmF0ZS5Db3JlTGliLCBWZXJzaW9uPTguMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49N2NlYzg1ZDdiZWE3Nzk4ZSkoP3BQZXJpb2RUbyk8L1BhcmFtZXRlcj48UGFyYW1ldGVyIE5hbWU9IkBxdWV1ZV9kbnMiIFR5cGU9IkRldkV4cHJlc3MuRGF0YUFjY2Vzcy5FeHByZXNzaW9uIj4oU3lzdGVtLlN0cmluZykoP3BRdWV1ZURucyk8L1BhcmFtZXRlcj48UGFyYW1ldGVyIE5hbWU9IkB3YWl0X2ludGVydmFsIiBUeXBlPSJEZXZFeHByZXNzLkRhdGFBY2Nlc3MuRXhwcmVzc2lvbiI+KFN5c3RlbS5TdHJpbmcpKD9wV2FpdEludGVydmFsKTwvUGFyYW1ldGVyPjxQcm9jTmFtZT5xY2FsbF9jZW50X2dldF9leHRlbnNpb25zX3N0YXRpc3RpY3NfYnlfcXVldWVzPC9Qcm9jTmFtZT48L1F1ZXJ5PjxSZXN1bHRTY2hlbWE+PERhdGFTZXQgTmFtZT0ic3FsRGF0YVNvdXJjZTMiPjxWaWV3IE5hbWU9InFjYWxsX2NlbnRfZ2V0X2V4dGVuc2lvbnNfc3RhdGlzdGljc19ieV9xdWV1ZXMiPjxGaWVsZCBOYW1lPSJxdWV1ZV9kbiIgVHlwZT0iU3RyaW5nIiAvPjxGaWVsZCBOYW1lPSJxdWV1ZV9kaXNwbGF5X25hbWUiIFR5cGU9IlN0cmluZyIgLz48RmllbGQgTmFtZT0iZXh0ZW5zaW9uX2RuIiBUeXBlPSJTdHJpbmciIC8+PEZpZWxkIE5hbWU9ImV4dGVuc2lvbl9kaXNwbGF5X25hbWUiIFR5cGU9IlN0cmluZyIgLz48RmllbGQgTmFtZT0icXVldWVfcmVjZWl2ZWRfY291bnQiIFR5cGU9IkludDMyIiAvPjxGaWVsZCBOYW1lPSJleHRlbnNpb25fYW5zd2VyZWRfY291bnQiIFR5cGU9IkludDMyIiAvPjxGaWVsZCBOYW1lPSJ0YWxrX3RpbWUiIFR5cGU9IlVua25vd24iIC8+PEZpZWxkIE5hbWU9ImF2Z190YWxrX3RpbWUiIFR5cGU9IlVua25vd24iIC8+PEZpZWxkIE5hbWU9ImF2Z19hbnN3ZXJfdGltZSIgVHlwZT0iVW5rbm93biIgLz48L1ZpZXc+PC9EYXRhU2V0PjwvUmVzdWx0U2NoZW1hPjxDb25uZWN0aW9uT3B0aW9ucyBDbG9zZUNvbm5lY3Rpb249InRydWUiIC8+PC9TcWxEYXRhU291cmNlPg==" />
   </ComponentStorage>
   <ObjectStorage>
     <Item1 ObjectType="DevExpress.XtraReports.Serialization.ObjectStorageInfo, DevExpress.XtraReports.v25.2" Ref="2" Content="System.DateTime" Type="System.Type" />
+    <Item2 ObjectType="DevExpress.XtraReports.Serialization.ObjectStorageInfo, DevExpress.XtraReports.v25.2" Ref="8" Content="System.Int32" Type="System.Type" />
   </ObjectStorage>
 </XtraReportsLayoutSerializer>

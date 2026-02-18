@@ -50,11 +50,11 @@ By following this guide, you will create a report with three sections:
 ```
 
 Each section uses a different stored procedure:
-- **KPI Cards** → `sp_queue_kpi_summary_shushant` (returns 1 aggregated row)
-- **Area Chart** → `sp_queue_calls_by_date_shushant` (returns 1 row per day)
+- **KPI Cards** → `sp_queue_stats_summary` (returns 1 aggregated row)
+- **Area Chart** → `sp_queue_stats_daily_summary` (returns 1 row per day)
 - **Agent Table** → `qcall_cent_get_extensions_statistics_by_queues` (returns 1 row per agent per queue)
 
-All three SPs accept the same 4 parameters, which become user inputs in the report's PREVIEW panel.
+The KPI and Chart SPs share 5 parameters (`@from`, `@to`, `@queue_dns`, `@sla_seconds`, `@report_timezone`). The Agent SP uses 4 parameters (`@period_from`, `@period_to`, `@queue_dns`, `@wait_interval`). All become user inputs in the report's PREVIEW panel via 6 Report Parameters.
 
 ---
 
@@ -77,20 +77,30 @@ Before starting, ensure:
 
 | SP Name | Purpose | Report Section | Output |
 |---------|---------|----------------|--------|
-| `sp_queue_kpi_summary_shushant` | KPI summary metrics | 8 KPI cards + filter info | Always 1 row |
-| `sp_queue_calls_by_date_shushant` | Daily call volume breakdown | Area chart (Answered vs Abandoned) | 1 row per day |
+| `sp_queue_stats_summary` | KPI summary metrics | 8 KPI cards + filter info | Always 1 row |
+| `sp_queue_stats_daily_summary` | Daily call volume breakdown | Area chart (Answered vs Abandoned) | 1 row per day |
 | `qcall_cent_get_extensions_statistics_by_queues` | Per-agent answered call stats | Agent performance table | 1 row per agent per queue |
 
 ### SP Parameter Types
 
-All three SPs accept the **exact same 4 parameters**:
+**KPI & Chart SPs** (`sp_queue_stats_summary`, `sp_queue_stats_daily_summary`) share these 5 parameters:
+
+| Parameter | SQL Type | Description | Example Value |
+|-----------|----------|-------------|---------------|
+| `@from` | `datetimeoffset` | Report start date (inclusive) | `2026-02-01 00:00:00` |
+| `@to` | `datetimeoffset` | Report end date (inclusive) | `2026-02-17 00:00:00` |
+| `@queue_dns` | `varchar(max)` | Queue DN filter — comma-separated like `8000,8089` | `8000,8089` |
+| `@sla_seconds` | `int` | SLA threshold in seconds | `20` |
+| `@report_timezone` | `varchar(100)` | Timezone for date display (from `sys.time_zone_info`) | `India Standard Time` |
+
+**Agent SP** (`qcall_cent_get_extensions_statistics_by_queues`) uses these 4 parameters:
 
 | Parameter | SQL Type | Description | Example Value |
 |-----------|----------|-------------|---------------|
 | `@period_from` | `datetimeoffset` | Report start date (inclusive) | `2026-02-01 00:00:00` |
-| `@period_to` | `datetimeoffset` | Report end date (inclusive) | `2026-02-16 23:59:59` |
-| `@queue_dns` | `varchar(max)` | Queue DN filter — comma-separated like `8077,8089`, or `%` for all queues | `8000,8089` |
-| `@wait_interval` | `time` | SLA threshold — calls abandoned before this time are excluded | `00:00:20` (20 seconds) |
+| `@period_to` | `datetimeoffset` | Report end date (inclusive) | `2026-02-17 00:00:00` |
+| `@queue_dns` | `varchar(max)` | Queue DN filter — comma-separated | `8000,8089` |
+| `@wait_interval` | `time` | Exclude calls dropped before this interval | `00:00:20` (20 seconds) |
 
 > **Important:** See `SQL_REFERENCE.md` for complete documentation on what each SP does, how the CTEs work, and what each output column means.
 
@@ -107,7 +117,7 @@ All three SPs accept the **exact same 4 parameters**:
 
 ## Step 2: Add Data Source – KPI Summary
 
-This data source powers the KPI cards (Total Calls, Answered, Abandoned, SLA%, Avg Talk, Total Talk, Avg Wait, Callbacks). It connects to the `sp_queue_kpi_summary_shushant` stored procedure, which returns a **single aggregated row** with all the metrics.
+This data source powers the KPI cards (Total Calls, Answered, Abandoned, SLA%, Avg Talk, Total Talk, Avg Wait, Callbacks). It connects to the `sp_queue_stats_summary` stored procedure, which returns a **single aggregated row** with all the metrics.
 
 > **Why this is the first data source:** The KPI SP returns exactly 1 row. We assign it as the report's "main" data source so that all labels in the ReportHeader band can directly reference its fields (like `[total_calls]`, `[answered_calls]`). The chart and agent table will use their own separate data sources.
 
@@ -120,7 +130,7 @@ This data source powers the KPI cards (Total Calls, Answered, Abandoned, SLA%, A
 
 ### Section 2 – Choose stored procedure
 - Expand **"Stored Procedures"**
-- Check ✅ **`sp_queue_kpi_summary_shushant(@period_from, @period_to, @queue_dns, @wait_interval)`**
+- Check ✅ **`sp_queue_stats_summary(@from, @to, @queue_dns, @sla_seconds, @report_timezone)`**
 
 ### Section 4 – Configure query parameters
 
@@ -128,22 +138,22 @@ This data source powers the KPI cards (Total Calls, Answered, Abandoned, SLA%, A
 
 | Parameter | Type | Value | Why This Setting |
 |-----------|------|-------|------------------|
-| `@period_from` | **Expression** | `#2026-02-01#` | `datetimeoffset` maps to Expression in DevExpress. The `#` marks denote a date literal. |
-| `@period_to` | **Expression** | `#2026-02-16#` | Same as above — DevExpress expression date syntax. |
-| `@queue_dns` | **Expression** | `'%'` | `varchar(max)` maps to Expression. Single quotes denote a string literal. `%` means "all queues". |
-| `@wait_interval` | **Time** | `00:00:20` | SQL `time` type maps to Time dropdown. Enter 20 seconds as SLA threshold. |
+| `@from` | **Expression** | `?pPeriodFrom` | Binds to Report Parameter for dynamic filtering |
+| `@to` | **Expression** | `?pPeriodTo` | Binds to Report Parameter for dynamic filtering |
+| `@queue_dns` | **Expression** | `?pQueueDns` | Binds to Report Parameter for dynamic filtering |
+| `@sla_seconds` | **Expression** | `?pSlaSeconds` | Binds to Report Parameter (integer → SLA in seconds) |
+| `@report_timezone` | **Expression** | `?pReportTimezone` | Binds to Report Parameter (timezone name) |
 
-> **Understanding Parameter Types in the Wizard:**
-> - **Expression:** Used for SQL types that don't have a direct .NET equivalent (like `datetimeoffset` and `varchar(max)`). You enter DevExpress expression syntax.
-> - **Time:** Used for SQL `time` type. You enter a time value directly.
-> - The `#date#` syntax is DevExpress's way of writing date literals in expressions (similar to VB.NET).
-> - The `'text'` syntax (single quotes) is DevExpress's string literal format.
-> - These are **temporary test values** for the Designer to discover the output schema. In Step 13, we'll replace them with `?paramName` bindings to Report Parameters.
+> **Understanding `?paramName` Syntax:**
+> - The `?` prefix tells DevExpress to look up the Report Parameter by name.
+> - So `?pPeriodFrom` will use whatever the user enters in the "Start Date" field.
+> - The Report Parameters' default values are used during schema discovery.
+> - All parameters use **Expression** type because `?paramName` is a DevExpress expression.
 
 ### Common Error
 ❌ **"An error occurred while rebuilding a data source schema"**
 - **Cause:** Parameters set with wrong type or empty values. The designer must execute the SP to discover output columns.
-- **Fix:** Ensure all 4 parameters have valid values as shown above. Date expressions MUST use `#` syntax, not plain date strings.
+- **Fix:** Ensure Report Parameters exist with valid default values BEFORE adding the data source. The `?paramName` references need working defaults.
 
 4. Click **Finish**
 
@@ -151,9 +161,9 @@ This data source powers the KPI cards (Total Calls, Answered, Abandoned, SLA%, A
 After finishing, the Field List should show:
 ```
 ▸ sqlDataSource1
-    ▸ sp_queue_kpi_summary_shushant
-        queue_dn
-        queue_display_name
+    ▸ sp_queue_stats_summary
+        queue_group
+        description
         total_calls
         abandoned_calls
         answered_calls
@@ -162,8 +172,14 @@ After finishing, the Field List should show:
         answered_within_sla_percent
         serviced_callbacks
         total_talking
-        mean_talking
-        avg_waiting
+        mean_talking_time
+        avg_wait_time
+        longest_wait_time
+        period_from_utc
+        period_to_utc
+        period_from_local
+        period_to_local
+        report_timezone_used
   ? Parameters
 ```
 
@@ -178,7 +194,7 @@ This step tells the entire report to use the KPI data source as its "default" da
 1. Click on the **report surface background** (not on any control) — or click **"Report"** at the top of the Report Explorer
 2. In the **Properties panel** (right side, click the gear ⚙️ icon if not visible), find:
    - **Data Source** → select **`sqlDataSource1`**
-   - **Data Member** → select **`sp_queue_kpi_summary_shushant`**
+   - **Data Member** → select **`sp_queue_stats_summary`**
 
 This tells the report to use the KPI stored procedure as its main data source. The KPI cards in the ReportHeader can now bind to fields like `total_calls`, `answered_calls`, etc.
 
@@ -207,9 +223,9 @@ Repeat Step 4 for each card — expand the card in Report Explorer, click the va
 | pnlCard2 | pnlCard2Value | `FormatString('{0:N0}', [answered_calls])` | Answered |
 | pnlCard3 | pnlCard3Value | `FormatString('{0:N0}', [abandoned_calls])` | Abandoned |
 | pnlCard4 | pnlCard4Value | `FormatString('{0:N1}%', [answered_within_sla_percent])` | SLA % |
-| pnlCard5 | pnlCard5Value | `[mean_talking]` | Avg Talk |
+| pnlCard5 | pnlCard5Value | `[mean_talking_time]` | Avg Talk |
 | pnlCard6 | pnlCard6Value | `[total_talking]` | Total Talk |
-| pnlCard7 | pnlCard7Value | `[avg_waiting]` | Avg Wait |
+| pnlCard7 | pnlCard7Value | `[avg_wait_time]` | Avg Wait |
 | pnlCard8 | pnlCard8Value | `FormatString('{0:N0}', [serviced_callbacks])` | Callbacks |
 
 > **Notes:**
@@ -226,21 +242,22 @@ The filter info panel (`pnlFilterInfo`) shows 3 labels at the top-right of the r
 2. In Properties, click the **`f`** button next to **Text**
 3. Enter the expression:
    ```
-   'Queue DN: ' + [queue_dn] + ' - ' + [queue_display_name]
+   'Queue: ' + [description]
    ```
+   > **Note:** The new `sp_queue_stats_summary` returns a `description` field that combines queue DN and display name (e.g., `"8089 - Cedar wallboard queue-005"`). The old SP returned separate `queue_dn` and `queue_display_name` fields.
 4. Click **OK**
 
 5. **Click `lblDateRange`** → set Text expression:
    ```
-   'Period: ' + FormatString('{0:MMM dd, yyyy}', #2026-02-01#) + ' - ' + FormatString('{0:MMM dd, yyyy}', #2026-02-16#)
+   'Period: ' + FormatString('{0:MMM dd, yyyy}', [Parameters.pPeriodFrom]) + ' - ' + FormatString('{0:MMM dd, yyyy}', [Parameters.pPeriodTo])
    ```
 
 6. **Click `lblSLAInfo`** → set Text expression:
    ```
-   'SLA Threshold: 00:00:20'
+   'SLA Threshold: ' + ToStr([Parameters.pSlaSeconds]) + ' seconds'
    ```
 
-> **Note:** The date range and SLA labels use hardcoded values for now. Later (Step 13), we'll create Report Parameters and replace these with `[Parameters.pPeriodFrom]` etc.
+> **Note:** Since Report Parameters are created before data sources (Step 2), the filter info labels can reference `[Parameters.pPeriodFrom]`, `[Parameters.pPeriodTo]`, and `[Parameters.pSlaSeconds]` directly. No need for hardcoded values.
 
 ---
 
@@ -265,21 +282,22 @@ This data source powers the area chart showing daily call trends.
 1. Click **"+ Add Data Source"** in the Field List panel
 2. Select **"Database"** → Next
 3. Choose **"3CX Exporter Production Database"** connection → Next
-4. Select **"Stored Procedures"** → check ✅ **`sp_queue_calls_by_date_shushant`** → Next
-5. Configure parameters (same pattern as Step 2):
+4. Select **"Stored Procedures"** → check ✅ **`sp_queue_stats_daily_summary(@from, @to, @queue_dns, @sla_seconds, @report_timezone)`** → Next
+5. Configure parameters (same pattern as Step 2 — all use Expression type with `?paramName`):
 
    | Parameter | Type | Value |
    |-----------|------|-------|
-   | `@period_from` | **Expression** | `#2026-02-01#` |
-   | `@period_to` | **Expression** | `#2026-02-16#` |
-   | `@queue_dns` | **Expression** | `'%'` |
-   | `@wait_interval` | **Time** | `00:00:20` |
+   | `@from` | **Expression** | `?pPeriodFrom` |
+   | `@to` | **Expression** | `?pPeriodTo` |
+   | `@queue_dns` | **Expression** | `?pQueueDns` |
+   | `@sla_seconds` | **Expression** | `?pSlaSeconds` |
+   | `@report_timezone` | **Expression** | `?pReportTimezone` |
 
 6. Click **Finish**
 
 ### Expected Result
 Field List shows `sqlDataSource2` with fields:
-- `queue_dn`, `call_date`, `total_calls`, `answered_calls`, `abandoned_calls`, `answered_within_sla`, `answer_rate`, `sla_percent`
+- `report_date_local`, `total_calls`, `answered_calls`, `abandoned_calls`, `answered_percent`, `answered_within_sla`, `answered_within_sla_percent`, `total_talking`, `mean_talking_time`, `avg_wait_time`, `longest_wait_time`, `period_from_utc`, `period_to_utc`, `report_timezone_used`
 
 ---
 
@@ -293,13 +311,13 @@ The chart displays call trends over time. It needs two "series" (data lines): on
 2. Click **"Run Designer..."** button (appears in the top-right corner of the chart when selected)
 3. In the Chart Designer dialog:
    - Set **Data Source** = `sqlDataSource2`
-   - Set **Data Member** = `sp_queue_calls_by_date_shushant`
+   - Set **Data Member** = `sp_queue_stats_daily_summary`
 
 4. **Add Series 1 — Answered Calls:**
    - Click **"+"** to add a new series
    - **Series Type:** Area (fills the space under the line with a semi-transparent color)
    - **Name:** `Answered`
-   - **Argument Data Member:** `call_date` (this becomes the X-axis — dates)
+   - **Argument Data Member:** `report_date_local` (this becomes the X-axis — dates)
    - **Value Data Member:** `answered_calls` (this becomes the Y-axis — count)
    - **Color:** Green (`#2ecc71` or similar)
 
@@ -307,7 +325,7 @@ The chart displays call trends over time. It needs two "series" (data lines): on
    - Click **"+"** to add another series
    - **Series Type:** Area
    - **Name:** `Abandoned`
-   - **Argument Data Member:** `call_date` (same X-axis as above — both series share dates)
+   - **Argument Data Member:** `report_date_local` (same X-axis as above — both series share dates)
    - **Value Data Member:** `abandoned_calls`
    - **Color:** Red (`#e74c3c` or similar)
 
@@ -317,12 +335,12 @@ The chart displays call trends over time. It needs two "series" (data lines): on
 
 > **How the chart reads data:** The SP returns rows like:
 > ```
-> call_date    | answered_calls | abandoned_calls
-> 2026-02-01   | 15             | 3
-> 2026-02-02   | 22             | 5
-> 2026-02-03   | 18             | 2
+> report_date_local | answered_calls | abandoned_calls
+> 2026-02-01        | 15             | 3
+> 2026-02-02        | 22             | 5
+> 2026-02-03        | 18             | 2
 > ```
-> The chart plots each row as a point: X = call_date, Y = answered_calls (green) and Y = abandoned_calls (red). The Area type fills between the line and the X-axis.
+> The chart plots each row as a point: X = report_date_local, Y = answered_calls (green) and Y = abandoned_calls (red). The Area type fills between the line and the X-axis.
 
 ---
 
@@ -334,14 +352,16 @@ This data source powers the Agent Performance table.
 2. Select **"Database"** → Next
 3. Choose **"3CX Exporter Production Database"** connection → Next
 4. Select **"Stored Procedures"** → check ✅ **`qcall_cent_get_extensions_statistics_by_queues`** → Next
-5. Configure parameters (same pattern as before):
+5. Configure parameters (**Agent SP uses different parameter names** from the KPI/Chart SPs):
 
    | Parameter | Type | Value |
    |-----------|------|-------|
-   | `@period_from` | **Expression** | `#2026-02-01#` |
-   | `@period_to` | **Expression** | `#2026-02-17#` |
-   | `@queue_dns` | **Expression** | `'%'` |
-   | `@wait_interval` | **Time** | `00:00:20` |
+   | `@period_from` | **Expression** | `?pPeriodFrom` |
+   | `@period_to` | **Expression** | `?pPeriodTo` |
+   | `@queue_dns` | **Expression** | `?pQueueDns` |
+   | `@wait_interval` | **Expression** | `?pWaitInterval` |
+
+   > **Note:** The Agent SP uses `@period_from`/`@period_to` (not `@from`/`@to` like the KPI/Chart SPs) and `@wait_interval` (not `@sla_seconds`). This is because the Agent SP is a different, older stored procedure.
 
 6. Click **Finish**
 
@@ -442,6 +462,8 @@ Click **PREVIEW** to verify all sections render:
 
 Report Parameters create input fields that appear when the user clicks PREVIEW.
 
+> **IMPORTANT:** Report Parameters MUST be created BEFORE adding data sources, because the data source wizard steps (Steps 2, 8, 10) use `?paramName` syntax that references these parameters. The default values are used during schema discovery.
+
 1. In the **Field List** panel (right side), find **"Parameters"** at the bottom
 2. Click the **"+"** button next to Parameters
 
@@ -466,9 +488,24 @@ Report Parameters create input fields that appear when the user clicks PREVIEW.
 
 ### Parameter 4: pWaitInterval
 - **Name:** `pWaitInterval`
-- **Description:** `SLA Threshold`
+- **Description:** `Wait Interval (Agent SP)`
 - **Type:** `String`
 - **Value:** `00:00:20`
+
+### Parameter 5: pSlaSeconds
+- **Name:** `pSlaSeconds`
+- **Description:** `SLA Threshold (seconds)`
+- **Type:** `Number (Int32)`
+- **Visible:** Yes
+- **Value:** `20`
+
+### Parameter 6: pReportTimezone
+- **Name:** `pReportTimezone`
+- **Description:** `Report Timezone`
+- **Type:** `String`
+- **Value:** `India Standard Time`
+
+> **Note:** `pWaitInterval` is a **time string** (e.g., `00:00:20`) used only by the Agent SP. `pSlaSeconds` is an **integer** (e.g., `20`) used by the KPI and Chart SPs. They represent similar concepts but in different formats for different stored procedures.
 
 ### Expected Result
 Field List shows:
@@ -478,126 +515,66 @@ Field List shows:
     pPeriodTo
     pQueueDns
     pWaitInterval
+    pSlaSeconds
+    pReportTimezone
 ```
 
 Preview mode shows a **PREVIEW PARAMETERS** panel on the right with input fields for each parameter plus RESET and SUBMIT buttons.
 
 ---
 
-## Step 13: Re-bind Data Source Parameters to Report Parameters
+## Step 13: Verify Data Source Parameter Bindings
 
-This is the **most critical step** in the entire process. It connects the user-input fields (Report Parameters) to the stored procedure parameters (Data Source Parameters), creating a dynamic report that responds to user selections.
+Since we created Report Parameters (Step 12) **before** adding data sources, all three data sources were configured with `?paramName` bindings from the start. No re-binding is needed.
 
-Since the data source parameter values **cannot be edited after creation** through the Designer UI, we need to **remove and re-create** each data source with parameter values pointing to the Report Parameters.
+### Verify the Binding Chain
 
-> **The binding chain you're creating:**
-> ```
-> User types "2026-02-01" in Preview panel
->   → Report Parameter pPeriodFrom = 2026-02-01
->     → Data Source Parameter @period_from = ?pPeriodFrom
->       → SQL Server receives: @period_from = '2026-02-01'
->         → WHERE qcv.time_start BETWEEN '2026-02-01' AND ...
-> ```
->
-> The `?paramName` syntax tells DevExpress: "Look up the Report Parameter named `paramName` and use its current value."
-
-> ⚠️ **WHY THIS STEP IS NEEDED:** When we first created the data sources (Steps 2, 8, 10), we used hardcoded values like `#2026-02-01#`. Now that we have Report Parameters (pPeriodFrom, pPeriodTo, etc.), we need the data sources to use those parameters so the user can control the report from the PREVIEW PARAMETERS panel.
->
-> ⚠️ **WHY WE CAN'T JUST EDIT:** DevExpress Data Source Wizard is a one-time configuration. Once you click Finish, the parameter values are locked in the .repx XML. The only way to change them is to delete the data source and create a new one.
-
-### Step 13a: Remove Existing Data Sources
-
-1. In the **Field List** panel, right-click **sqlDataSource1** → **"Remove Data Source"**
-2. Right-click **sqlDataSource2** → **"Remove Data Source"**
-3. Right-click **sqlDataSource3** → **"Remove Data Source"**
-
-> **Note:** Removing data sources will break the existing bindings (KPI cards, chart, agent table). That's OK — we will re-bind everything after re-adding.
-
-### Step 13b: Re-add sqlDataSource1 (KPIs) with Report Parameter Bindings ✅
-
-1. Click **"+ Add Data Source"** → Database → Next
-2. Choose **"3CX Exporter Production Database"** → Next
-3. Select **"Stored Procedures"** → check ✅ **`sp_queue_kpi_summary_shushant`** → Next
-4. Configure parameters — **this time use `?paramName` syntax** to reference report parameters:
-
-   | Parameter | Type | Value |
-   |-----------|------|-------|
-   | `@period_from` | **Expression** | `?pPeriodFrom` |
-   | `@period_to` | **Expression** | `?pPeriodTo` |
-   | `@queue_dns` | **Expression** | `?pQueueDns` |
-   | `@wait_interval` | **Expression** | `?pWaitInterval` |
-
-   > **KEY SYNTAX:** The `?` prefix tells DevExpress to look up the Report Parameter by name. So `?pPeriodFrom` will use whatever the user enters in the "Start Date" field.
-
-5. Click **Finish**
-
-> **CONFIRMED WORKING:** The `?paramName` syntax works for **all 4 parameters** including `@wait_interval`. The Report Parameters' default values are used during schema discovery, so no schema rebuild error occurs.
-
-### Step 13c: Re-add sqlDataSource2 (Chart Data) with Report Parameter Bindings ✅
-
-1. Click **"+ Add Data Source"** → Database → Next
-2. Choose **"3CX Exporter Production Database"** → Next
-3. Select **"Stored Procedures"** → check ✅ **`sp_queue_calls_by_date_shushant`** → Next
-4. Configure parameters:
-
-   | Parameter | Type | Value |
-   |-----------|------|-------|
-   | `@period_from` | **Expression** | `?pPeriodFrom` |
-   | `@period_to` | **Expression** | `?pPeriodTo` |
-   | `@queue_dns` | **Expression** | `?pQueueDns` |
-   | `@wait_interval` | **Expression** | `?pWaitInterval` |
-
-5. Click **Finish**
-
-### Step 13d: Re-add sqlDataSource3 (Agent Data) with Report Parameter Bindings ✅
-
-1. Click **"+ Add Data Source"** → Database → Next
-2. Choose **"3CX Exporter Production Database"** → Next
-3. Select **"Stored Procedures"** → check ✅ **`qcall_cent_get_extensions_statistics_by_queues`** → Next
-4. Configure parameters:
-
-   | Parameter | Type | Value |
-   |-----------|------|-------|
-   | `@period_from` | **Expression** | `?pPeriodFrom` |
-   | `@period_to` | **Expression** | `?pPeriodTo` |
-   | `@queue_dns` | **Expression** | `?pQueueDns` |
-   | `@wait_interval` | **Expression** | `?pWaitInterval` |
-
-5. Click **Finish**
-
-### Step 13e: Re-bind Report, Chart, and Agent Band ✅
-
-After re-creating the data sources, re-attach them:
-
-1. **Report (KPI cards):** Click on the report background → Properties → Data Source = `sqlDataSource1`, Data Member = `sp_queue_kpi_summary_shushant`
-
-2. **Chart:** Click the chart → Properties panel → set **Data Source** = `sqlDataSource2`, **Data Member** = `sp_queue_calls_by_date_shushant`. Alternatively, click "Run Designer..." to verify series are still linked.
-
-3. **AgentDetail band:** Select "AgentDetail (Detail Report)" from the Properties dropdown → Data Source = `sqlDataSource3`, Data Member = `qcall_cent_get_extensions_statistics_by_queues`
-
-> **Note:** If chart series or cell bindings broke during the remove/re-add, re-bind them following Steps 9 and 11c.
-
-### Step 13f: Update Filter Info Expressions ✅
-
-Update `lblDateRange` expression to use the Report Parameters instead of hardcoded dates:
+The binding chain works like this:
 ```
-'Period: ' + FormatString('{0:MMM dd, yyyy}', [Parameters.pPeriodFrom]) + ' - ' + FormatString('{0:MMM dd, yyyy}', [Parameters.pPeriodTo])
+User types "2026-02-01" in Preview panel
+  → Report Parameter pPeriodFrom = 2026-02-01
+    → Data Source Parameter @from = ?pPeriodFrom
+      → SQL Server receives: @from = '2026-02-01'
+        → SP filters data for that date range
 ```
 
-Update `lblQueueFilter` expression:
-```
-'Queue DN: ' + [queue_dn] + ' - ' + [queue_display_name]
-```
+### Checklist
 
-Update `lblSLAInfo` expression:
-```
-'SLA Threshold: ' + [Parameters.pWaitInterval]
-```
+Verify each data source has the correct parameter bindings by clicking on it in the Field List:
 
-> ✅ **Verified:** Filter info panel now shows dynamic values from the parameters:
-> - "Queue DN: 8089 - Cedar wallboard queue-005"
-> - "Period: Feb 01, 2026 - Feb 16, 2026"
-> - "SLA Threshold: 00:00:20"
+**sqlDataSource1 (KPI Summary — `sp_queue_stats_summary`):**
+| SP Parameter | Bound To |
+|-------------|----------|
+| `@from` | `?pPeriodFrom` |
+| `@to` | `?pPeriodTo` |
+| `@queue_dns` | `?pQueueDns` |
+| `@sla_seconds` | `?pSlaSeconds` |
+| `@report_timezone` | `?pReportTimezone` |
+
+**sqlDataSource2 (Chart — `sp_queue_stats_daily_summary`):**
+| SP Parameter | Bound To |
+|-------------|----------|
+| `@from` | `?pPeriodFrom` |
+| `@to` | `?pPeriodTo` |
+| `@queue_dns` | `?pQueueDns` |
+| `@sla_seconds` | `?pSlaSeconds` |
+| `@report_timezone` | `?pReportTimezone` |
+
+**sqlDataSource3 (Agents — `qcall_cent_get_extensions_statistics_by_queues`):**
+| SP Parameter | Bound To |
+|-------------|----------|
+| `@period_from` | `?pPeriodFrom` |
+| `@period_to` | `?pPeriodTo` |
+| `@queue_dns` | `?pQueueDns` |
+| `@wait_interval` | `?pWaitInterval` |
+
+> **Note:** If you need to change parameter bindings after creation, DevExpress does not allow editing data source parameters in the UI. You must **remove** the data source and **re-add** it with the correct `?paramName` values.
+
+### Verify Report/Chart/Agent Band Assignments
+
+1. **Report (KPI cards):** Click report background → Properties → Data Source = `sqlDataSource1`, Data Member = `sp_queue_stats_summary`
+2. **Chart:** Click chart → Run Designer → Data Source = `sqlDataSource2`, Data Member = `sp_queue_stats_daily_summary`
+3. **AgentDetail band:** Select "AgentDetail (Detail Report)" from Properties dropdown → Data Source = `sqlDataSource3`, Data Member = `qcall_cent_get_extensions_statistics_by_queues`
 
 ---
 
@@ -659,15 +636,41 @@ To verify parameters work dynamically:
 
 ---
 
+## Step 15: Add Page Footer (Date/Time + Page Numbers)
+
+1. **Add the PageFooter band** (if not already present):
+   - Right-click on the report design surface → **Insert Band** → **PageFooter**
+
+2. **Add Current Date/Time** (left side of footer):
+   - From the **Toolbox**, drag an **XRPageInfo** control into the left side of the **PageFooter** band
+   - In **Properties**, set:
+     - **Page Information** → `DateTime`
+     - **Format String** → click `...` → enter `{0:MMM dd, yyyy hh:mm tt}`
+     - **Text Alignment** → `TopLeft`
+     - Adjust **Font** and **Size** as needed
+
+3. **Add Page Numbers** (right side of footer):
+   - Drag another **XRPageInfo** control into the right side of the **PageFooter** band
+   - In **Properties**, set:
+     - **Page Information** → `NumberOfTotal`
+     - **Format String** → click `...` → enter `Page {0} of {1}`
+     - **Text Alignment** → `TopRight`
+
+4. **Save** the report (Ctrl+S)
+
+> **Note:** Both controls use the **XRPageInfo** type — just with different `Page Information` property values.
+
+---
+
 ## Issues & Fixes Log
 
 | # | Issue | Cause | Fix |
 |---|-------|-------|-----|
-| 1 | Schema rebuild error on Finish | Date params set as "Expression" with plain date string (e.g., `2026-02-01`) | Use DevExpress date literal syntax: `#2026-02-01#` |
-| 2 | `@wait_interval` can't be changed to Expression (initial setup) | Designer restricts `time` SQL type to Time/Expression only | Keep as **Time** type with value `00:00:20` for initial setup. When re-creating with `?pWaitInterval`, **Expression** type works fine. |
-| 3 | `@period_from` Type dropdown shows only Object/Expression | `datetimeoffset` SQL type maps to Object in wizard | Use **Expression** type with `#date#` syntax |
-| 4 | Cannot edit data source parameters after creation | DevExpress Designer UI does not allow modifying parameter values once a data source is created | **Remove** the data source entirely and **re-add** it with correct parameter bindings |
-| 5 | Selected wrong band for AgentDetail | Two similar bands: "AgentDetail (DetailReportBand)" vs "AgentDetailBand (Detail)" | Always select **"AgentDetail (Detail Report)"** from the Properties dropdown — this is the parent container that has Data Source/Data Member properties |
+| 1 | Schema rebuild error on Finish | SP parameters have wrong types or empty values | Ensure Report Parameters exist with valid default values BEFORE adding data sources. Use **Expression** type for all `?paramName` bindings. |
+| 2 | `@wait_interval` shows as Time type | Designer infers SQL `time` type as Time dropdown | Use **Expression** type (not Time) when binding with `?pWaitInterval`. |
+| 3 | Cannot edit data source parameters after creation | DevExpress Designer UI does not allow modifying parameter values once a data source is created | **Remove** the data source entirely and **re-add** it with correct parameter bindings |
+| 4 | Selected wrong band for AgentDetail | Two similar bands: "AgentDetail (DetailReportBand)" vs "AgentDetailBand (Detail)" | Always select **"AgentDetail (Detail Report)"** from the Properties dropdown — this is the parent container that has Data Source/Data Member properties |
+| 5 | Chart series bindings lost after save | DevExpress `SaveLayoutToXml()` strips `ArgumentDataMember` and `ValueDataMembersSerializable` from chart series when the SqlDataSource schema can't be validated at serialization time | **Fixed in code** — `FileReportStorageService.SetData()` now captures chart bindings before serialization and post-processes the XML to restore them. No user action required. |
 
 ---
 
@@ -707,8 +710,8 @@ PageFooter: Date/time + Page X of Y
 
 | Data Source | Stored Procedure | Parameters | Used By |
 |-------------|------------------|------------|--------|
-| sqlDataSource1 | `sp_queue_kpi_summary_shushant` | `?pPeriodFrom`, `?pPeriodTo`, `?pQueueDns`, `?pWaitInterval` | Report (KPI cards), Filter Info panel |
-| sqlDataSource2 | `sp_queue_calls_by_date_shushant` | `?pPeriodFrom`, `?pPeriodTo`, `?pQueueDns`, `?pWaitInterval` | Area chart (Answered + Abandoned) |
+| sqlDataSource1 | `sp_queue_stats_summary` | `?pPeriodFrom`, `?pPeriodTo`, `?pQueueDns`, `?pSlaSeconds`, `?pReportTimezone` | Report (KPI cards), Filter Info panel |
+| sqlDataSource2 | `sp_queue_stats_daily_summary` | `?pPeriodFrom`, `?pPeriodTo`, `?pQueueDns`, `?pSlaSeconds`, `?pReportTimezone` | Area chart (Answered + Abandoned) |
 | sqlDataSource3 | `qcall_cent_get_extensions_statistics_by_queues` | `?pPeriodFrom`, `?pPeriodTo`, `?pQueueDns`, `?pWaitInterval` | Agent performance table |
 
 ## Report Parameters Summary
@@ -717,8 +720,10 @@ PageFooter: Date/time + Page X of Y
 |-----------|-------------|------|---------------|
 | `pPeriodFrom` | Start Date | Date and Time | 2/1/2026, 12:00 AM |
 | `pPeriodTo` | End Date | Date and Time | 2/17/2026, 12:00 AM |
-| `pQueueDns` | Queue DN (e.g., 8077 or % for all) | String | 8089 |
-| `pWaitInterval` | SLA Threshold | String | 00:00:20 |
+| `pQueueDns` | Queue DN (e.g., 8077 or % for all) | String | 8077 |
+| `pWaitInterval` | Wait Interval (Agent SP) | String | 00:00:20 |
+| `pSlaSeconds` | SLA Threshold (seconds) | Number (Int32) | 20 |
+| `pReportTimezone` | Report Timezone | String | India Standard Time |
 
 ---
 
@@ -749,11 +754,13 @@ When you click **Save** in the Designer:
 ### Key Takeaways
 
 - **`?paramName`** syntax binds data source SP parameters to Report Parameters
-- **All 4 SP parameters** can use Expression type with `?paramName` (including `@wait_interval`)
+- **All SP parameters** can use Expression type with `?paramName`
+- **Create Report Parameters FIRST** (Step 12) before adding data sources, so `?paramName` references resolve during schema discovery
 - Data sources **cannot be edited after creation** — remove and re-add if changes are needed
+- KPI and Chart SPs use `@from`, `@to`, `@queue_dns`, `@sla_seconds`, `@report_timezone`
+- Agent SP uses `@period_from`, `@period_to`, `@queue_dns`, `@wait_interval` (different parameter names!)
 - Always select **"AgentDetail (Detail Report)"** (not "AgentDetailBand") when setting Data Source on the agent sub-report
 - The chart requires both **Data Source** and **Data Member** to be set — missing either results in a blank chart
-- Use `#date#` syntax for date literals in expressions, `'text'` for string literals
 - Always preview with different parameter values to verify the report works dynamically
 
 ### Creating Variations
@@ -773,13 +780,13 @@ To create a new report based on this template:
 | Symptom | Cause | Solution |
 |---------|-------|----------|
 | "An error occurred while rebuilding a data source schema" | SP parameters have wrong types or empty values | Use exactly the types shown in this guide: Expression for dates/strings, Time for `@wait_interval`. Date values must use `#date#` syntax. |
-| Chart appears blank after binding | Missing DataMember property on the chart | Click the chart → Properties → verify both Data Source AND Data Member are set. Data Member should be the SP name (e.g., `sp_queue_calls_by_date_shushant`). |
-| KPI cards show field names instead of values | Data Source not set on the Report itself | Click the report background → Properties → set Data Source = sqlDataSource1, Data Member = SP name. |
+| Chart appears blank after binding | Missing DataMember property on the chart | Click the chart → Properties → verify both Data Source AND Data Member are set. Data Member should be the SP name (e.g., `sp_queue_stats_daily_summary`). |
+| KPI cards show field names instead of values | Data Source not set on the Report itself | Click the report background → Properties → set Data Source = sqlDataSource1, Data Member = `sp_queue_stats_summary`. |
 | Agent table shows no data rows | Data Source set on wrong band | Verify you set Data Source on "AgentDetail (Detail Report)", NOT on "AgentDetailBand (Detail)". |
 | Preview shows all zeros / empty | Using hardcoded dates outside available data range | Check that your date parameters fall within the data range in the database. Try a known range. |
 | "Cannot find connection" error | Connection name in .repx doesn't match any registered connection | Verify `ReportDataSourceProviders.cs` has the connection name registered in `LoadConnection()`. |
 | Parameters panel doesn't appear in Preview | Report Parameters not marked as Visible | Check each parameter's Visible property is set to Yes/True. |
-| `@wait_interval` won't accept `?pWaitInterval` | Used Time type during re-bind instead of Expression | When re-creating data sources in Step 13, set `@wait_interval` type to **Expression** (not Time). The `?` syntax requires Expression type. |
+| `@wait_interval` won't accept `?pWaitInterval` | Used Time type during re-bind instead of Expression | When creating data sources, set `@wait_interval` type to **Expression** (not Time). The `?` syntax requires Expression type. |
 
 ### Tips for Success
 

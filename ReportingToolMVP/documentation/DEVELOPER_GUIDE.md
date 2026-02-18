@@ -125,8 +125,8 @@ This is a **standalone .NET 8 Blazor Server application** for creating, editing,
 │   │  Database: 3CX Exporter                                      │       │
 │   │                                                             │       │
 │   │  Stored Procedures:                                          │       │
-│   │  ├── sp_queue_kpi_summary_shushant        → KPI cards       │       │
-│   │  ├── sp_queue_calls_by_date_shushant      → Area chart      │       │
+│   │  ├── sp_queue_stats_summary               → KPI cards       │       │
+│   │  ├── sp_queue_stats_daily_summary         → Area chart      │       │
 │   │  └── qcall_cent_get_extensions_statistics  → Agent table    │       │
 │   │         _by_queues                                           │       │
 │   └─────────────────────────────────────────────────────────────┘       │
@@ -162,7 +162,7 @@ For each SqlDataSource in the report:
   │           └── Returns SqlDataConnection with connection string
   │
   ├── Executes stored procedure with bound parameters
-  │     (e.g., EXEC sp_queue_kpi_summary_shushant @period_from, @period_to, ...)
+  │     (e.g., EXEC sp_queue_stats_summary @from, @to, @queue_dns, @sla_seconds, @report_timezone)
   │
   └── Result set feeds into report bands (KPI cards, chart, table)
        │
@@ -212,8 +212,8 @@ VoipTools-ReportingToolMVP/                    ← Git repository root
 │   ├── ReportingToolMVP.Tests.csproj          ← Test project file (Dapper, xUnit)
 │   ├── appsettings.Test.json                  ← Test DB connection config
 │   ├── DatabaseTestBase.cs                    ← Shared test base class
-│   ├── KpiStoredProcTests.cs                  ← Tests for sp_queue_kpi_summary_shushant
-│   ├── ChartStoredProcTests.cs                ← Tests for sp_queue_calls_by_date_shushant
+│   ├── KpiStoredProcTests.cs                  ← Tests for sp_queue_stats_summary
+│   ├── ChartStoredProcTests.cs                ← Tests for sp_queue_stats_daily_summary
 │   └── AgentStoredProcTests.cs                ← Tests for qcall_cent_get_extensions_statistics_by_queues
 │
 └── ReportingToolMVP/                          ← ★ MAIN APPLICATION PROJECT
@@ -326,7 +326,7 @@ VoipTools-ReportingToolMVP/                    ← Git repository root
 5. For each SqlDataSource:
    a. CustomConnectionProviderFactory.Create() → returns CustomConnectionProviderService
    b. Service.LoadConnection("3CX_Exporter_Production") → returns SqlDataConnection
-   c. Engine executes SP: EXEC sp_queue_kpi_summary_shushant @period_from=..., @period_to=...
+   c. Engine executes SP: EXEC sp_queue_stats_summary @from=..., @to=..., @queue_dns=..., @sla_seconds=..., @report_timezone=...
 6. Result sets populate report bands:
    - KPI data → ReportHeader KPI card expressions
    - Chart data → XRChart series (Answered/Abandoned area chart)
@@ -821,8 +821,8 @@ Password: V01PT0y5
 |--------|------|---------|
 | `CallCent_QueueCalls_View` | View | All 3 stored procedures |
 | `extensions_by_queues_view` | View | SP1 (KPIs) + SP3 (Agents) |
-| `sp_queue_kpi_summary_shushant` | Stored Procedure | KPI cards |
-| `sp_queue_calls_by_date_shushant` | Stored Procedure | Area chart |
+| `sp_queue_stats_summary` | Stored Procedure | KPI cards |
+| `sp_queue_stats_daily_summary` | Stored Procedure | Area chart |
 | `qcall_cent_get_extensions_statistics_by_queues` | Stored Procedure | Agent table |
 
 ---

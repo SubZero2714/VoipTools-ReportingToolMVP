@@ -10,11 +10,14 @@ CREATE OR ALTER PROCEDURE [dbo].[qcall_cent_get_extensions_statistics_by_queues]
     @period_from      DATETIMEOFFSET,
     @period_to        DATETIMEOFFSET,
     @queue_dns        VARCHAR(MAX),   -- comma-separated queue DNs
-    @wait_interval    TIME            -- Exclude calls dropped before this interval
+    @wait_interval    VARCHAR(8) = '00:00:20'  -- HH:MM:SS format string (VARCHAR so DevExpress Designer allows Expression binding)
 )
 AS
 BEGIN
     SET NOCOUNT ON;
+
+    -- Convert VARCHAR to TIME internally for comparison
+    DECLARE @wait_time TIME = CAST(@wait_interval AS TIME);
 
     -- CTE 1: Get all qualifying calls from queue
     ;WITH queue_all_calls AS
@@ -36,7 +39,7 @@ BEGIN
                 SELECT LTRIM(value)
                 FROM string_split(@queue_dns, ',')
             ))
-            AND (qcv.is_answered = 1 OR qcv.ring_time >= @wait_interval)
+            AND (qcv.is_answered = 1 OR qcv.ring_time >= @wait_time)
     ),
 
     -- CTE 2: Count total received calls per queue

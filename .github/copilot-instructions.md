@@ -15,9 +15,9 @@ QueuePerformanceDashboardGenerator.cs → generates .repx on startup with XML po
 - `CallCent_QueueCalls_View` – call records with queue metrics (3CX managed)
 - `extensions_by_queues_view` – queue-to-agent mappings with display names (3CX managed)
 - 3 Stored Procedures (custom):
-  - `sp_queue_kpi_summary_shushant` – single aggregated row for KPI cards
-  - `sp_queue_calls_by_date_shushant` – daily call trends for area chart
-  - `qcall_cent_get_extensions_statistics_by_queues` – per-agent performance for table
+  - `sp_queue_stats_summary` – single aggregated row for KPI cards (params: @from, @to, @queue_dns, @sla_seconds, @report_timezone)
+  - `sp_queue_stats_daily_summary` – daily call trends for area chart (same 5 params as above)
+  - `qcall_cent_get_extensions_statistics_by_queues` – per-agent performance for table (params: @period_from, @period_to, @queue_dns, @wait_interval)
 
 ### Key Connection
 - Connection name in .repx: `3CX_Exporter_Production`

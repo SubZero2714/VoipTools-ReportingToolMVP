@@ -14,8 +14,8 @@ namespace ReportingToolMVP.Reports;
 /// SqlDataSources, stored procedure parameters, and expression bindings.
 /// 
 /// SPs used (from SQL/Similar_to_samuel_sirs_report/):
-///   - sp_queue_kpi_summary_shushant       → KPI cards
-///   - sp_queue_calls_by_date_shushant     → Area chart
+///   - sp_queue_stats_summary              → KPI cards
+///   - sp_queue_stats_daily_summary        → Area chart
 ///   - qcall_cent_get_extensions_statistics_by_queues → Agent table
 /// </summary>
 public static class QueuePerformanceDashboardGenerator
@@ -56,10 +56,10 @@ public static class QueuePerformanceDashboardGenerator
         //    The serialized attribute order is: Name, SeriesID, ArgumentScaleType
         xml = xml.Replace(
             "Name=\"Answered\" SeriesID=\"0\" ArgumentScaleType=\"DateTime\"",
-            "Name=\"Answered\" ArgumentScaleType=\"DateTime\" ArgumentDataMember=\"call_date\" ValueDataMembersSerializable=\"answered_calls\" SeriesID=\"0\"");
+            "Name=\"Answered\" ArgumentScaleType=\"DateTime\" ArgumentDataMember=\"report_date_local\" ValueDataMembersSerializable=\"answered_calls\" SeriesID=\"0\"");
         xml = xml.Replace(
             "Name=\"Abandoned\" SeriesID=\"1\" ArgumentScaleType=\"DateTime\"",
-            "Name=\"Abandoned\" ArgumentScaleType=\"DateTime\" ArgumentDataMember=\"call_date\" ValueDataMembersSerializable=\"abandoned_calls\" SeriesID=\"1\"");
+            "Name=\"Abandoned\" ArgumentScaleType=\"DateTime\" ArgumentDataMember=\"report_date_local\" ValueDataMembersSerializable=\"abandoned_calls\" SeriesID=\"1\"");
 
         // 3. CRITICAL: Inject ResultSchema into the chart's StoredProcQuery.
         //    Without ResultSchema, DevExpress can't resolve SP column metadata
@@ -82,8 +82,7 @@ public static class QueuePerformanceDashboardGenerator
                         "<ResultSchema>" +
                         "<DataSet Name=\"dsChartData\">" +
                         "<View Name=\"ChartData\">" +
-                        "<Field Name=\"queue_dn\" Type=\"String\" />" +
-                        "<Field Name=\"call_date\" Type=\"DateTime\" />" +
+                        "<Field Name=\"report_date_local\" Type=\"DateTime\" />" +
                         "<Field Name=\"total_calls\" Type=\"Int32\" />" +
                         "<Field Name=\"answered_calls\" Type=\"Int32\" />" +
                         "<Field Name=\"abandoned_calls\" Type=\"Int32\" />" +
@@ -150,25 +149,41 @@ public static class QueuePerformanceDashboardGenerator
             Value = "00:00:20",
             Visible = true
         };
-        report.Parameters.AddRange(new[] { pPeriodFrom, pPeriodTo, pQueueDns, pWaitInterval });
+        var pSlaSeconds = new DevExpress.XtraReports.Parameters.Parameter
+        {
+            Name = "pSlaSeconds",
+            Description = "SLA Seconds (e.g. 20):",
+            Type = typeof(int),
+            Value = 20,
+            Visible = true
+        };
+        var pReportTimezone = new DevExpress.XtraReports.Parameters.Parameter
+        {
+            Name = "pReportTimezone",
+            Description = "Report Timezone:",
+            Type = typeof(string),
+            Value = "India Standard Time",
+            Visible = true
+        };
+        report.Parameters.AddRange(new[] { pPeriodFrom, pPeriodTo, pQueueDns, pWaitInterval, pSlaSeconds, pReportTimezone });
 
-        // === DATA SOURCE 1: KPIs (sp_queue_kpi_summary_shushant) ===
+        // === DATA SOURCE 1: KPIs (sp_queue_stats_summary) ===
         // SP returns a SINGLE aggregated row for all queues in @queue_dns.
         // No FilterString needed — the SP handles filtering internally.
-        var dsKPIs = CreateStoredProcDataSource("dsKPIs", "KPIs", "sp_queue_kpi_summary_shushant");
+        var dsKPIs = CreateNewSpDataSource("dsKPIs", "KPIs", "sp_queue_stats_summary");
         report.ComponentStorage.Add(dsKPIs);
         report.DataSource = dsKPIs;
         report.DataMember = "KPIs";
 
-        // === DATA SOURCE 2: Chart Data (sp_queue_calls_by_date_shushant) ===
+        // === DATA SOURCE 2: Chart Data (sp_queue_stats_daily_summary) ===
         // Uses StoredProcQuery (same as KPIs/Agents). ResultSchema is injected
         // via XML post-processing in GenerateAndSave() — NOT via
         // ResultSchemaSerializable (which corrupts StoredProcQuery → CustomSqlQuery).
-        var dsChartData = CreateStoredProcDataSource("dsChartData", "ChartData", "sp_queue_calls_by_date_shushant");
+        var dsChartData = CreateNewSpDataSource("dsChartData", "ChartData", "sp_queue_stats_daily_summary");
         report.ComponentStorage.Add(dsChartData);
 
         // === DATA SOURCE 3: Agents (qcall_cent_get_extensions_statistics_by_queues) ===
-        var dsAgents = CreateStoredProcDataSource("dsAgents", "Agents", "qcall_cent_get_extensions_statistics_by_queues");
+        var dsAgents = CreateAgentDataSource("dsAgents", "Agents", "qcall_cent_get_extensions_statistics_by_queues");
         report.ComponentStorage.Add(dsAgents);
 
         // === BANDS ===
@@ -188,14 +203,35 @@ public static class QueuePerformanceDashboardGenerator
         return report;
     }
 
-    private static SqlDataSource CreateStoredProcDataSource(string dsName, string queryName, string spName)
+    /// <summary>Creates data source for the new KPI/Chart SPs (sp_queue_stats_summary, sp_queue_stats_daily_summary)</summary>
+    private static SqlDataSource CreateNewSpDataSource(string dsName, string queryName, string spName)
     {
         var ds = new SqlDataSource(dsName);
         ds.ConnectionName = ConnectionName;
 
         var spQuery = new StoredProcQuery(queryName, spName);
+        spQuery.Parameters.Add(new QueryParameter("@from", typeof(DevExpress.DataAccess.Expression),
+            new DevExpress.DataAccess.Expression("[Parameters.pPeriodFrom]")));
+        spQuery.Parameters.Add(new QueryParameter("@to", typeof(DevExpress.DataAccess.Expression),
+            new DevExpress.DataAccess.Expression("[Parameters.pPeriodTo]")));
+        spQuery.Parameters.Add(new QueryParameter("@queue_dns", typeof(DevExpress.DataAccess.Expression),
+            new DevExpress.DataAccess.Expression("[Parameters.pQueueDns]")));
+        spQuery.Parameters.Add(new QueryParameter("@sla_seconds", typeof(DevExpress.DataAccess.Expression),
+            new DevExpress.DataAccess.Expression("[Parameters.pSlaSeconds]")));
+        spQuery.Parameters.Add(new QueryParameter("@report_timezone", typeof(DevExpress.DataAccess.Expression),
+            new DevExpress.DataAccess.Expression("[Parameters.pReportTimezone]")));
 
-        // Bind SP parameters to report parameters using expressions
+        ds.Queries.Add(spQuery);
+        return ds;
+    }
+
+    /// <summary>Creates data source for the Agent SP (uses original @period_from/@period_to/@wait_interval params)</summary>
+    private static SqlDataSource CreateAgentDataSource(string dsName, string queryName, string spName)
+    {
+        var ds = new SqlDataSource(dsName);
+        ds.ConnectionName = ConnectionName;
+
+        var spQuery = new StoredProcQuery(queryName, spName);
         spQuery.Parameters.Add(new QueryParameter("@period_from", typeof(DevExpress.DataAccess.Expression),
             new DevExpress.DataAccess.Expression("[Parameters.pPeriodFrom]")));
         spQuery.Parameters.Add(new QueryParameter("@period_to", typeof(DevExpress.DataAccess.Expression),
@@ -236,7 +272,7 @@ public static class QueuePerformanceDashboardGenerator
         };
 
         var lblQueueFilter = CreateLabel("lblQueueFilter", "", 10, 5, 260, 14, "Segoe UI", 8, FontStyle.Bold, Color.FromArgb(67, 97, 238));
-        lblQueueFilter.ExpressionBindings.Add(new ExpressionBinding("BeforePrint", "Text", "'Queue DN: ' + [queue_dn] + ' - ' + [queue_display_name]"));
+        lblQueueFilter.ExpressionBindings.Add(new ExpressionBinding("BeforePrint", "Text", "'Queue DN: ' + [description]"));
         pnlFilter.Controls.Add(lblQueueFilter);
 
         var lblDateRange = CreateLabel("lblDateRange", "", 10, 22, 260, 14, "Segoe UI", 8, FontStyle.Regular, Color.FromArgb(113, 128, 150));
@@ -245,7 +281,7 @@ public static class QueuePerformanceDashboardGenerator
         pnlFilter.Controls.Add(lblDateRange);
 
         var lblSLA = CreateLabel("lblSLAInfo", "", 10, 38, 260, 12, "Segoe UI", 7, FontStyle.Regular, Color.FromArgb(160, 174, 192));
-        lblSLA.ExpressionBindings.Add(new ExpressionBinding("BeforePrint", "Text", "'SLA Threshold: ' + [Parameters.pWaitInterval]"));
+        lblSLA.ExpressionBindings.Add(new ExpressionBinding("BeforePrint", "Text", "'SLA Threshold: ' + ToStr([Parameters.pSlaSeconds]) + ' seconds'"));
         pnlFilter.Controls.Add(lblSLA);
 
         header.Controls.Add(pnlFilter);
@@ -263,9 +299,9 @@ public static class QueuePerformanceDashboardGenerator
             ("Answered", "[answered_calls]", "{0:N0}", Color.FromArgb(72, 187, 120), Color.FromArgb(72, 187, 120)),
             ("Abandoned", "[abandoned_calls]", "{0:N0}", Color.FromArgb(245, 101, 101), Color.FromArgb(245, 101, 101)),
             ("SLA %", "[answered_within_sla_percent]", "{0:N1}%", Color.FromArgb(155, 89, 182), Color.FromArgb(155, 89, 182)),
-            ("Avg Talk", "[mean_talking]", null, Color.FromArgb(67, 97, 238), Color.FromArgb(45, 55, 72)),
+            ("Avg Talk", "[mean_talking_time]", null, Color.FromArgb(67, 97, 238), Color.FromArgb(45, 55, 72)),
             ("Total Talk", "[total_talking]", null, Color.FromArgb(237, 137, 54), Color.FromArgb(237, 137, 54)),
-            ("Avg Wait", "[avg_waiting]", null, Color.FromArgb(56, 178, 172), Color.FromArgb(56, 178, 172)),
+            ("Avg Wait", "[avg_wait_time]", null, Color.FromArgb(56, 178, 172), Color.FromArgb(56, 178, 172)),
             ("Callbacks", "[serviced_callbacks]", "{0:N0}", Color.FromArgb(72, 187, 120), Color.FromArgb(72, 187, 120))
         };
 
@@ -296,7 +332,7 @@ public static class QueuePerformanceDashboardGenerator
 
         var answeredSeries = new Series("Answered", ViewType.Area)
         {
-            ArgumentDataMember = "call_date",
+            ArgumentDataMember = "report_date_local",
             ArgumentScaleType = ScaleType.DateTime,
         };
         answeredSeries.ValueDataMembersSerializable = "answered_calls";
@@ -309,7 +345,7 @@ public static class QueuePerformanceDashboardGenerator
 
         var abandonedSeries = new Series("Abandoned", ViewType.Area)
         {
-            ArgumentDataMember = "call_date",
+            ArgumentDataMember = "report_date_local",
             ArgumentScaleType = ScaleType.DateTime,
         };
         abandonedSeries.ValueDataMembersSerializable = "abandoned_calls";
