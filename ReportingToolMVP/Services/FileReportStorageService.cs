@@ -79,33 +79,10 @@ namespace ReportingToolMVP.Services
                 if (string.IsNullOrEmpty(url))
                 {
                     _logger.LogInformation("Creating new blank report");
-                    var blankReport = new ReportingToolMVP.Reports.CodeBased.BlankReport();
+                    var blankReport = new XtraReport();
                     using (var stream = new MemoryStream())
                     {
                         blankReport.SaveLayoutToXml(stream);
-                        return stream.ToArray();
-                    }
-                }
-
-                // Handle code-based reports
-                if (url == "QueueDashboardReport" || url == "Queue Dashboard Report")
-                {
-                    _logger.LogInformation("Loading code-based QueueDashboardReport");
-                    var report = new ReportingToolMVP.Reports.CodeBased.QueueDashboardReport();
-                    using (var stream = new MemoryStream())
-                    {
-                        report.SaveLayoutToXml(stream);
-                        return stream.ToArray();
-                    }
-                }
-
-                if (url == "CallDetailsReport" || url == "Call Details Report")
-                {
-                    _logger.LogInformation("Loading code-based CallDetailsReport");
-                    var report = new ReportingToolMVP.Reports.CodeBased.CallDetailsReport();
-                    using (var stream = new MemoryStream())
-                    {
-                        report.SaveLayoutToXml(stream);
                         return stream.ToArray();
                     }
                 }
@@ -116,7 +93,7 @@ namespace ReportingToolMVP.Services
                 {
                     _logger.LogWarning($"Report file not found: {filePath}. Creating blank report.");
                     // Return blank report instead of throwing error
-                    var blankReport = new ReportingToolMVP.Reports.CodeBased.BlankReport();
+                    var blankReport = new XtraReport();
                     using (var stream = new MemoryStream())
                     {
                         blankReport.SaveLayoutToXml(stream);
@@ -163,10 +140,6 @@ namespace ReportingToolMVP.Services
 
             try
             {
-                // Add code-based reports first
-                reports["QueueDashboardReport"] = "Queue Dashboard (Code-Based)";
-                reports["CallDetailsReport"] = "Call Details (Code-Based)";
-
                 // Look in Templates subfolder for .repx files
                 if (Directory.Exists(_templatesDirectory))
                 {

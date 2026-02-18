@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <XtraReportsLayoutSerializer SerializerVersion="25.2.3.0" Ref="1" ControlType="DevExpress.XtraReports.UI.XtraReport, DevExpress.XtraReports.v25.2, Version=25.2.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a" Name="QueuePerformanceDashboard" DisplayName="Queue Performance Dashboard" Landscape="true" Margins="30, 30, 30, 30" PaperKind="Custom" PageWidthF="1100" PageHeightF="850" Version="25.2" DataMember="KPIs" DataSource="#Ref-0">
   <Parameters>
     <Item1 Ref="3" Description="Start Date:" ValueInfo="2025-06-01" Name="pPeriodFrom" Type="#Ref-2" />
@@ -7,8 +7,8 @@
     <Item4 Ref="7" Description="SLA Threshold (HH:MM:SS):" ValueInfo="00:00:20" Name="pWaitInterval" />
   </Parameters>
   <Bands>
-    <Item1 Ref="8" ControlType="TopMarginBand" Name="TopMargin1" HeightF="30" />
-    <Item2 Ref="9" ControlType="ReportHeaderBand" Name="ReportHeader1" HeightF="580">
+    <Item1 Ref="8" ControlType="TopMarginBand" HeightF="30" />
+    <Item2 Ref="9" ControlType="ReportHeaderBand" HeightF="580">
       <Controls>
         <Item1 Ref="10" ControlType="XRLabel" Name="lblTitle" Text="VoIPTools Customer Service" SizeF="400,32" LocationFloat="30,5" Font="Segoe UI, 20pt, style=Bold" ForeColor="255,67,97,238" Padding="2,2,0,0,100" />
         <Item2 Ref="11" ControlType="XRLabel" Name="lblSubtitle" Text="Queue Performance Dashboard (Production)" SizeF="350,16" LocationFloat="30,38" Font="Segoe UI, 9pt" ForeColor="255,113,128,150" Padding="2,2,0,0,100" />
@@ -125,11 +125,11 @@
           </Controls>
         </Item12>
         <Item13 Ref="61" ControlType="XRLabel" Name="lblChartTitle" Text="Call Trends by Date" SizeF="250,20" LocationFloat="30,145" Font="Segoe UI, 11pt, style=Bold" ForeColor="255,45,55,72" Padding="2,2,0,0,100" />
-        <Item14 Ref="63" ControlType="XRChart" Name="chartTrends" DataSource="#Ref-62" SizeF="980,350" LocationFloat="30,168" BorderColor="Black" Borders="None">
+        <Item14 Ref="63" ControlType="XRChart" Name="chartTrends" DataMember="ChartData" DataSource="#Ref-62" SizeF="980,350" LocationFloat="30,168" BorderColor="Black" Borders="None">
           <Chart Ref="64">
             <DataContainer Ref="65" DataMember="ChartData" ValidateDataMembers="false">
               <SeriesSerializable>
-                <Item1 Ref="66" Name="Answered" SeriesID="0" ArgumentDataMember="call_date" ValueDataMembersSerializable="answered_calls" ArgumentScaleType="DateTime">
+                <Item1 Ref="66" Name="Answered" ArgumentScaleType="DateTime" ArgumentDataMember="call_date" ValueDataMembersSerializable="answered_calls" SeriesID="0">
                   <View Ref="67" Transparency="80" MarkerVisibility="True" Color="255,72,187,120" TypeNameSerializable="AreaSeriesView">
                     <Border Ref="68" Color="255,56,161,105" Visibility="True" />
                     <EmptyPointOptions Ref="69">
@@ -137,7 +137,7 @@
                     </EmptyPointOptions>
                   </View>
                 </Item1>
-                <Item2 Ref="71" Name="Abandoned" SeriesID="1" ArgumentDataMember="call_date" ValueDataMembersSerializable="abandoned_calls" ArgumentScaleType="DateTime">
+                <Item2 Ref="71" Name="Abandoned" ArgumentScaleType="DateTime" ArgumentDataMember="call_date" ValueDataMembersSerializable="abandoned_calls" SeriesID="1">
                   <View Ref="72" Transparency="80" MarkerVisibility="True" Color="255,245,101,101" TypeNameSerializable="AreaSeriesView">
                     <Border Ref="73" Color="255,229,62,62" Visibility="True" />
                     <EmptyPointOptions Ref="74">
@@ -166,7 +166,7 @@
         <Item15 Ref="86" ControlType="XRLabel" Name="lblAgentTitle" Text="Agent Performance" SizeF="250,20" LocationFloat="30,528" Font="Segoe UI, 11pt, style=Bold" ForeColor="255,45,55,72" Padding="2,2,0,0,100" />
       </Controls>
     </Item2>
-    <Item3 Ref="87" ControlType="DetailBand" Name="Detail1" HeightF="0" Visible="false" />
+    <Item3 Ref="87" ControlType="DetailBand" HeightF="0" Visible="false" />
     <Item4 Ref="89" ControlType="DetailReportBand" Name="AgentDetail" Level="0" DataMember="Agents" DataSource="#Ref-88">
       <Bands>
         <Item1 Ref="90" ControlType="GroupHeaderBand" Name="AgentGroupHeader" RepeatEveryPage="true" GroupUnion="WithFirstDetail" HeightF="22">
@@ -231,26 +231,20 @@
         </Item2>
       </Bands>
     </Item4>
-    <Item5 Ref="114" ControlType="PageFooterBand" Name="PageFooter1" HeightF="25">
+    <Item5 Ref="114" ControlType="PageFooterBand" HeightF="25">
       <Controls>
         <Item1 Ref="115" ControlType="XRPageInfo" Name="pageInfo1" PageInfo="DateTime" SizeF="200,20" LocationFloat="30,2" Font="Segoe UI, 7pt" ForeColor="255,160,174,192" Padding="2,2,0,0,100" />
         <Item2 Ref="116" ControlType="XRPageInfo" Name="pageInfo2" TextFormatString="Page {0} of {1}" TextAlignment="TopRight" SizeF="200,20" LocationFloat="810,2" Font="Segoe UI, 7pt" ForeColor="255,160,174,192" Padding="2,2,0,0,100" />
       </Controls>
     </Item5>
-    <Item6 Ref="117" ControlType="BottomMarginBand" Name="BottomMargin1" HeightF="30" />
+    <Item6 Ref="117" ControlType="BottomMarginBand" HeightF="30" />
   </Bands>
   <StyleSheet>
     <Item1 Ref="118" Name="EvenRow" BorderStyle="Inset" BackColor="255,248,250,252" StringFormat="Near;Near;0;None;Character;Default" />
   </StyleSheet>
-  <ParameterPanelLayoutItems>
-    <Item1 Ref="119" LayoutItemType="Parameter" Parameter="#Ref-3" />
-    <Item2 Ref="120" LayoutItemType="Parameter" Parameter="#Ref-4" />
-    <Item3 Ref="121" LayoutItemType="Parameter" Parameter="#Ref-6" />
-    <Item4 Ref="122" LayoutItemType="Parameter" Parameter="#Ref-7" />
-  </ParameterPanelLayoutItems>
   <ComponentStorage>
-    <Item1 Ref="0" ObjectType="DevExpress.DataAccess.Sql.SqlDataSource,DevExpress.DataAccess.v25.2" Name="component1" Base64="PFNxbERhdGFTb3VyY2UgTmFtZT0iY29tcG9uZW50MSI+PENvbm5lY3Rpb24gTmFtZT0iM0NYX0V4cG9ydGVyX1Byb2R1Y3Rpb24iIEZyb21BcHBDb25maWc9InRydWUiIC8+PFF1ZXJ5IFR5cGU9IlN0b3JlZFByb2NRdWVyeSIgTmFtZT0iS1BJcyI+PFBhcmFtZXRlciBOYW1lPSJAcGVyaW9kX2Zyb20iIFR5cGU9IkRldkV4cHJlc3MuRGF0YUFjY2Vzcy5FeHByZXNzaW9uIj4obnVsbCkoW1BhcmFtZXRlcnMucFBlcmlvZEZyb21dKTwvUGFyYW1ldGVyPjxQYXJhbWV0ZXIgTmFtZT0iQHBlcmlvZF90byIgVHlwZT0iRGV2RXhwcmVzcy5EYXRhQWNjZXNzLkV4cHJlc3Npb24iPihudWxsKShbUGFyYW1ldGVycy5wUGVyaW9kVG9dKTwvUGFyYW1ldGVyPjxQYXJhbWV0ZXIgTmFtZT0iQHF1ZXVlX2RucyIgVHlwZT0iRGV2RXhwcmVzcy5EYXRhQWNjZXNzLkV4cHJlc3Npb24iPihudWxsKShbUGFyYW1ldGVycy5wUXVldWVEbnNdKTwvUGFyYW1ldGVyPjxQYXJhbWV0ZXIgTmFtZT0iQHdhaXRfaW50ZXJ2YWwiIFR5cGU9IkRldkV4cHJlc3MuRGF0YUFjY2Vzcy5FeHByZXNzaW9uIj4obnVsbCkoW1BhcmFtZXRlcnMucFdhaXRJbnRlcnZhbF0pPC9QYXJhbWV0ZXI+PFByb2NOYW1lPnNwX3F1ZXVlX2twaV9zdW1tYXJ5X3NodXNoYW50PC9Qcm9jTmFtZT48L1F1ZXJ5PjxDb25uZWN0aW9uT3B0aW9ucyBDbG9zZUNvbm5lY3Rpb249InRydWUiIC8+PC9TcWxEYXRhU291cmNlPg==" />
-    <Item2 Ref="62" ObjectType="DevExpress.DataAccess.Sql.SqlDataSource,DevExpress.DataAccess.v25.2" Name="component2" Base64="PFNxbERhdGFTb3VyY2UgTmFtZT0iY29tcG9uZW50MiI+PENvbm5lY3Rpb24gTmFtZT0iM0NYX0V4cG9ydGVyX1Byb2R1Y3Rpb24iIEZyb21BcHBDb25maWc9InRydWUiIC8+PFF1ZXJ5IFR5cGU9IlN0b3JlZFByb2NRdWVyeSIgTmFtZT0iQ2hhcnREYXRhIj48UGFyYW1ldGVyIE5hbWU9IkBwZXJpb2RfZnJvbSIgVHlwZT0iRGV2RXhwcmVzcy5EYXRhQWNjZXNzLkV4cHJlc3Npb24iPihudWxsKShbUGFyYW1ldGVycy5wUGVyaW9kRnJvbV0pPC9QYXJhbWV0ZXI+PFBhcmFtZXRlciBOYW1lPSJAcGVyaW9kX3RvIiBUeXBlPSJEZXZFeHByZXNzLkRhdGFBY2Nlc3MuRXhwcmVzc2lvbiI+KG51bGwpKFtQYXJhbWV0ZXJzLnBQZXJpb2RUb10pPC9QYXJhbWV0ZXI+PFBhcmFtZXRlciBOYW1lPSJAcXVldWVfZG5zIiBUeXBlPSJEZXZFeHByZXNzLkRhdGFBY2Nlc3MuRXhwcmVzc2lvbiI+KG51bGwpKFtQYXJhbWV0ZXJzLnBRdWV1ZURuc10pPC9QYXJhbWV0ZXI+PFBhcmFtZXRlciBOYW1lPSJAd2FpdF9pbnRlcnZhbCIgVHlwZT0iRGV2RXhwcmVzcy5EYXRhQWNjZXNzLkV4cHJlc3Npb24iPihudWxsKShbUGFyYW1ldGVycy5wV2FpdEludGVydmFsXSk8L1BhcmFtZXRlcj48UHJvY05hbWU+c3BfcXVldWVfY2FsbHNfYnlfZGF0ZV9zaHVzaGFudDwvUHJvY05hbWU+PC9RdWVyeT48UmVzdWx0U2NoZW1hPjxEYXRhU2V0IE5hbWU9ImNvbXBvbmVudDIiPjxWaWV3IE5hbWU9IkNoYXJ0RGF0YSI+PEZpZWxkIE5hbWU9InF1ZXVlX2RuIiBUeXBlPSJTdHJpbmciIC8+PEZpZWxkIE5hbWU9ImNhbGxfZGF0ZSIgVHlwZT0iRGF0ZVRpbWUiIC8+PEZpZWxkIE5hbWU9InRvdGFsX2NhbGxzIiBUeXBlPSJJbnQzMiIgLz48RmllbGQgTmFtZT0iYW5zd2VyZWRfY2FsbHMiIFR5cGU9IkludDMyIiAvPjxGaWVsZCBOYW1lPSJhYmFuZG9uZWRfY2FsbHMiIFR5cGU9IkludDMyIiAvPjwvVmlldz48L0RhdGFTZXQ+PC9SZXN1bHRTY2hlbWE+PENvbm5lY3Rpb25PcHRpb25zIENsb3NlQ29ubmVjdGlvbj0idHJ1ZSIgLz48L1NxbERhdGFTb3VyY2U+" />
+    <Item1 Ref="0" ObjectType="DevExpress.DataAccess.Sql.SqlDataSource,DevExpress.DataAccess.v25.2" Base64="PFNxbERhdGFTb3VyY2U+PENvbm5lY3Rpb24gTmFtZT0iM0NYX0V4cG9ydGVyX1Byb2R1Y3Rpb24iIEZyb21BcHBDb25maWc9InRydWUiIC8+PFF1ZXJ5IFR5cGU9IlN0b3JlZFByb2NRdWVyeSIgTmFtZT0iS1BJcyI+PFBhcmFtZXRlciBOYW1lPSJAcGVyaW9kX2Zyb20iIFR5cGU9IkRldkV4cHJlc3MuRGF0YUFjY2Vzcy5FeHByZXNzaW9uIj4obnVsbCkoW1BhcmFtZXRlcnMucFBlcmlvZEZyb21dKTwvUGFyYW1ldGVyPjxQYXJhbWV0ZXIgTmFtZT0iQHBlcmlvZF90byIgVHlwZT0iRGV2RXhwcmVzcy5EYXRhQWNjZXNzLkV4cHJlc3Npb24iPihudWxsKShbUGFyYW1ldGVycy5wUGVyaW9kVG9dKTwvUGFyYW1ldGVyPjxQYXJhbWV0ZXIgTmFtZT0iQHF1ZXVlX2RucyIgVHlwZT0iRGV2RXhwcmVzcy5EYXRhQWNjZXNzLkV4cHJlc3Npb24iPihudWxsKShbUGFyYW1ldGVycy5wUXVldWVEbnNdKTwvUGFyYW1ldGVyPjxQYXJhbWV0ZXIgTmFtZT0iQHdhaXRfaW50ZXJ2YWwiIFR5cGU9IkRldkV4cHJlc3MuRGF0YUFjY2Vzcy5FeHByZXNzaW9uIj4obnVsbCkoW1BhcmFtZXRlcnMucFdhaXRJbnRlcnZhbF0pPC9QYXJhbWV0ZXI+PFByb2NOYW1lPnNwX3F1ZXVlX2twaV9zdW1tYXJ5X3NodXNoYW50PC9Qcm9jTmFtZT48L1F1ZXJ5PjxDb25uZWN0aW9uT3B0aW9ucyBDbG9zZUNvbm5lY3Rpb249InRydWUiIC8+PC9TcWxEYXRhU291cmNlPg==" />
+    <Item2 Ref="62" ObjectType="DevExpress.DataAccess.Sql.SqlDataSource,DevExpress.DataAccess.v25.2" Base64="PFNxbERhdGFTb3VyY2U+PENvbm5lY3Rpb24gTmFtZT0iM0NYX0V4cG9ydGVyX1Byb2R1Y3Rpb24iIEZyb21BcHBDb25maWc9InRydWUiIC8+PFF1ZXJ5IFR5cGU9IlN0b3JlZFByb2NRdWVyeSIgTmFtZT0iQ2hhcnREYXRhIj48UGFyYW1ldGVyIE5hbWU9IkBwZXJpb2RfZnJvbSIgVHlwZT0iRGV2RXhwcmVzcy5EYXRhQWNjZXNzLkV4cHJlc3Npb24iPihudWxsKShbUGFyYW1ldGVycy5wUGVyaW9kRnJvbV0pPC9QYXJhbWV0ZXI+PFBhcmFtZXRlciBOYW1lPSJAcGVyaW9kX3RvIiBUeXBlPSJEZXZFeHByZXNzLkRhdGFBY2Nlc3MuRXhwcmVzc2lvbiI+KG51bGwpKFtQYXJhbWV0ZXJzLnBQZXJpb2RUb10pPC9QYXJhbWV0ZXI+PFBhcmFtZXRlciBOYW1lPSJAcXVldWVfZG5zIiBUeXBlPSJEZXZFeHByZXNzLkRhdGFBY2Nlc3MuRXhwcmVzc2lvbiI+KG51bGwpKFtQYXJhbWV0ZXJzLnBRdWV1ZURuc10pPC9QYXJhbWV0ZXI+PFBhcmFtZXRlciBOYW1lPSJAd2FpdF9pbnRlcnZhbCIgVHlwZT0iRGV2RXhwcmVzcy5EYXRhQWNjZXNzLkV4cHJlc3Npb24iPihudWxsKShbUGFyYW1ldGVycy5wV2FpdEludGVydmFsXSk8L1BhcmFtZXRlcj48UHJvY05hbWU+c3BfcXVldWVfY2FsbHNfYnlfZGF0ZV9zaHVzaGFudDwvUHJvY05hbWU+PC9RdWVyeT48UmVzdWx0U2NoZW1hPjxEYXRhU2V0IE5hbWU9ImRzQ2hhcnREYXRhIj48VmlldyBOYW1lPSJDaGFydERhdGEiPjxGaWVsZCBOYW1lPSJxdWV1ZV9kbiIgVHlwZT0iU3RyaW5nIiAvPjxGaWVsZCBOYW1lPSJjYWxsX2RhdGUiIFR5cGU9IkRhdGVUaW1lIiAvPjxGaWVsZCBOYW1lPSJ0b3RhbF9jYWxscyIgVHlwZT0iSW50MzIiIC8+PEZpZWxkIE5hbWU9ImFuc3dlcmVkX2NhbGxzIiBUeXBlPSJJbnQzMiIgLz48RmllbGQgTmFtZT0iYWJhbmRvbmVkX2NhbGxzIiBUeXBlPSJJbnQzMiIgLz48L1ZpZXc+PC9EYXRhU2V0PjwvUmVzdWx0U2NoZW1hPjxDb25uZWN0aW9uT3B0aW9ucyBDbG9zZUNvbm5lY3Rpb249InRydWUiIC8+PC9TcWxEYXRhU291cmNlPg==" />
     <Item3 Ref="88" ObjectType="DevExpress.DataAccess.Sql.SqlDataSource,DevExpress.DataAccess.v25.2" Base64="PFNxbERhdGFTb3VyY2U+PENvbm5lY3Rpb24gTmFtZT0iM0NYX0V4cG9ydGVyX1Byb2R1Y3Rpb24iIEZyb21BcHBDb25maWc9InRydWUiIC8+PFF1ZXJ5IFR5cGU9IlN0b3JlZFByb2NRdWVyeSIgTmFtZT0iQWdlbnRzIj48UGFyYW1ldGVyIE5hbWU9IkBwZXJpb2RfZnJvbSIgVHlwZT0iRGV2RXhwcmVzcy5EYXRhQWNjZXNzLkV4cHJlc3Npb24iPihudWxsKShbUGFyYW1ldGVycy5wUGVyaW9kRnJvbV0pPC9QYXJhbWV0ZXI+PFBhcmFtZXRlciBOYW1lPSJAcGVyaW9kX3RvIiBUeXBlPSJEZXZFeHByZXNzLkRhdGFBY2Nlc3MuRXhwcmVzc2lvbiI+KG51bGwpKFtQYXJhbWV0ZXJzLnBQZXJpb2RUb10pPC9QYXJhbWV0ZXI+PFBhcmFtZXRlciBOYW1lPSJAcXVldWVfZG5zIiBUeXBlPSJEZXZFeHByZXNzLkRhdGFBY2Nlc3MuRXhwcmVzc2lvbiI+KG51bGwpKFtQYXJhbWV0ZXJzLnBRdWV1ZURuc10pPC9QYXJhbWV0ZXI+PFBhcmFtZXRlciBOYW1lPSJAd2FpdF9pbnRlcnZhbCIgVHlwZT0iRGV2RXhwcmVzcy5EYXRhQWNjZXNzLkV4cHJlc3Npb24iPihudWxsKShbUGFyYW1ldGVycy5wV2FpdEludGVydmFsXSk8L1BhcmFtZXRlcj48UHJvY05hbWU+cWNhbGxfY2VudF9nZXRfZXh0ZW5zaW9uc19zdGF0aXN0aWNzX2J5X3F1ZXVlczwvUHJvY05hbWU+PC9RdWVyeT48Q29ubmVjdGlvbk9wdGlvbnMgQ2xvc2VDb25uZWN0aW9uPSJ0cnVlIiAvPjwvU3FsRGF0YVNvdXJjZT4=" />
   </ComponentStorage>
   <ObjectStorage>

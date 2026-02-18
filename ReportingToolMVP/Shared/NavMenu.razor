@@ -26,22 +26,6 @@
 
     <!-- Navigation Links -->
     <nav class="sidebar-nav">
-        <a href="" class="nav-item @(IsActive("") ? "active" : "")">
-            <span class="nav-icon oi oi-home"></span>
-            @if (!IsCollapsed)
-            {
-                <span class="nav-label">Home</span>
-            }
-        </a>
-        
-        <a href="reportbuilder" class="nav-item @(IsActive("reportbuilder") ? "active" : "")">
-            <span class="nav-icon oi oi-spreadsheet"></span>
-            @if (!IsCollapsed)
-            {
-                <span class="nav-label">Report Builder</span>
-            }
-        </a>
-
         <a href="reportdesigner" class="nav-item @(IsActive("reportdesigner") ? "active" : "")">
             <span class="nav-icon oi oi-brush"></span>
             @if (!IsCollapsed)
@@ -55,14 +39,6 @@
             @if (!IsCollapsed)
             {
                 <span class="nav-label">Report Viewer</span>
-            }
-        </a>
-
-        <a href="test" class="nav-item @(IsActive("test") ? "active" : "")">
-            <span class="nav-icon oi oi-check"></span>
-            @if (!IsCollapsed)
-            {
-                <span class="nav-label">Test Suite</span>
             }
         </a>
     </nav>

@@ -1,1 +1,0 @@
-EXEC [sp_queue_stats_today] 20 --this query will give ONLY current day information (ALL QUEUES WITH SLA)

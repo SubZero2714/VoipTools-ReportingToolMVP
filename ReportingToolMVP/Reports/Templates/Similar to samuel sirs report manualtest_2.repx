@@ -157,7 +157,7 @@
     <Item3 Ref="80" ControlType="DetailBand" Name="Detail1" HeightF="0" Visible="false" />
     <Item4 Ref="82" ControlType="DetailReportBand" Name="AgentDetail" Level="0" DataMember="qcall_cent_get_extensions_statistics_by_queues" DataSource="#Ref-81">
       <Bands>
-        <Item1 Ref="83" ControlType="GroupHeaderBand" Name="GroupHeader1" RepeatEveryPage="true" Expanded="false" HeightF="25">
+        <Item1 Ref="83" ControlType="GroupHeaderBand" Name="GroupHeader1" RepeatEveryPage="true" HeightF="25">
           <Controls>
             <Item1 Ref="84" ControlType="XRTable" Name="table1" TextAlignment="MiddleLeft" SizeF="980.0002,25" LocationFloat="0,0" Padding="2,2,0,0,96">
               <Rows>

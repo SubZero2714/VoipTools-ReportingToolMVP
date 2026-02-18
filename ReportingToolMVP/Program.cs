@@ -80,9 +80,7 @@ builder.Services.AddScoped<DevExpress.DataAccess.Web.IConnectionProviderFactory,
 // Register DB Schema Provider Factory - Required for Query Builder in Report Designer
 builder.Services.AddScoped<DevExpress.DataAccess.Web.IDBSchemaProviderExFactory, CustomDBSchemaProviderExFactory>();
 
-// Register custom services
-builder.Services.AddScoped<ICustomReportService, CustomReportService>();
-builder.Services.AddScoped<IReportExportService, ReportExportService>();
+
 
 var app = builder.Build();
 
