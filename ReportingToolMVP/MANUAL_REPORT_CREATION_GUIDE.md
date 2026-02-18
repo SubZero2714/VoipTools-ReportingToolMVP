@@ -1,33 +1,98 @@
 # Manual Report Creation Guide
 ## VoIPTools Customer Service – Queue Performance Dashboard
 
-> **Purpose:** Step-by-step guide to manually create a production report using the Report Designer UI with stored procedures from the `3CX Exporter` database.
+> **Purpose:** Complete step-by-step guide to manually create a Queue Performance Dashboard report using the DevExpress Report Designer UI. This guide walks through creating all three data sources, binding KPI cards, configuring the area chart, setting up the agent performance table, and connecting everything to dynamic Report Parameters.  
+> **Audience:** End users with access to the Report Designer. No coding required.  
+> **Time:** Approximately 30-45 minutes for first-time creation.  
+> **Last Updated:** February 18, 2026
+
+---
+
+## What You Will Build
+
+By following this guide, you will create a report with three sections:
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│  HEADER                                                         │
+│  ┌───────────────────────────────────────────────────────────┐ │
+│  │ Title: "VoIPTools Customer Service"                        │ │
+│  │ Subtitle: "Queue Performance Dashboard (Production)"       │ │
+│  │ Filter Info: Queue DN, Date Range, SLA Threshold           │ │
+│  │ Generated: Date/Time stamp                                 │ │
+│  ├───────────────────────────────────────────────────────────┤ │
+│  │ ┌──────┐ ┌──────┐ ┌──────┐ ┌──────┐ ┌──────┐ ┌──────┐  │ │
+│  │ │Total │ │Answ'd│ │Aband.│ │SLA % │ │AvgTk │ │TotTk │  │ │
+│  │ │Calls │ │      │ │      │ │      │ │      │ │      │  │ │
+│  │ │ 487  │ │ 435  │ │  52  │ │87.4% │ │01:45 │ │12:45 │  │ │
+│  │ └──────┘ └──────┘ └──────┘ └──────┘ └──────┘ └──────┘  │ │
+│  │ ┌──────┐ ┌──────┐                                        │ │
+│  │ │AvgWt │ │Callbk│    ← 8 KPI cards from SP1             │ │
+│  │ │00:23 │ │  0   │                                        │ │
+│  │ └──────┘ └──────┘                                        │ │
+│  ├───────────────────────────────────────────────────────────┤ │
+│  │ CALL TRENDS BY DATE (Area Chart)                          │ │
+│  │ ▄▄▄▄█████▄▄▄▄                                            │ │
+│  │ ▀▀▀▄▄▄▄▄▀▀▀▀  ← Two area series from SP2               │ │
+│  │ Green = Answered, Red = Abandoned                         │ │
+│  └───────────────────────────────────────────────────────────┘ │
+│                                                                 │
+│  AGENT PERFORMANCE TABLE (from SP3)                             │
+│  ┌────────────┬───────┬──────┬──────┬──────┬──────┐            │
+│  │ Agent      │Ans'd  │AvgAns│AvgTk │QTime │InQ%  │            │
+│  ├────────────┼───────┼──────┼──────┼──────┼──────┤            │
+│  │ 1001-John  │  45   │00:08 │01:51 │  -   │  -   │            │
+│  │ 1002-Jane  │  38   │00:06 │01:50 │  -   │  -   │            │
+│  └────────────┴───────┴──────┴──────┴──────┴──────┘            │
+│                                                                 │
+│  FOOTER: Generated date + Page X of Y                           │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+Each section uses a different stored procedure:
+- **KPI Cards** → `sp_queue_kpi_summary_shushant` (returns 1 aggregated row)
+- **Area Chart** → `sp_queue_calls_by_date_shushant` (returns 1 row per day)
+- **Agent Table** → `qcall_cent_get_extensions_statistics_by_queues` (returns 1 row per agent per queue)
+
+All three SPs accept the same 4 parameters, which become user inputs in the report's PREVIEW panel.
 
 ---
 
 ## Prerequisites
 
-- Application running at `https://localhost:7209`
-- Access to Report Designer (`/reportdesigner`)
-- Database: `3CX Exporter` on server `3.132.72.134`
-- Database credentials: User `sa`, Password `V01PT0y5`
+Before starting, ensure:
+
+- **Application is running** at `https://localhost:7209` (see DEVELOPER_GUIDE.md for setup)
+- **Report Designer is accessible** at `/reportdesigner`
+- **Database connection works** — the Designer must connect to the `3CX Exporter` database
+  - Server: `3.132.72.134`
+  - Database: `3CX Exporter`
+  - Credentials: User `sa`, Password `V01PT0y5`
+- **Stored procedures are deployed** — all three SPs must exist in the database
+- **An existing report template** (e.g., `Similar_to_samuel_sirs_report`) should exist as a reference. You can open it in the Designer to compare your progress at any point.
+
+> **Tip:** Open the existing production report side-by-side in a separate browser tab for reference while following this guide.
 
 ## Stored Procedures Used
 
-| SP Name | Purpose | Parameters |
-|---------|---------|------------|
-| `sp_queue_kpi_summary_shushant` | KPI summary (Total Calls, Answered, Abandoned, SLA%, etc.) | `@period_from`, `@period_to`, `@queue_dns`, `@wait_interval` |
-| `sp_queue_calls_by_date_shushant` | Daily call trends (for area chart) | `@period_from`, `@period_to`, `@queue_dns`, `@wait_interval` |
-| `qcall_cent_get_extensions_statistics_by_queues` | Agent/extension performance (for agent table) | `@period_from`, `@period_to`, `@queue_dns`, `@wait_interval` |
+| SP Name | Purpose | Report Section | Output |
+|---------|---------|----------------|--------|
+| `sp_queue_kpi_summary_shushant` | KPI summary metrics | 8 KPI cards + filter info | Always 1 row |
+| `sp_queue_calls_by_date_shushant` | Daily call volume breakdown | Area chart (Answered vs Abandoned) | 1 row per day |
+| `qcall_cent_get_extensions_statistics_by_queues` | Per-agent answered call stats | Agent performance table | 1 row per agent per queue |
 
 ### SP Parameter Types
 
-| Parameter | SQL Type | Description |
-|-----------|----------|-------------|
-| `@period_from` | `datetimeoffset` | Report start date |
-| `@period_to` | `datetimeoffset` | Report end date |
-| `@queue_dns` | `varchar(max)` | Queue DN filter (use `%` for all queues, or comma-separated like `8077,8089`) |
-| `@wait_interval` | `time` | SLA threshold (typically `00:00:20` = 20 seconds) |
+All three SPs accept the **exact same 4 parameters**:
+
+| Parameter | SQL Type | Description | Example Value |
+|-----------|----------|-------------|---------------|
+| `@period_from` | `datetimeoffset` | Report start date (inclusive) | `2026-02-01 00:00:00` |
+| `@period_to` | `datetimeoffset` | Report end date (inclusive) | `2026-02-16 23:59:59` |
+| `@queue_dns` | `varchar(max)` | Queue DN filter — comma-separated like `8077,8089`, or `%` for all queues | `8000,8089` |
+| `@wait_interval` | `time` | SLA threshold — calls abandoned before this time are excluded | `00:00:20` (20 seconds) |
+
+> **Important:** See `SQL_REFERENCE.md` for complete documentation on what each SP does, how the CTEs work, and what each output column means.
 
 ---
 
@@ -42,7 +107,9 @@
 
 ## Step 2: Add Data Source – KPI Summary
 
-This data source powers the KPI cards (Total Calls, Answered, Abandoned, SLA%, Avg Talk, Total Talk, Avg Wait, Callbacks).
+This data source powers the KPI cards (Total Calls, Answered, Abandoned, SLA%, Avg Talk, Total Talk, Avg Wait, Callbacks). It connects to the `sp_queue_kpi_summary_shushant` stored procedure, which returns a **single aggregated row** with all the metrics.
+
+> **Why this is the first data source:** The KPI SP returns exactly 1 row. We assign it as the report's "main" data source so that all labels in the ReportHeader band can directly reference its fields (like `[total_calls]`, `[answered_calls]`). The chart and agent table will use their own separate data sources.
 
 1. In the **Field List** panel (right side), click **"+ Add Data Source"**
 2. Select **"Database"** → click Next
@@ -57,20 +124,21 @@ This data source powers the KPI cards (Total Calls, Answered, Abandoned, SLA%, A
 
 ### Section 4 – Configure query parameters
 
-> **IMPORTANT:** The parameter Type dropdown varies depending on the SQL data type. Use the settings below exactly.
+> **IMPORTANT:** The parameter Type dropdown varies depending on the SQL data type. Use the settings below exactly. The Designer executes the stored procedure during this step to discover the output columns — if parameters have wrong types or values, you'll get a schema error.
 
-| Parameter | Type | Value |
-|-----------|------|-------|
-| `@period_from` | **Expression** | `#2026-02-01#` |
-| `@period_to` | **Expression** | `#2026-02-16#` |
-| `@queue_dns` | **Expression** | `'%'` |
-| `@wait_interval` | **Time** | `00:00:20` |
+| Parameter | Type | Value | Why This Setting |
+|-----------|------|-------|------------------|
+| `@period_from` | **Expression** | `#2026-02-01#` | `datetimeoffset` maps to Expression in DevExpress. The `#` marks denote a date literal. |
+| `@period_to` | **Expression** | `#2026-02-16#` | Same as above — DevExpress expression date syntax. |
+| `@queue_dns` | **Expression** | `'%'` | `varchar(max)` maps to Expression. Single quotes denote a string literal. `%` means "all queues". |
+| `@wait_interval` | **Time** | `00:00:20` | SQL `time` type maps to Time dropdown. Enter 20 seconds as SLA threshold. |
 
-> **Notes:**
-> - For date parameters: Select **"Expression"** type and wrap the date in `#` hash marks (DevExpress expression syntax for date literals)
-> - For `@queue_dns`: Select **"Expression"** type and wrap the value in single quotes
-> - For `@wait_interval`: The dropdown only offers **"Time"** or "Expression" — use **"Time"** and enter `00:00:20`
-> - These are temporary defaults for schema discovery. We will later bind them to Report Parameters.
+> **Understanding Parameter Types in the Wizard:**
+> - **Expression:** Used for SQL types that don't have a direct .NET equivalent (like `datetimeoffset` and `varchar(max)`). You enter DevExpress expression syntax.
+> - **Time:** Used for SQL `time` type. You enter a time value directly.
+> - The `#date#` syntax is DevExpress's way of writing date literals in expressions (similar to VB.NET).
+> - The `'text'` syntax (single quotes) is DevExpress's string literal format.
+> - These are **temporary test values** for the Designer to discover the output schema. In Step 13, we'll replace them with `?paramName` bindings to Report Parameters.
 
 ### Common Error
 ❌ **"An error occurred while rebuilding a data source schema"**
@@ -102,6 +170,10 @@ After finishing, the Field List should show:
 ---
 
 ## Step 3: Assign Data Source to the Report
+
+This step tells the entire report to use the KPI data source as its "default" data source. This is required for the KPI card labels and filter info panel to access fields like `[total_calls]`, `[queue_dn]`, etc.
+
+> **How DevExpress data binding works:** A DevExpress report has a hierarchy of bands. The "Report" level is the outermost container. When you set a Data Source on the Report itself, all bands inside it (ReportHeader, Detail, etc.) can reference fields from that data source using `[field_name]` expressions. Sub-reports (like the Agent DetailReportBand) can override this with their own data source.
 
 1. Click on the **report surface background** (not on any control) — or click **"Report"** at the top of the Report Explorer
 2. In the **Properties panel** (right side, click the gear ⚙️ icon if not visible), find:
@@ -213,6 +285,10 @@ Field List shows `sqlDataSource2` with fields:
 
 ## Step 9: Bind the Chart to sqlDataSource2
 
+The chart displays call trends over time. It needs two "series" (data lines): one for answered calls and one for abandoned calls, both plotted against dates.
+
+> **How DevExpress charts work in reports:** An `XRChart` control has its OWN data source (separate from the report's main data source). You assign a data source and data member, then create "series" that map columns to axes. The X-axis (Argument) is typically a date, and the Y-axis (Value) is a numeric column.
+
 1. **Click on the chart** (the big empty box labeled "There are no visible series in the chart")
 2. Click **"Run Designer..."** button (appears in the top-right corner of the chart when selected)
 3. In the Chart Designer dialog:
@@ -221,23 +297,32 @@ Field List shows `sqlDataSource2` with fields:
 
 4. **Add Series 1 — Answered Calls:**
    - Click **"+"** to add a new series
-   - **Series Type:** Area
+   - **Series Type:** Area (fills the space under the line with a semi-transparent color)
    - **Name:** `Answered`
-   - **Argument Data Member:** `call_date`
-   - **Value Data Member:** `answered_calls`
+   - **Argument Data Member:** `call_date` (this becomes the X-axis — dates)
+   - **Value Data Member:** `answered_calls` (this becomes the Y-axis — count)
    - **Color:** Green (`#2ecc71` or similar)
 
 5. **Add Series 2 — Abandoned Calls:**
    - Click **"+"** to add another series
    - **Series Type:** Area
    - **Name:** `Abandoned`
-   - **Argument Data Member:** `call_date`
+   - **Argument Data Member:** `call_date` (same X-axis as above — both series share dates)
    - **Value Data Member:** `abandoned_calls`
    - **Color:** Red (`#e74c3c` or similar)
 
 6. Click **OK** to close the Chart Designer
 
-> **Tip:** The chart preview in the designer should immediately show 2 overlapping area series with real data.
+> **Tip:** The chart preview in the designer should immediately show 2 overlapping area series with real data. If the chart appears blank after clicking OK, check that both the Data Source AND Data Member are set correctly. A common mistake is setting the Data Source but forgetting the Data Member.
+
+> **How the chart reads data:** The SP returns rows like:
+> ```
+> call_date    | answered_calls | abandoned_calls
+> 2026-02-01   | 15             | 3
+> 2026-02-02   | 22             | 5
+> 2026-02-03   | 18             | 2
+> ```
+> The chart plots each row as a point: X = call_date, Y = answered_calls (green) and Y = abandoned_calls (red). The Area type fills between the line and the X-axis.
 
 ---
 
@@ -270,9 +355,22 @@ Field List shows `sqlDataSource3` with fields:
 
 ### Step 11a: Set Data Source on the AgentDetail Band
 
+> **Understanding the Band Hierarchy:**
+> ```
+> Report (main data source = sqlDataSource1 for KPIs)
+> ├── ReportHeader (uses report's data source → KPI fields available)
+> ├── Detail Band (hidden)
+> └── AgentDetail (DetailReportBand) ← THIS NEEDS ITS OWN DATA SOURCE
+>     ├── GroupHeaderBand (table headers — repeats every page)
+>     └── AgentDetailBand (Detail) ← renders one row per agent
+> ```
+> The `AgentDetail` band is a **DetailReportBand** — a special sub-report container that has its OWN data source. This is how one report can show data from multiple stored procedures: the outer report uses SP1 (KPIs), and the inner DetailReportBand uses SP3 (agents).
+
 > ⚠️ **COMMON MISTAKE:** There are TWO bands with similar names:
 > - **AgentDetail (DetailReportBand)** — the parent container. **This is the one you need.**
 > - **AgentDetailBand (Detail)** — the inner band for placing cells. This one does NOT have Data Source properties.
+>
+> In the Properties dropdown at the top-right, make sure you select the one labeled "(Detail Report)", not "(Detail)".
 
 1. In the **Properties panel** dropdown (top-right), select **"AgentDetail (Detail Report)"** — NOT "AgentDetailBand (Detail)"
 2. Set the properties:
@@ -386,13 +484,26 @@ Preview mode shows a **PREVIEW PARAMETERS** panel on the right with input fields
 
 ---
 
-## Step 13: Re-bind Data Source Parameters to Report Parameters ✅
+## Step 13: Re-bind Data Source Parameters to Report Parameters
 
-Since the data source parameter values cannot be edited after creation through the UI, we need to **remove and re-create** each data source with parameter values pointing to the Report Parameters.
+This is the **most critical step** in the entire process. It connects the user-input fields (Report Parameters) to the stored procedure parameters (Data Source Parameters), creating a dynamic report that responds to user selections.
 
-> ⚠️ **WHY THIS STEP IS NEEDED:** When we first created the data sources, we used hardcoded values like `#2026-02-01#`. Now that we have Report Parameters (pPeriodFrom, pPeriodTo, etc.), we need the data sources to use those parameters so the user can control the report from the PREVIEW PARAMETERS panel.
+Since the data source parameter values **cannot be edited after creation** through the Designer UI, we need to **remove and re-create** each data source with parameter values pointing to the Report Parameters.
+
+> **The binding chain you're creating:**
+> ```
+> User types "2026-02-01" in Preview panel
+>   → Report Parameter pPeriodFrom = 2026-02-01
+>     → Data Source Parameter @period_from = ?pPeriodFrom
+>       → SQL Server receives: @period_from = '2026-02-01'
+>         → WHERE qcv.time_start BETWEEN '2026-02-01' AND ...
+> ```
 >
-> ✅ **STATUS:** All 3 data sources re-created and re-bound successfully. Preview shows live data from the PREVIEW PARAMETERS panel.
+> The `?paramName` syntax tells DevExpress: "Look up the Report Parameter named `paramName` and use its current value."
+
+> ⚠️ **WHY THIS STEP IS NEEDED:** When we first created the data sources (Steps 2, 8, 10), we used hardcoded values like `#2026-02-01#`. Now that we have Report Parameters (pPeriodFrom, pPeriodTo, etc.), we need the data sources to use those parameters so the user can control the report from the PREVIEW PARAMETERS panel.
+>
+> ⚠️ **WHY WE CAN'T JUST EDIT:** DevExpress Data Source Wizard is a one-time configuration. Once you click Finish, the parameter values are locked in the .repx XML. The only way to change them is to delete the data source and create a new one.
 
 ### Step 13a: Remove Existing Data Sources
 
@@ -611,16 +722,73 @@ PageFooter: Date/time + Page X of Y
 
 ---
 
-## Guide Complete ✅
+## Guide Complete
 
-This report is fully functional with dynamic parameter binding. Users can:
-1. Open the report in **Report Designer** (`/reportdesigner`) to modify layout or data sources
-2. Open the report in **Report Viewer** (`/reportviewer`) to view and export
-3. Use the **PREVIEW PARAMETERS** panel to filter by date range, queue, and SLA threshold
-4. Export to PDF, Excel, or other formats from the viewer toolbar
+This report is fully functional with dynamic parameter binding. Here's what you can do with it:
+
+### Using the Report
+
+1. **Design/Edit:** Open `/reportdesigner` → select the report → modify layout, data sources, or formatting
+2. **View/Export:** Open `/reportviewer` → select the report from the dropdown → enter parameters → Submit
+3. **Filter:** Use the PREVIEW PARAMETERS panel to filter by date range, queue, and SLA threshold
+4. **Export:** From the viewer toolbar, click the export icon to save as:
+   - **PDF** — for printing or email distribution
+   - **Excel (XLSX)** — for further data analysis
+   - **CSV** — for importing into other systems
+   - **HTML** — for web embedding
+   - **RTF/DOCX** — for Word document editing
+   - **Image (PNG/TIFF)** — for presentations
+
+### Saving Your Report
+
+When you click **Save** in the Designer:
+- If it's a new report, you'll be prompted for a name. Use descriptive names (e.g., `Queue_Performance_Q1_2026`)
+- The report is saved as a `.repx` file in the `Reports/Templates/` folder on the server
+- The report immediately appears in the Report Viewer dropdown
 
 ### Key Takeaways
+
 - **`?paramName`** syntax binds data source SP parameters to Report Parameters
 - **All 4 SP parameters** can use Expression type with `?paramName` (including `@wait_interval`)
 - Data sources **cannot be edited after creation** — remove and re-add if changes are needed
 - Always select **"AgentDetail (Detail Report)"** (not "AgentDetailBand") when setting Data Source on the agent sub-report
+- The chart requires both **Data Source** and **Data Member** to be set — missing either results in a blank chart
+- Use `#date#` syntax for date literals in expressions, `'text'` for string literals
+- Always preview with different parameter values to verify the report works dynamically
+
+### Creating Variations
+
+To create a new report based on this template:
+1. Open the existing report in the Designer
+2. Click **"Save As"** to save with a new name
+3. Modify as needed (change layout, add/remove cards, adjust chart type, etc.)
+4. All data source bindings carry over — you don't need to redo the parameter setup
+
+---
+
+## Troubleshooting
+
+### Common Errors and Solutions
+
+| Symptom | Cause | Solution |
+|---------|-------|----------|
+| "An error occurred while rebuilding a data source schema" | SP parameters have wrong types or empty values | Use exactly the types shown in this guide: Expression for dates/strings, Time for `@wait_interval`. Date values must use `#date#` syntax. |
+| Chart appears blank after binding | Missing DataMember property on the chart | Click the chart → Properties → verify both Data Source AND Data Member are set. Data Member should be the SP name (e.g., `sp_queue_calls_by_date_shushant`). |
+| KPI cards show field names instead of values | Data Source not set on the Report itself | Click the report background → Properties → set Data Source = sqlDataSource1, Data Member = SP name. |
+| Agent table shows no data rows | Data Source set on wrong band | Verify you set Data Source on "AgentDetail (Detail Report)", NOT on "AgentDetailBand (Detail)". |
+| Preview shows all zeros / empty | Using hardcoded dates outside available data range | Check that your date parameters fall within the data range in the database. Try a known range. |
+| "Cannot find connection" error | Connection name in .repx doesn't match any registered connection | Verify `ReportDataSourceProviders.cs` has the connection name registered in `LoadConnection()`. |
+| Parameters panel doesn't appear in Preview | Report Parameters not marked as Visible | Check each parameter's Visible property is set to Yes/True. |
+| `@wait_interval` won't accept `?pWaitInterval` | Used Time type during re-bind instead of Expression | When re-creating data sources in Step 13, set `@wait_interval` type to **Expression** (not Time). The `?` syntax requires Expression type. |
+
+### Tips for Success
+
+1. **Save often** — use Ctrl+S or the Save button after completing each major step
+2. **Preview after each binding** — catch errors early rather than debugging everything at the end
+3. **Use the Report Explorer** — the tree view (left panel) is the most reliable way to find and select controls, especially when the visual canvas is crowded
+4. **Check the Properties dropdown** — the dropdown at the top of the Properties panel shows which control is currently selected. Always verify before changing properties.
+5. **Right-click for context menus** — many actions (Insert Band, Add Column, etc.) are available through right-click menus that aren't visible in the toolbar
+
+---
+
+*End of Manual Report Creation Guide*
